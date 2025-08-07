@@ -9,6 +9,7 @@ class Conta {
   final double saldoAtual;
   final double saldoPrevisto;
   final Color cor;
+  final String? banco; // Chave do banco para identificação
 
   Conta({
     required this.id,
@@ -17,6 +18,7 @@ class Conta {
     required this.saldoAtual,
     required this.saldoPrevisto,
     required this.cor,
+    this.banco,
   });
 
   factory Conta.fromMap(Map<String, dynamic> map, String id) {
@@ -30,6 +32,7 @@ class Conta {
       saldoAtual: (map['saldoAtual'] ?? 0.0).toDouble(),
       saldoPrevisto: (map['saldoPrevisto'] ?? 0.0).toDouble(),
       cor: Color(map['cor'] ?? 0xFF4CAF50),
+      banco: map['banco'],
     );
   }
 
@@ -40,6 +43,7 @@ class Conta {
       'saldoAtual': saldoAtual,
       'saldoPrevisto': saldoPrevisto,
       'cor': cor.value,
+      'banco': banco,
     };
   }
 
@@ -50,6 +54,7 @@ class Conta {
     double? saldoAtual,
     double? saldoPrevisto,
     Color? cor,
+    String? banco,
   }) {
     return Conta(
       id: id ?? this.id,
@@ -58,6 +63,7 @@ class Conta {
       saldoAtual: saldoAtual ?? this.saldoAtual,
       saldoPrevisto: saldoPrevisto ?? this.saldoPrevisto,
       cor: cor ?? this.cor,
+      banco: banco ?? this.banco,
     );
   }
 

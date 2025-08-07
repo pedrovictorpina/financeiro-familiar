@@ -4,6 +4,9 @@ import '../../providers/auth_provider.dart';
 import '../../providers/finance_provider.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../transactions/transactions_screen.dart';
+import '../transactions/add_income_screen.dart';
+import '../transactions/add_expense_screen.dart';
+import '../transactions/add_transfer_screen.dart';
 import '../planning/planning_screen.dart';
 import '../settings/settings_screen.dart';
 import '../auth/login_screen.dart';
@@ -175,7 +178,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.green,
                       onTap: () {
                         Navigator.of(context).pop();
-                        // TODO: Navegar para tela de adicionar receita
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AddIncomeScreen(),
+                          ),
+                        );
                       },
                     ),
                     
@@ -190,7 +197,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.red,
                       onTap: () {
                         Navigator.of(context).pop();
-                        // TODO: Navegar para tela de adicionar despesa
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AddExpenseScreen(),
+                          ),
+                        );
                       },
                     ),
                     
@@ -205,7 +216,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.blue,
                       onTap: () {
                         Navigator.of(context).pop();
-                        // TODO: Navegar para tela de transferência
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AddTransferScreen(),
+                          ),
+                        );
                       },
                     ),
                   ],

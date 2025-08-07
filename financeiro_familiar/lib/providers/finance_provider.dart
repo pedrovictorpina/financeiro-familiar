@@ -8,9 +8,11 @@ import '../models/meta.dart';
 import '../models/planejamento.dart';
 import '../models/config_dashboard.dart';
 import '../services/firestore_service.dart';
+import '../services/auth_service.dart';
 
 class FinanceProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
+  final AuthService _authService = AuthService();
   
   // Estado atual
   Orcamento? _orcamentoAtual;
@@ -67,8 +69,15 @@ class FinanceProvider extends ChangeNotifier {
   // ORÇAMENTOS
   void carregarOrcamentos(String uid) {
     _firestoreService.getOrcamentosDoUsuario(uid).listen(
-      (orcamentos) {
+      (orcamentos) async {
         _orcamentos = orcamentos;
+        
+        // Se não há orçamentos, criar um padrão
+        if (orcamentos.isEmpty) {
+          await _criarOrcamentoPadrao(uid);
+          return; // O listener será chamado novamente após a criação
+        }
+        
         if (_orcamentoAtual == null && orcamentos.isNotEmpty) {
           selecionarOrcamento(orcamentos.first.id!);
         }
@@ -79,6 +88,27 @@ class FinanceProvider extends ChangeNotifier {
         notifyListeners();
       },
     );
+  }
+  
+  Future<void> _criarOrcamentoPadrao(String uid) async {
+    try {
+      final agora = DateTime.now();
+      final mesAtual = '${agora.year}-${agora.month.toString().padLeft(2, '0')}';
+      
+      final orcamentoPadrao = Orcamento(
+        id: '',
+        nome: 'Meu Orçamento',
+        criadorUid: uid,
+        usuariosVinculados: [uid],
+        mesAtual: mesAtual,
+        dataCriacao: agora,
+      );
+      
+      await _firestoreService.criarOrcamento(orcamentoPadrao);
+    } catch (e) {
+      _errorMessage = 'Erro ao criar orçamento padrão: $e';
+      notifyListeners();
+    }
   }
 
   Future<bool> criarOrcamento(Orcamento orcamento) async {
@@ -234,6 +264,91 @@ class FinanceProvider extends ChangeNotifier {
     _setLoading(true);
     try {
       await _firestoreService.adicionarConta(_orcamentoAtual!.id!, conta);
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> atualizarConta(Conta conta) async {
+    if (_orcamentoAtual == null) return false;
+    
+    _setLoading(true);
+    try {
+      await _firestoreService.atualizarConta(_orcamentoAtual!.id!, conta);
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> deletarConta(String contaId) async {
+    if (_orcamentoAtual == null) return false;
+    
+    _setLoading(true);
+    try {
+      await _firestoreService.deletarConta(_orcamentoAtual!.id!, contaId);
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // CARTÕES
+  Future<bool> adicionarCartao(Cartao cartao) async {
+    if (_orcamentoAtual == null) {
+      _errorMessage = 'Nenhum orçamento selecionado';
+      print('DEBUG: Tentativa de adicionar cartão sem orçamento selecionado');
+      return false;
+    }
+    
+    print('DEBUG: Adicionando cartão ao orçamento: ${_orcamentoAtual!.id}');
+    print('DEBUG: Usuário autenticado: ${_authService.currentUser?.uid}');
+    
+    _setLoading(true);
+    try {
+      await _firestoreService.adicionarCartao(_orcamentoAtual!.id!, cartao);
+      print('DEBUG: Cartão adicionado com sucesso');
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      print('DEBUG: Erro ao adicionar cartão: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> atualizarCartao(Cartao cartao) async {
+    if (_orcamentoAtual == null) return false;
+    
+    _setLoading(true);
+    try {
+      await _firestoreService.atualizarCartao(_orcamentoAtual!.id!, cartao);
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> deletarCartao(String cartaoId) async {
+    if (_orcamentoAtual == null) return false;
+    
+    _setLoading(true);
+    try {
+      await _firestoreService.deletarCartao(_orcamentoAtual!.id!, cartaoId);
       return true;
     } catch (e) {
       _errorMessage = e.toString();

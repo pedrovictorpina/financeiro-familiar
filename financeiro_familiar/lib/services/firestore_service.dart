@@ -156,6 +156,32 @@ class FirestoreService {
     }
   }
 
+  Future<void> atualizarConta(String orcamentoId, Conta conta) async {
+    try {
+      await _firestore
+          .collection('orcamentos')
+          .doc(orcamentoId)
+          .collection('contas')
+          .doc(conta.id)
+          .update(conta.toMap());
+    } catch (e) {
+      throw Exception('Erro ao atualizar conta: $e');
+    }
+  }
+
+  Future<void> deletarConta(String orcamentoId, String contaId) async {
+    try {
+      await _firestore
+          .collection('orcamentos')
+          .doc(orcamentoId)
+          .collection('contas')
+          .doc(contaId)
+          .delete();
+    } catch (e) {
+      throw Exception('Erro ao deletar conta: $e');
+    }
+  }
+
   // CARTÕES
   Future<String> adicionarCartao(String orcamentoId, Cartao cartao) async {
     try {
@@ -179,6 +205,32 @@ class FirestoreService {
         .map((snapshot) => snapshot.docs
             .map((doc) => Cartao.fromMap(doc.data(), doc.id))
             .toList());
+  }
+
+  Future<void> atualizarCartao(String orcamentoId, Cartao cartao) async {
+    try {
+      await _firestore
+          .collection('orcamentos')
+          .doc(orcamentoId)
+          .collection('cartoes')
+          .doc(cartao.id)
+          .update(cartao.toMap());
+    } catch (e) {
+      throw Exception('Erro ao atualizar cartão: $e');
+    }
+  }
+
+  Future<void> deletarCartao(String orcamentoId, String cartaoId) async {
+    try {
+      await _firestore
+          .collection('orcamentos')
+          .doc(orcamentoId)
+          .collection('cartoes')
+          .doc(cartaoId)
+          .delete();
+    } catch (e) {
+      throw Exception('Erro ao deletar cartão: $e');
+    }
   }
 
   // METAS

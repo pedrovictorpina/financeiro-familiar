@@ -41,46 +41,47 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'your-web-api-key',
-    appId: 'your-web-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    authDomain: 'your-project-id.firebaseapp.com',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyDSA16qsztuSb5odrdVMk8XIl3-niDUBdw',
+    appId: '1:320089126273:web:36d9f8e94c4a9c3bb6e480',
+    messagingSenderId: '320089126273',
+    projectId: 'financeiro-familiar-11f38',
+    authDomain: 'financeiro-familiar-11f38.firebaseapp.com',
+    storageBucket: 'financeiro-familiar-11f38.firebasestorage.app',
+    measurementId: 'G-Q8E2WM3LM4',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'your-android-api-key',
-    appId: 'your-android-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyDSA16qsztuSb5odrdVMk8XIl3-niDUBdw',
+    appId: '1:320089126273:android:36d9f8e94c4a9c3bb6e480',
+    messagingSenderId: '320089126273',
+    projectId: 'financeiro-familiar-11f38',
+    storageBucket: 'financeiro-familiar-11f38.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'your-ios-api-key',
-    appId: 'your-ios-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyDSA16qsztuSb5odrdVMk8XIl3-niDUBdw',
+    appId: '1:320089126273:ios:36d9f8e94c4a9c3bb6e480',
+    messagingSenderId: '320089126273',
+    projectId: 'financeiro-familiar-11f38',
+    storageBucket: 'financeiro-familiar-11f38.firebasestorage.app',
     iosBundleId: 'com.example.financeiroFamiliar',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'your-macos-api-key',
-    appId: 'your-macos-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyDSA16qsztuSb5odrdVMk8XIl3-niDUBdw',
+    appId: '1:320089126273:macos:36d9f8e94c4a9c3bb6e480',
+    messagingSenderId: '320089126273',
+    projectId: 'financeiro-familiar-11f38',
+    storageBucket: 'financeiro-familiar-11f38.firebasestorage.app',
     iosBundleId: 'com.example.financeiroFamiliar',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'your-windows-api-key',
-    appId: 'your-windows-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    authDomain: 'your-project-id.firebaseapp.com',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyDSA16qsztuSb5odrdVMk8XIl3-niDUBdw',
+    appId: '1:320089126273:windows:36d9f8e94c4a9c3bb6e480',
+    messagingSenderId: '320089126273',
+    projectId: 'financeiro-familiar-11f38',
+    authDomain: 'financeiro-familiar-11f38.firebaseapp.com',
+    storageBucket: 'financeiro-familiar-11f38.firebasestorage.app',
   );
 }

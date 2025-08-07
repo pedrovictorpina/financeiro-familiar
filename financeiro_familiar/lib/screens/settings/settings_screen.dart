@@ -5,6 +5,8 @@ import '../../providers/finance_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/formatters.dart';
 import '../auth/login_screen.dart';
+import '../cards/cards_screen.dart';
+import '../../test_firebase_connection.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -265,6 +267,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               trailing: const Icon(Icons.chevron_right),
               onTap: () => _sincronizarDados(financeProvider),
             ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.bug_report, color: Colors.orange),
+              title: const Text('Teste Firebase'),
+              subtitle: const Text('Testar conexão com Firebase'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _abrirTesteFirebase(),
+            ),
           ],
         ),
       ),
@@ -412,9 +422,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _gerenciarCartoes() {
-    // TODO: Implementar gerenciamento de cartões
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const CardsScreen(),
+      ),
     );
   }
 
@@ -627,6 +638,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // TODO: Implementar ajuda
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    );
+  }
+
+  void _abrirTesteFirebase() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const FirebaseTestScreen(),
+      ),
     );
   }
 }
