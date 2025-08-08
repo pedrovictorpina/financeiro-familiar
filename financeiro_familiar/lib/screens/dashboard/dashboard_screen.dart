@@ -258,7 +258,7 @@ Text(
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.2),
+                    color: color.withAlpha(51),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -557,7 +557,7 @@ Text(
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: conta.cor.withOpacity(0.2),
+                          color: conta.cor.withAlpha(51),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
@@ -770,7 +770,7 @@ Text(
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                                  color: const Color(0xFF8B5CF6).withAlpha(51),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Icon(

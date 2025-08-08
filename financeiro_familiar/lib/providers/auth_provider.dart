@@ -157,12 +157,14 @@ class AuthProvider extends ChangeNotifier {
     
     try {
       if (_userData != null) {
-        final usuarioAtualizado = _userData!.copyWith(
-          nome: nome,
-          email: email,
-        );
-        
-        await _authService.updateUserData(usuarioAtualizado);
+        final usuarioAtualizado = _userData?.copyWith(
+            nome: nome,
+            email: email,
+          );
+          
+          if (usuarioAtualizado != null) {
+            await _authService.updateUserData(usuarioAtualizado);
+          }
         _userData = usuarioAtualizado;
         notifyListeners();
         return true;
@@ -189,10 +191,10 @@ class AuthProvider extends ChangeNotifier {
           password: senhaAtual,
         );
         
-        await _user!.reauthenticateWithCredential(credential);
+        await _user?.reauthenticateWithCredential(credential);
         
         // Atualizar a senha
-        await _user!.updatePassword(novaSenha);
+        await _user?.updatePassword(novaSenha);
         return true;
       }
       return false;

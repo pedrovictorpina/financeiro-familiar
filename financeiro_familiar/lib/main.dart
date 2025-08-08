@@ -9,6 +9,7 @@ import 'providers/finance_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
+import 'services/update_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,8 +67,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  bool _hasCheckedForUpdates = false;
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +92,13 @@ class AuthWrapper extends StatelessWidget {
         
         // Se usuário está logado, mostrar tela principal
         if (authProvider.user != null) {
+          // Verificar atualizações apenas uma vez após o login
+          if (!_hasCheckedForUpdates) {
+            _hasCheckedForUpdates = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              UpdateService.checkForUpdatesOnStartup(context);
+            });
+          }
           return const HomeScreen();
         }
         

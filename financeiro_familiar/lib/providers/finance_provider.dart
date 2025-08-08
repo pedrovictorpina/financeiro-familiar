@@ -208,7 +208,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.adicionarTransacao(_orcamentoAtual!.id!, transacao);
+      await _firestoreService.adicionarTransacao(_orcamentoAtual!.id, transacao);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -223,7 +223,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.atualizarTransacao(_orcamentoAtual!.id!, transacao);
+      await _firestoreService.atualizarTransacao(_orcamentoAtual!.id, transacao);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -238,7 +238,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.deletarTransacao(_orcamentoAtual!.id!, transacaoId);
+      await _firestoreService.deletarTransacao(_orcamentoAtual!.id, transacaoId);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -254,7 +254,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.adicionarCategoria(_orcamentoAtual!.id!, categoria);
+      await _firestoreService.adicionarCategoria(_orcamentoAtual!.id, categoria);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -270,7 +270,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.adicionarConta(_orcamentoAtual!.id!, conta);
+      await _firestoreService.adicionarConta(_orcamentoAtual!.id, conta);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -285,7 +285,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.atualizarConta(_orcamentoAtual!.id!, conta);
+      await _firestoreService.atualizarConta(_orcamentoAtual!.id, conta);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -300,7 +300,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.deletarConta(_orcamentoAtual!.id!, contaId);
+      await _firestoreService.deletarConta(_orcamentoAtual!.id, contaId);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -323,7 +323,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.adicionarCartao(_orcamentoAtual!.id!, cartao);
+      await _firestoreService.adicionarCartao(_orcamentoAtual!.id, cartao);
       print('DEBUG: Cartão adicionado com sucesso');
       return true;
     } catch (e) {
@@ -340,7 +340,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.atualizarCartao(_orcamentoAtual!.id!, cartao);
+      await _firestoreService.atualizarCartao(_orcamentoAtual!.id, cartao);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -355,7 +355,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.deletarCartao(_orcamentoAtual!.id!, cartaoId);
+      await _firestoreService.deletarCartao(_orcamentoAtual!.id, cartaoId);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -371,7 +371,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.adicionarMeta(_orcamentoAtual!.id!, meta);
+      await _firestoreService.adicionarMeta(_orcamentoAtual!.id, meta);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -386,7 +386,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.atualizarMeta(_orcamentoAtual!.id!, meta);
+      await _firestoreService.atualizarMeta(_orcamentoAtual!.id, meta);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -401,7 +401,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.atualizarProgressoMeta(_orcamentoAtual!.id!, metaId, valorAdicionado);
+      await _firestoreService.atualizarProgressoMeta(_orcamentoAtual!.id, metaId, valorAdicionado);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -416,7 +416,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.excluirMeta(_orcamentoAtual!.id!, metaId);
+      await _firestoreService.excluirMeta(_orcamentoAtual!.id, metaId);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -431,7 +431,7 @@ class FinanceProvider extends ChangeNotifier {
     if (_orcamentoAtual == null) return;
     
     final mesFormatado = '${mes.year}-${mes.month.toString().padLeft(2, '0')}';
-    _firestoreService.getPlanejamentos(_orcamentoAtual!.id!, mesFormatado).listen(
+    _firestoreService.getPlanejamentos(_orcamentoAtual!.id, mesFormatado).listen(
       (planejamentos) {
         _planejamentos = planejamentos;
         notifyListeners();
@@ -454,7 +454,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      final id = await _firestoreService.adicionarPlanejamento(_orcamentoAtual!.id!, planejamento);
+      final id = await _firestoreService.adicionarPlanejamento(_orcamentoAtual!.id, planejamento);
       print('DEBUG: Planejamento adicionado com ID: $id');
       return true;
     } catch (e) {
@@ -471,7 +471,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.atualizarPlanejamento(_orcamentoAtual!.id!, planejamento);
+      await _firestoreService.atualizarPlanejamento(_orcamentoAtual!.id, planejamento);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -486,7 +486,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.excluirPlanejamento(_orcamentoAtual!.id!, planejamentoId);
+      await _firestoreService.excluirPlanejamento(_orcamentoAtual!.id, planejamentoId);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -502,7 +502,7 @@ class FinanceProvider extends ChangeNotifier {
     
     _setLoading(true);
     try {
-      await _firestoreService.salvarConfigDashboard(_orcamentoAtual!.id!, configs);
+      await _firestoreService.salvarConfigDashboard(_orcamentoAtual!.id, configs);
       return true;
     } catch (e) {
       _errorMessage = e.toString();

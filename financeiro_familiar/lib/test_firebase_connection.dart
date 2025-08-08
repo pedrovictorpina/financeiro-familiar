@@ -3,13 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
-import 'services/auth_service.dart';
-import 'services/firestore_service.dart';
 import 'models/usuario.dart';
-import 'check_database.dart';
 
 class FirebaseConnectionTest {
-  static final FirestoreService _firestoreService = FirestoreService();
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final List<String> _logs = [];
 
@@ -180,7 +176,7 @@ class FirebaseConnectionTest {
     // Teste 5: Operações CRUD
     await testCRUDOperations();
     
-    _log('\n' + '=' * 50);
+    _log('\n${'=' * 50}');
     _log('🏁 Testes concluídos!');
     
     return List.from(_logs);
@@ -289,7 +285,7 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
         logs.add('❌ Erro ao criar documento de teste: $e');
       }
 
-      logs.add('\n' + '=' * 50);
+      logs.add('\n${'=' * 50}');
       logs.add('✅ Verificação concluída!');
       
       setState(() {

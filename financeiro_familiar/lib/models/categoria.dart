@@ -41,7 +41,7 @@ class Categoria {
     return {
       'nome': nome,
       'tipo': tipo.toString().split('.').last,
-      'cor': cor.value,
+      'cor': cor.toARGB32(),
       'icone': icone.codePoint,
     };
   }

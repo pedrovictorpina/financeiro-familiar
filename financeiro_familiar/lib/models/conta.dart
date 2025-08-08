@@ -44,7 +44,7 @@ class Conta {
       'tipo': tipo.toString().split('.').last,
       'saldoAtual': saldoAtual,
       'saldoPrevisto': saldoPrevisto,
-      'cor': cor.value,
+      'cor': cor.toARGB32(),
       'banco': banco,
     };
   }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/finance_provider.dart';
 import '../../utils/formatters.dart';
-import '../../utils/constants.dart';
 import '../../models/transacao.dart';
 import '../../models/categoria.dart';
 import '../../models/conta.dart';
@@ -206,7 +205,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: cor.withOpacity(0.2),
+          backgroundColor: cor.withAlpha(51),
           child: Icon(icone, color: cor),
         ),
         title: Text(

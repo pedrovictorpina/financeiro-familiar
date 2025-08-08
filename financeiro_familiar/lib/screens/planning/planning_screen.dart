@@ -335,7 +335,7 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: categoria.cor.withOpacity(0.2),
+                  backgroundColor: categoria.cor.withAlpha(51),
                   child: Icon(
                     categoria.icone,
                     color: categoria.cor,
@@ -496,7 +496,7 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Color(int.parse(meta.cor!.replaceFirst('#', '0xFF'))).withOpacity(0.2),
+                  backgroundColor: Color(int.parse(meta.cor!.replaceFirst('#', '0xFF'))).withAlpha(51),
                   child: Icon(
                     meta.icone != null
                         ? IconData(int.parse(meta.icone!), fontFamily: 'MaterialIcons')

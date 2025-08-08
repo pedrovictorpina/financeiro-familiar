@@ -108,7 +108,7 @@ class CardsScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: cartao.cor.withOpacity(0.2),
+                    color: cartao.cor.withAlpha(51),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(

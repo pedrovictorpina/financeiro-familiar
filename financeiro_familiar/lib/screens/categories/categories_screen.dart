@@ -44,7 +44,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEF4444).withOpacity(0.2),
+                            color: const Color(0xFFEF4444).withAlpha(51),
                             borderRadius: BorderRadius.circular(60),
                           ),
                           child: const Icon(
@@ -236,7 +236,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                    color: categoria.cor.withOpacity(0.2),
+                    color: categoria.cor.withAlpha(51),
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Icon(
@@ -273,8 +273,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: tipo == TipoCategoria.receita
-                      ? Colors.green.withOpacity(0.2)
-                      : Colors.red.withOpacity(0.2),
+                      ? Colors.green.withAlpha(51)
+                        : Colors.red.withAlpha(51),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
