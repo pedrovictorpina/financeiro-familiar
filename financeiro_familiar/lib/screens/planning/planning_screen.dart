@@ -5,6 +5,9 @@ import '../../utils/formatters.dart';
 import '../../utils/constants.dart';
 import '../../models/planejamento.dart';
 import '../../models/categoria.dart';
+import 'add_budget_screen.dart';
+import 'add_goal_screen.dart';
+import 'add_goal_value_screen.dart';
 
 class PlanningScreen extends StatefulWidget {
   const PlanningScreen({super.key});
@@ -21,6 +24,23 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    
+    // Carregar planejamentos do mês selecionado após o orçamento ser carregado
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+      
+      // Aguardar o orçamento ser carregado antes de carregar planejamentos
+      if (financeProvider.orcamentoAtual != null) {
+        financeProvider.carregarPlanejamentosMes(_mesSelecionado);
+      } else {
+        // Aguardar um pouco e tentar novamente
+        Future.delayed(Duration(milliseconds: 500), () {
+          if (financeProvider.orcamentoAtual != null) {
+            financeProvider.carregarPlanejamentosMes(_mesSelecionado);
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -72,7 +92,15 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
         final planejamentos = financeProvider.planejamentos
-            .where((p) => DateTime.parse(p.mes).year == _mesSelecionado.year && DateTime.parse(p.mes).month == _mesSelecionado.month)
+            .where((p) {
+              final partes = p.mes.split('-');
+              if (partes.length >= 2) {
+                final ano = int.tryParse(partes[0]) ?? 0;
+                final mes = int.tryParse(partes[1]) ?? 0;
+                return ano == _mesSelecionado.year && mes == _mesSelecionado.month;
+              }
+              return false;
+            })
             .toList();
 
         if (planejamentos.isEmpty) {
@@ -468,10 +496,12 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Color(meta.cor).withOpacity(0.2),
+                  backgroundColor: Color(int.parse(meta.cor!.replaceFirst('#', '0xFF'))).withOpacity(0.2),
                   child: Icon(
-                    meta.icone,
-                    color: Color(meta.cor),
+                    meta.icone != null
+                        ? IconData(int.parse(meta.icone!), fontFamily: 'MaterialIcons')
+                        : Icons.flag_outlined,
+                    color: Color(int.parse(meta.cor!.replaceFirst('#', '0xFF'))),
                     size: 20,
                   ),
                 ),
@@ -673,26 +703,51 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
       initialDatePickerMode: DatePickerMode.year,
+      locale: const Locale('pt', 'BR'),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: Color(0xFF8B5CF6),
+              onPrimary: Colors.white,
+              surface: Color(0xFF2A2A2A),
+              onSurface: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     
     if (data != null) {
       setState(() {
         _mesSelecionado = DateTime(data.year, data.month);
       });
+      
+      // Carregar planejamentos do novo mês selecionado
+      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+      financeProvider.carregarPlanejamentosMes(_mesSelecionado);
     }
   }
 
   void _adicionarPlanejamento() {
-    // TODO: Implementar modal para adicionar planejamento
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddBudgetScreen(mesSelecionado: _mesSelecionado),
+      ),
     );
   }
 
   void _editarPlanejamento(Planejamento planejamento) {
-    // TODO: Implementar modal para editar planejamento
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddBudgetScreen(
+          mesSelecionado: _mesSelecionado,
+          planejamento: planejamento,
+        ),
+      ),
     );
   }
 
@@ -724,23 +779,29 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
   }
 
   void _adicionarMeta() {
-    // TODO: Implementar modal para adicionar meta
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddGoalScreen(),
+      ),
     );
   }
 
   void _editarMeta(meta) {
-    // TODO: Implementar modal para editar meta
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddGoalScreen(meta: meta),
+      ),
     );
   }
 
   void _adicionarValorMeta(meta) {
-    // TODO: Implementar modal para adicionar valor à meta
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddGoalValueScreen(meta: meta),
+      ),
     );
   }
 

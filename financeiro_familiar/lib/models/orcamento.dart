@@ -5,6 +5,7 @@ class Orcamento {
   final List<String> usuariosVinculados;
   final String mesAtual;
   final DateTime dataCriacao;
+  double valorLimite;
 
   Orcamento({
     required this.id,
@@ -13,6 +14,7 @@ class Orcamento {
     required this.usuariosVinculados,
     required this.mesAtual,
     required this.dataCriacao,
+    this.valorLimite = 0.0,
   });
 
   factory Orcamento.fromMap(Map<String, dynamic> map, String id) {
@@ -23,6 +25,7 @@ class Orcamento {
       usuariosVinculados: List<String>.from(map['usuariosVinculados'] ?? []),
       mesAtual: map['mesAtual'] ?? '',
       dataCriacao: DateTime.fromMillisecondsSinceEpoch(map['dataCriacao'] ?? 0),
+      valorLimite: (map['valorLimite'] ?? 0.0).toDouble(),
     );
   }
 
@@ -33,6 +36,7 @@ class Orcamento {
       'usuariosVinculados': usuariosVinculados,
       'mesAtual': mesAtual,
       'dataCriacao': dataCriacao.millisecondsSinceEpoch,
+      'valorLimite': valorLimite,
     };
   }
 
@@ -43,6 +47,7 @@ class Orcamento {
     List<String>? usuariosVinculados,
     String? mesAtual,
     DateTime? dataCriacao,
+    double? valorLimite,
   }) {
     return Orcamento(
       id: id ?? this.id,
@@ -51,6 +56,7 @@ class Orcamento {
       usuariosVinculados: usuariosVinculados ?? this.usuariosVinculados,
       mesAtual: mesAtual ?? this.mesAtual,
       dataCriacao: dataCriacao ?? this.dataCriacao,
+      valorLimite: valorLimite ?? this.valorLimite,
     );
   }
 

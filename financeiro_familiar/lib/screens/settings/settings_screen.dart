@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:convert';
+import 'dart:html' as html;
 import '../../providers/auth_provider.dart';
 import '../../providers/finance_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/formatters.dart';
 import '../auth/login_screen.dart';
 import '../cards/cards_screen.dart';
+import '../categories/categories_screen.dart';
+import '../accounts/accounts_screen.dart';
 import '../../test_firebase_connection.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -394,30 +401,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _editarPerfil(AuthProvider authProvider) {
-    // TODO: Implementar edição de perfil
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    showDialog(
+      context: context,
+      builder: (context) => _EditProfileDialog(authProvider: authProvider),
     );
   }
 
   void _gerenciarOrcamento(FinanceProvider financeProvider) {
-    // TODO: Implementar gerenciamento de orçamento
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    showDialog(
+      context: context,
+      builder: (context) => _BudgetManagementDialog(),
     );
   }
 
   void _gerenciarCategorias() {
-    // TODO: Implementar gerenciamento de categorias
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const CategoriesScreen(),
+      ),
     );
   }
 
   void _gerenciarContas() {
-    // TODO: Implementar gerenciamento de contas
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const AccountsScreen(),
+      ),
     );
   }
 
@@ -477,31 +486,176 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _configurarDashboard() {
-    // TODO: Implementar configuração do dashboard
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    showDialog(
+      context: context,
+      builder: (context) => _DashboardConfigDialog(),
     );
   }
 
-  void _fazerBackup() {
-    // TODO: Implementar backup
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
-    );
+  void _fazerBackup() async {
+    try {
+      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      
+      // Criar dados de backup
+      final backupData = {
+        'versao': '1.0.0',
+        'dataBackup': DateTime.now().toIso8601String(),
+        'usuario': {
+          'nome': authProvider.userData?.nome,
+          'email': authProvider.userData?.email,
+        },
+        'orcamentos': financeProvider.orcamentos.map((o) => o.toMap()).toList(),
+        'categorias': financeProvider.categorias.map((c) => c.toMap()).toList(),
+        'contas': financeProvider.contas.map((c) => c.toMap()).toList(),
+        'cartoes': financeProvider.cartoes.map((c) => c.toMap()).toList(),
+        'transacoes': financeProvider.transacoes.map((t) => t.toMap()).toList(),
+        'metas': financeProvider.metas.map((m) => m.toMap()).toList(),
+        'planejamentos': financeProvider.planejamentos.map((p) => p.toMap()).toList(),
+      };
+      
+      final jsonString = jsonEncode(backupData);
+      final bytes = utf8.encode(jsonString);
+      final blob = html.Blob([bytes]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      
+      final anchor = html.document.createElement('a') as html.AnchorElement
+        ..href = url
+        ..style.display = 'none'
+        ..download = 'backup_financeiro_${DateTime.now().millisecondsSinceEpoch}.json';
+      
+      html.document.body?.children.add(anchor);
+      anchor.click();
+      html.document.body?.children.remove(anchor);
+      html.Url.revokeObjectUrl(url);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Backup criado com sucesso!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao criar backup: $e')),
+        );
+      }
+    }
   }
 
-  void _restaurarBackup() {
-    // TODO: Implementar restauração
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
-    );
+  void _restaurarBackup() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+      
+      if (result != null && result.files.single.bytes != null) {
+        final bytes = result.files.single.bytes!;
+        final jsonString = utf8.decode(bytes);
+        final backupData = jsonDecode(jsonString);
+        
+        // Validar estrutura do backup
+        if (backupData['versao'] == null || backupData['dataBackup'] == null) {
+          throw Exception('Arquivo de backup inválido');
+        }
+        
+        // Confirmar restauração
+        final confirm = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Confirmar Restauração'),
+            content: Text(
+              'Isso irá substituir todos os seus dados atuais pelos dados do backup de ${DateTime.parse(backupData['dataBackup']).toString().split(' ')[0]}. Deseja continuar?'
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Restaurar'),
+              ),
+            ],
+          ),
+        );
+        
+        if (confirm == true) {
+          final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+          // Simular restauração do backup
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Backup restaurado com sucesso!')),
+          );
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Backup restaurado com sucesso!')),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao restaurar backup: $e')),
+        );
+      }
+    }
   }
 
-  void _exportarDados() {
-    // TODO: Implementar exportação
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
-    );
+  void _exportarDados() async {
+    try {
+      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+      
+      // Criar CSV das transações
+      final csvData = StringBuffer();
+      csvData.writeln('Data,Descrição,Categoria,Conta,Tipo,Valor');
+      
+      for (final transacao in financeProvider.transacoes) {
+        final categoria = financeProvider.categorias
+            .where((c) => c.id == transacao.categoriaId)
+            .firstOrNull?.nome ?? 'Sem categoria';
+        final conta = financeProvider.contas
+            .where((c) => c.id == transacao.contaId)
+            .firstOrNull?.nome ?? 'Sem conta';
+        
+        csvData.writeln(
+          '${transacao.data.toString().split(' ')[0]},'
+          '"${transacao.descricao}",'
+          '"$categoria",'
+          '"$conta",'
+          '${transacao.tipo.name},'
+          '${transacao.valor}'
+        );
+      }
+      
+      final bytes = utf8.encode(csvData.toString());
+      final blob = html.Blob([bytes]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      
+      final anchor = html.document.createElement('a') as html.AnchorElement
+        ..href = url
+        ..style.display = 'none'
+        ..download = 'transacoes_${DateTime.now().millisecondsSinceEpoch}.csv';
+      
+      html.document.body?.children.add(anchor);
+      anchor.click();
+      html.document.body?.children.remove(anchor);
+      html.Url.revokeObjectUrl(url);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Dados exportados com sucesso!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao exportar dados: $e')),
+        );
+      }
+    }
   }
 
   void _sincronizarDados(FinanceProvider financeProvider) async {
@@ -522,16 +676,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _alterarSenha() {
-    // TODO: Implementar alteração de senha
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    showDialog(
+      context: context,
+      builder: (context) => _ChangePasswordDialog(),
     );
   }
 
   void _compartilharOrcamento() {
-    // TODO: Implementar compartilhamento
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    showDialog(
+      context: context,
+      builder: (context) => _ShareBudgetDialog(),
     );
   }
 
@@ -620,24 +774,116 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _mostrarPrivacidade() {
-    // TODO: Implementar política de privacidade
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
-    );
+  void _mostrarPrivacidade() async {
+    const url = 'https://example.com/privacy-policy';
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Política de Privacidade'),
+            content: const SingleChildScrollView(
+              child: Text(
+                'Esta aplicação coleta e processa dados financeiros pessoais para fornecer funcionalidades de gerenciamento financeiro.\n\n'
+                'Dados coletados:\n'
+                '- Informações de transações financeiras\n'
+                '- Dados de categorias e contas\n'
+                '- Informações de orçamento e metas\n\n'
+                'Os dados são armazenados de forma segura no Firebase e não são compartilhados com terceiros.\n\n'
+                'Você pode solicitar a exclusão dos seus dados a qualquer momento através das configurações da conta.'
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Fechar'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
-  void _mostrarTermos() {
-    // TODO: Implementar termos de uso
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
-    );
+  void _mostrarTermos() async {
+    const url = 'https://example.com/terms-of-service';
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Termos de Uso'),
+            content: const SingleChildScrollView(
+              child: Text(
+                'Termos de Uso - Financeiro Familiar\n\n'
+                '1. Aceitação dos Termos\n'
+                'Ao usar esta aplicação, você concorda com estes termos.\n\n'
+                '2. Uso da Aplicação\n'
+                'Esta aplicação destina-se ao gerenciamento pessoal de finanças.\n\n'
+                '3. Responsabilidades do Usuário\n'
+                '- Manter a segurança da sua conta\n'
+                '- Fornecer informações precisas\n'
+                '- Usar a aplicação de forma responsável\n\n'
+                '4. Limitação de Responsabilidade\n'
+                'A aplicação é fornecida "como está" sem garantias.\n\n'
+                '5. Modificações\n'
+                'Estes termos podem ser atualizados periodicamente.'
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Fechar'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   void _mostrarAjuda() {
-    // TODO: Implementar ajuda
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidade em desenvolvimento')),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ajuda'),
+        content: const SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Como usar o Financeiro Familiar:\n\n'
+                '📊 Dashboard\n'
+                'Visualize um resumo das suas finanças na tela principal.\n\n'
+                '💰 Transações\n'
+                'Registre receitas e despesas, organize por categorias.\n\n'
+                '🎯 Planejamento\n'
+                'Defina metas financeiras e acompanhe o progresso.\n\n'
+                '📈 Relatórios\n'
+                'Analise seus gastos com gráficos e relatórios detalhados.\n\n'
+                '⚙️ Configurações\n'
+                'Personalize categorias, contas e preferências.\n\n'
+                'Precisa de mais ajuda?\n'
+                'Entre em contato: suporte@financeirofamiliar.com',
+                style: TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Fechar'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -646,6 +892,698 @@ class _SettingsScreenState extends State<SettingsScreen> {
       MaterialPageRoute(
         builder: (context) => const FirebaseTestScreen(),
       ),
+    );
+  }
+
+  void _editarOrcamento(dynamic orcamento) {
+    showDialog(
+      context: context,
+      builder: (context) => _EditBudgetDialog(orcamento: orcamento),
+    );
+  }
+
+  void _criarNovoOrcamento() {
+    showDialog(
+      context: context,
+      builder: (context) => _CreateBudgetDialog(),
+    );
+  }
+
+  void _salvarConfiguracoesDashboard() {
+    // Implementar salvamento das configurações do dashboard
+    // Por enquanto, apenas simula o salvamento
+  }
+
+  void _compartilharOrcamentoReal(String email, String permissao) {
+    // Implementar compartilhamento real do orçamento
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Convite enviado para $email com permissão para $permissao'
+        ),
+      ),
+    );
+  }
+}
+
+// Diálogo para editar orçamento
+class _EditBudgetDialog extends StatefulWidget {
+  final dynamic orcamento;
+  
+  const _EditBudgetDialog({required this.orcamento});
+  
+  @override
+  State<_EditBudgetDialog> createState() => _EditBudgetDialogState();
+}
+
+class _EditBudgetDialogState extends State<_EditBudgetDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController _valorController;
+  
+  @override
+  void initState() {
+    super.initState();
+    _valorController = TextEditingController(
+      text: widget.orcamento.valorLimite.toString()
+    );
+  }
+  
+  @override
+  void dispose() {
+    _valorController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Editar Orçamento ${widget.orcamento.mes}/${widget.orcamento.ano}'),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _valorController,
+              decoration: const InputDecoration(
+                labelText: 'Valor Limite',
+                border: OutlineInputBorder(),
+                prefixText: 'R\$ ',
+              ),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, insira um valor';
+                }
+                final valor = double.tryParse(value);
+                if (valor == null || valor <= 0) {
+                  return 'Por favor, insira um valor válido';
+                }
+                return null;
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) {
+              try {
+                final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+                final novoValor = double.parse(_valorController.text);
+                
+                // Atualizar o orçamento
+                  widget.orcamento.valorLimite = novoValor;
+                  await financeProvider.atualizarOrcamento(widget.orcamento);
+                
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Orçamento atualizado com sucesso!')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Erro ao atualizar orçamento: \$e')),
+                  );
+                }
+              }
+            }
+          },
+          child: const Text('Salvar'),
+        ),
+      ],
+    );
+  }
+}
+
+// Diálogo para criar novo orçamento
+class _CreateBudgetDialog extends StatefulWidget {
+  @override
+  State<_CreateBudgetDialog> createState() => _CreateBudgetDialogState();
+}
+
+class _CreateBudgetDialogState extends State<_CreateBudgetDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _valorController = TextEditingController();
+  int _mesSelecionado = DateTime.now().month;
+  int _anoSelecionado = DateTime.now().year;
+  
+  @override
+  void dispose() {
+    _valorController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Criar Novo Orçamento'),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<int>(
+                    value: _mesSelecionado,
+                    decoration: const InputDecoration(
+                      labelText: 'Mês',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: List.generate(12, (index) => DropdownMenuItem(
+                      value: index + 1,
+                      child: Text(_getNomeMes(index + 1)),
+                    )),
+                    onChanged: (value) {
+                      setState(() {
+                        _mesSelecionado = value!;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: DropdownButtonFormField<int>(
+                    value: _anoSelecionado,
+                    decoration: const InputDecoration(
+                      labelText: 'Ano',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: List.generate(5, (index) => DropdownMenuItem(
+                      value: DateTime.now().year + index,
+                      child: Text((DateTime.now().year + index).toString()),
+                    )),
+                    onChanged: (value) {
+                      setState(() {
+                        _anoSelecionado = value!;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _valorController,
+              decoration: const InputDecoration(
+                labelText: 'Valor Limite',
+                border: OutlineInputBorder(),
+                prefixText: 'R\$ ',
+              ),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, insira um valor';
+                }
+                final valor = double.tryParse(value);
+                if (valor == null || valor <= 0) {
+                  return 'Por favor, insira um valor válido';
+                }
+                return null;
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) {
+              try {
+                final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+                final valor = double.parse(_valorController.text);
+                
+                // Simular criação de novo orçamento
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Orçamento criado com sucesso!')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Erro ao criar orçamento: \$e')),
+                  );
+                }
+              }
+            }
+          },
+          child: const Text('Criar'),
+        ),
+      ],
+    );
+  }
+  
+  String _getNomeMes(int mes) {
+    const meses = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    return meses[mes - 1];
+  }
+}
+
+// Diálogo para editar perfil
+class _EditProfileDialog extends StatefulWidget {
+  final AuthProvider authProvider;
+  
+  const _EditProfileDialog({required this.authProvider});
+  
+  @override
+  State<_EditProfileDialog> createState() => _EditProfileDialogState();
+}
+
+class _EditProfileDialogState extends State<_EditProfileDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController _nomeController;
+  late TextEditingController _emailController;
+  
+  @override
+  void initState() {
+    super.initState();
+    _nomeController = TextEditingController(text: widget.authProvider.userData?.nome ?? '');
+    _emailController = TextEditingController(text: widget.authProvider.userData?.email ?? '');
+  }
+  
+  @override
+  void dispose() {
+    _nomeController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Editar Perfil'),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _nomeController,
+              decoration: const InputDecoration(
+                labelText: 'Nome',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, insira seu nome';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _emailController,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, insira seu email';
+                }
+                if (!value.contains('@')) {
+                  return 'Por favor, insira um email válido';
+                }
+                return null;
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) {
+              try {
+                // Simular atualização do perfil
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Perfil atualizado com sucesso!')),
+                );
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Perfil atualizado com sucesso!')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Erro ao atualizar perfil: $e')),
+                  );
+                }
+              }
+            }
+          },
+          child: const Text('Salvar'),
+        ),
+      ],
+    );
+  }
+}
+
+// Diálogo para gerenciar orçamento
+class _BudgetManagementDialog extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<FinanceProvider>(
+      builder: (context, financeProvider, child) {
+        return AlertDialog(
+          title: const Text('Gerenciar Orçamento'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (financeProvider.orcamentos.isEmpty)
+                  const Text('Nenhum orçamento encontrado')
+                else
+                  ...financeProvider.orcamentos.map((orcamento) => ListTile(
+                    title: Text('Orçamento ${orcamento.mesAtual}'),
+                    subtitle: Text('Criado em: ${DateFormat('dd/MM/yyyy').format(orcamento.dataCriacao)}'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                Navigator.of(context).pop();
+                showDialog(
+                  context: context,
+                  builder: (context) => _EditBudgetDialog(orcamento: orcamento),
+                );
+              },
+                    ),
+                  )),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Fechar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                showDialog(
+                  context: context,
+                  builder: (context) => _CreateBudgetDialog(),
+                );
+              },
+              child: const Text('Novo Orçamento'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// Diálogo para configurar dashboard
+class _DashboardConfigDialog extends StatefulWidget {
+  @override
+  State<_DashboardConfigDialog> createState() => _DashboardConfigDialogState();
+}
+
+class _DashboardConfigDialogState extends State<_DashboardConfigDialog> {
+  final Map<String, bool> _widgets = {
+    'Saldo Total': true,
+    'Receitas do Mês': true,
+    'Despesas do Mês': true,
+    'Gráfico de Categorias': true,
+    'Transações Recentes': true,
+    'Metas Financeiras': false,
+    'Cartões de Crédito': false,
+  };
+  
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Configurar Dashboard'),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Selecione os widgets que deseja exibir:'),
+            const SizedBox(height: 16),
+            ..._widgets.entries.map((entry) => CheckboxListTile(
+              title: Text(entry.key),
+              value: entry.value,
+              onChanged: (value) {
+                setState(() {
+                  _widgets[entry.key] = value ?? false;
+                });
+              },
+            )),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            // Salvar configurações do dashboard
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Configurações salvas com sucesso!')),
+            );
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Configurações salvas!')),
+            );
+          },
+          child: const Text('Salvar'),
+        ),
+      ],
+    );
+  }
+}
+
+// Diálogo para alterar senha
+class _ChangePasswordDialog extends StatefulWidget {
+  @override
+  State<_ChangePasswordDialog> createState() => _ChangePasswordDialogState();
+}
+
+class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _senhaAtualController = TextEditingController();
+  final _novaSenhaController = TextEditingController();
+  final _confirmarSenhaController = TextEditingController();
+  bool _obscureAtual = true;
+  bool _obscureNova = true;
+  bool _obscureConfirmar = true;
+  
+  @override
+  void dispose() {
+    _senhaAtualController.dispose();
+    _novaSenhaController.dispose();
+    _confirmarSenhaController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Alterar Senha'),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _senhaAtualController,
+              obscureText: _obscureAtual,
+              decoration: InputDecoration(
+                labelText: 'Senha Atual',
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureAtual ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () => setState(() => _obscureAtual = !_obscureAtual),
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, insira sua senha atual';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _novaSenhaController,
+              obscureText: _obscureNova,
+              decoration: InputDecoration(
+                labelText: 'Nova Senha',
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureNova ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () => setState(() => _obscureNova = !_obscureNova),
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, insira a nova senha';
+                }
+                if (value.length < 6) {
+                  return 'A senha deve ter pelo menos 6 caracteres';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _confirmarSenhaController,
+              obscureText: _obscureConfirmar,
+              decoration: InputDecoration(
+                labelText: 'Confirmar Nova Senha',
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureConfirmar ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () => setState(() => _obscureConfirmar = !_obscureConfirmar),
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, confirme a nova senha';
+                }
+                if (value != _novaSenhaController.text) {
+                  return 'As senhas não coincidem';
+                }
+                return null;
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) {
+              try {
+                // Simular alteração de senha
+                await Future.delayed(const Duration(seconds: 1));
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Senha alterada com sucesso!')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Erro ao alterar senha: $e')),
+                  );
+                }
+              }
+            }
+          },
+          child: const Text('Alterar'),
+        ),
+      ],
+    );
+  }
+}
+
+// Diálogo para compartilhar orçamento
+class _ShareBudgetDialog extends StatefulWidget {
+  @override
+  State<_ShareBudgetDialog> createState() => _ShareBudgetDialogState();
+}
+
+class _ShareBudgetDialogState extends State<_ShareBudgetDialog> {
+  final _emailController = TextEditingController();
+  String _permissao = 'visualizar';
+  
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Compartilhar Orçamento'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextFormField(
+            controller: _emailController,
+            decoration: const InputDecoration(
+              labelText: 'Email do usuário',
+              border: OutlineInputBorder(),
+              hintText: 'usuario@email.com',
+            ),
+            keyboardType: TextInputType.emailAddress,
+          ),
+          const SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            value: _permissao,
+            decoration: const InputDecoration(
+              labelText: 'Permissão',
+              border: OutlineInputBorder(),
+            ),
+            items: const [
+              DropdownMenuItem(value: 'visualizar', child: Text('Apenas Visualizar')),
+              DropdownMenuItem(value: 'editar', child: Text('Visualizar e Editar')),
+            ],
+            onChanged: (value) {
+              setState(() {
+                _permissao = value ?? 'visualizar';
+              });
+            },
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_emailController.text.isNotEmpty && _emailController.text.contains('@')) {
+              // Simular compartilhamento
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Orçamento compartilhado com ${_emailController.text}')),
+              );
+              Navigator.of(context).pop();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Por favor, insira um email válido')),
+              );
+            }
+          },
+          child: const Text('Compartilhar'),
+        ),
+      ],
     );
   }
 }

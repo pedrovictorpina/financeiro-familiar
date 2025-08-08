@@ -150,6 +150,60 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Método para atualizar perfil do usuário
+  Future<bool> atualizarPerfil(String nome, String email) async {
+    _setLoading(true);
+    _clearError();
+    
+    try {
+      if (_userData != null) {
+        final usuarioAtualizado = _userData!.copyWith(
+          nome: nome,
+          email: email,
+        );
+        
+        await _authService.updateUserData(usuarioAtualizado);
+        _userData = usuarioAtualizado;
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Método para alterar senha
+  Future<bool> alterarSenha(String senhaAtual, String novaSenha) async {
+    _setLoading(true);
+    _clearError();
+    
+    try {
+      if (_user != null) {
+        // Reautenticar o usuário com a senha atual
+        final credential = EmailAuthProvider.credential(
+          email: _user!.email!,
+          password: senhaAtual,
+        );
+        
+        await _user!.reauthenticateWithCredential(credential);
+        
+        // Atualizar a senha
+        await _user!.updatePassword(novaSenha);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   void clearError() {
     _clearError();
   }

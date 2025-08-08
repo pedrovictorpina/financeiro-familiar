@@ -793,7 +793,7 @@ Text(
                                       ),
                                     ),
                                     Text(
-                                      'Fatura: ${Formatters.formatCurrency(cartao.faturaAtual)}',
+                                      'Fatura: ${Formatters.formatCurrency(cartao.faturaAtualCalculada)}',
                                       style: TextStyle(
                                         color: Colors.grey[400],
                                         fontSize: isWeb ? 14 : 12,
@@ -806,6 +806,14 @@ Text(
                                         fontSize: isWeb ? 12 : 11,
                                       ),
                                     ),
+                                    Text(
+                                      'Disponível: ${Formatters.formatCurrency(cartao.limiteDisponivel)}',
+                                      style: TextStyle(
+                                        color: cartao.limiteDisponivel > 0 ? Colors.green[400] : Colors.red[400],
+                                        fontSize: isWeb ? 12 : 11,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -813,9 +821,9 @@ Text(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    '${((cartao.faturaAtual / cartao.limite) * 100).toStringAsFixed(1)}%',
+                                    '${cartao.percentualUtilizado.toStringAsFixed(1)}%',
                                     style: TextStyle(
-                                      color: cartao.faturaAtual > cartao.limite * 0.8 ? Colors.red : Colors.green,
+                                      color: cartao.percentualUtilizado > 80 ? Colors.red : Colors.green,
                                       fontSize: isWeb ? 14 : 12,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -826,10 +834,10 @@ Text(
                           ),
                           const SizedBox(height: 12),
                           LinearProgressIndicator(
-                            value: (cartao.faturaAtual / cartao.limite).clamp(0.0, 1.0),
+                            value: (cartao.percentualUtilizado / 100).clamp(0.0, 1.0),
                             backgroundColor: Colors.grey[700],
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              cartao.faturaAtual > cartao.limite * 0.8 ? Colors.red : Colors.green,
+                              cartao.percentualUtilizado > 80 ? Colors.red : Colors.green,
                             ),
                             minHeight: 6,
                           ),

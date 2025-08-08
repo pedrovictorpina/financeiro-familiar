@@ -25,8 +25,15 @@ class Categoria {
         (e) => e.toString().split('.').last == map['tipo'],
         orElse: () => TipoCategoria.despesa,
       ),
-      cor: Color(map['cor'] ?? 0xFF2196F3),
-      icone: IconData(map['icone'] ?? Icons.category.codePoint, fontFamily: 'MaterialIcons'),
+      cor: map['cor'] != null && map['cor'] is String
+          ? Color(int.parse(map['cor'].replaceFirst('#', '0xFF')))
+          : Color(map['cor'] ?? 0xFF2196F3),
+      icone: IconData(
+        map['icone'] != null && map['icone'] is String
+            ? int.parse(map['icone'])
+            : map['icone'] ?? Icons.category.codePoint,
+        fontFamily: 'MaterialIcons',
+      ),
     );
   }
 

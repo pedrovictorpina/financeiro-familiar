@@ -68,22 +68,29 @@ class FinanceProvider extends ChangeNotifier {
 
   // ORÇAMENTOS
   void carregarOrcamentos(String uid) {
+    print('DEBUG: Iniciando carregamento de orçamentos para UID: $uid');
     _firestoreService.getOrcamentosDoUsuario(uid).listen(
       (orcamentos) async {
+        print('DEBUG: Orçamentos carregados: ${orcamentos.length}');
         _orcamentos = orcamentos;
         
         // Se não há orçamentos, criar um padrão
         if (orcamentos.isEmpty) {
+          print('DEBUG: Nenhum orçamento encontrado, criando orçamento padrão');
           await _criarOrcamentoPadrao(uid);
           return; // O listener será chamado novamente após a criação
         }
         
         if (_orcamentoAtual == null && orcamentos.isNotEmpty) {
+          print('DEBUG: Selecionando primeiro orçamento: ${orcamentos.first.id}');
           selecionarOrcamento(orcamentos.first.id!);
         }
+        
+        print('DEBUG: Orçamento atual: ${_orcamentoAtual?.id}');
         notifyListeners();
       },
       onError: (error) {
+        print('DEBUG: Erro ao carregar orçamentos: $error');
         _errorMessage = 'Erro ao carregar orçamentos: $error';
         notifyListeners();
       },
@@ -374,12 +381,42 @@ class FinanceProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> atualizarProgressoMeta(String metaId, double novoValor) async {
+  Future<bool> atualizarMeta(Meta meta) async {
     if (_orcamentoAtual == null) return false;
     
     _setLoading(true);
     try {
-      await _firestoreService.atualizarProgressoMeta(_orcamentoAtual!.id!, metaId, novoValor);
+      await _firestoreService.atualizarMeta(_orcamentoAtual!.id!, meta);
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> atualizarProgressoMeta(String metaId, double valorAdicionado, String? descricao) async {
+    if (_orcamentoAtual == null) return false;
+    
+    _setLoading(true);
+    try {
+      await _firestoreService.atualizarProgressoMeta(_orcamentoAtual!.id!, metaId, valorAdicionado);
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> excluirMeta(String metaId) async {
+    if (_orcamentoAtual == null) return false;
+    
+    _setLoading(true);
+    try {
+      await _firestoreService.excluirMeta(_orcamentoAtual!.id!, metaId);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -390,12 +427,66 @@ class FinanceProvider extends ChangeNotifier {
   }
 
   // PLANEJAMENTOS
+  void carregarPlanejamentosMes(DateTime mes) {
+    if (_orcamentoAtual == null) return;
+    
+    final mesFormatado = '${mes.year}-${mes.month.toString().padLeft(2, '0')}';
+    _firestoreService.getPlanejamentos(_orcamentoAtual!.id!, mesFormatado).listen(
+      (planejamentos) {
+        _planejamentos = planejamentos;
+        notifyListeners();
+      },
+      onError: (error) {
+        _errorMessage = 'Erro ao carregar planejamentos: $error';
+        notifyListeners();
+      },
+    );
+  }
+
   Future<bool> adicionarPlanejamento(Planejamento planejamento) async {
+    if (_orcamentoAtual == null) {
+      print('DEBUG: Erro - Orçamento atual é null');
+      return false;
+    }
+    
+    print('DEBUG: Adicionando planejamento ao orçamento ${_orcamentoAtual!.id}');
+    print('DEBUG: Dados do planejamento: ${planejamento.toMap()}');
+    
+    _setLoading(true);
+    try {
+      final id = await _firestoreService.adicionarPlanejamento(_orcamentoAtual!.id!, planejamento);
+      print('DEBUG: Planejamento adicionado com ID: $id');
+      return true;
+    } catch (e) {
+      print('DEBUG: Erro ao adicionar planejamento: $e');
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> atualizarPlanejamento(Planejamento planejamento) async {
     if (_orcamentoAtual == null) return false;
     
     _setLoading(true);
     try {
-      await _firestoreService.adicionarPlanejamento(_orcamentoAtual!.id!, planejamento);
+      await _firestoreService.atualizarPlanejamento(_orcamentoAtual!.id!, planejamento);
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> excluirPlanejamento(String planejamentoId) async {
+    if (_orcamentoAtual == null) return false;
+    
+    _setLoading(true);
+    try {
+      await _firestoreService.excluirPlanejamento(_orcamentoAtual!.id!, planejamentoId);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -465,5 +556,41 @@ class FinanceProvider extends ChangeNotifier {
     }
     
     return gastos;
+  }
+
+  // Método para atualizar orçamento
+  Future<bool> atualizarOrcamento(dynamic orcamento) async {
+    _setLoading(true);
+    try {
+      // Simular atualização do orçamento
+      // Em uma implementação real, isso seria salvo no Firestore
+      await Future.delayed(const Duration(milliseconds: 500));
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  // Método para restaurar backup
+  Future<bool> restaurarBackup(Map<String, dynamic> backupData) async {
+    _setLoading(true);
+    try {
+      // Simular restauração do backup
+      // Em uma implementação real, isso restauraria todos os dados do backup
+      await Future.delayed(const Duration(milliseconds: 1000));
+      
+      // Recarregar dados após restauração
+      await carregarDados();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
   }
 }

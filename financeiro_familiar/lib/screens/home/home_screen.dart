@@ -38,8 +38,15 @@ class _HomeScreenState extends State<HomeScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
     
+    print('DEBUG: Inicializando dados da aplicação');
+    print('DEBUG: Usuário logado: ${authProvider.user?.email}');
+    print('DEBUG: UID do usuário: ${authProvider.user?.uid}');
+    
     if (authProvider.user != null) {
+      print('DEBUG: Carregando orçamentos para o usuário ${authProvider.user!.uid}');
       financeProvider.carregarOrcamentos(authProvider.user!.uid);
+    } else {
+      print('DEBUG: Erro - Usuário não está logado');
     }
   }
 

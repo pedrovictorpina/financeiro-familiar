@@ -81,16 +81,44 @@ class Cartao {
   }
 
   double get faturaAtualCalculada {
-    // Soma todas as faturas mensais para representar o total gasto no cartão
-    return faturasMensais.fold(0.0, (sum, fatura) => sum + (fatura['valor']?.toDouble() ?? 0.0));
+    if (faturasMensais.isEmpty) {
+      return faturaAtual;
+    }
+    
+    // Ordena as faturas por ano e mês (mais recente primeiro)
+    final faturasOrdenadas = List<Map<String, dynamic>>.from(faturasMensais);
+    faturasOrdenadas.sort((a, b) {
+      final anoA = a['ano'] ?? 0;
+      final anoB = b['ano'] ?? 0;
+      final mesA = a['mes'] ?? 0;
+      final mesB = b['mes'] ?? 0;
+      
+      if (anoA != anoB) {
+        return anoB.compareTo(anoA); // Ano mais recente primeiro
+      }
+      return mesB.compareTo(mesA); // Mês mais recente primeiro
+    });
+    
+    // Retorna o valor da fatura mais recente
+    final faturaMaisRecente = faturasOrdenadas.first;
+    return faturaMaisRecente['valor']?.toDouble() ?? 0.0;
   }
   
-  double get limiteDisponivel => limite - faturaAtualCalculada;
+  double get limiteDisponivel => limite - totalFaturasMensais;
   
-  double get percentualUtilizado => limite > 0 ? (faturaAtualCalculada / limite) * 100 : 0;
+  double get percentualUtilizado => limite > 0 ? (totalFaturasMensais / limite) * 100 : 0;
   
   double get totalFaturasMensais {
     return faturasMensais.fold(0.0, (sum, fatura) => sum + (fatura['valor']?.toDouble() ?? 0.0));
+  }
+  
+  // Método para obter a fatura de um mês específico
+  double getFaturaMes(int mes, int ano) {
+    final fatura = faturasMensais.firstWhere(
+      (f) => f['mes'] == mes && f['ano'] == ano,
+      orElse: () => <String, dynamic>{},
+    );
+    return fatura.isNotEmpty ? fatura['valor']?.toDouble() ?? 0.0 : 0.0;
   }
 
   DateTime get proximoFechamento {

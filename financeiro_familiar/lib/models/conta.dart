@@ -31,7 +31,9 @@ class Conta {
       ),
       saldoAtual: (map['saldoAtual'] ?? 0.0).toDouble(),
       saldoPrevisto: (map['saldoPrevisto'] ?? 0.0).toDouble(),
-      cor: Color(map['cor'] ?? 0xFF4CAF50),
+      cor: map['cor'] != null && map['cor'] is String
+          ? Color(int.parse(map['cor'].replaceFirst('#', '0xFF')))
+          : Color(map['cor'] ?? 0xFF4CAF50),
       banco: map['banco'],
     );
   }

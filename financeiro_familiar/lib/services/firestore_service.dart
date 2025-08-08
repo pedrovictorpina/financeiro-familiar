@@ -271,6 +271,32 @@ class FirestoreService {
     }
   }
 
+  Future<void> atualizarMeta(String orcamentoId, Meta meta) async {
+    try {
+      await _firestore
+          .collection('orcamentos')
+          .doc(orcamentoId)
+          .collection('metas')
+          .doc(meta.id)
+          .update(meta.toMap());
+    } catch (e) {
+      throw Exception('Erro ao atualizar meta: $e');
+    }
+  }
+
+  Future<void> excluirMeta(String orcamentoId, String metaId) async {
+    try {
+      await _firestore
+          .collection('orcamentos')
+          .doc(orcamentoId)
+          .collection('metas')
+          .doc(metaId)
+          .delete();
+    } catch (e) {
+      throw Exception('Erro ao excluir meta: $e');
+    }
+  }
+
   // PLANEJAMENTOS
   Future<String> adicionarPlanejamento(String orcamentoId, Planejamento planejamento) async {
     try {
@@ -295,6 +321,32 @@ class FirestoreService {
         .map((snapshot) => snapshot.docs
             .map((doc) => Planejamento.fromMap(doc.data(), doc.id))
             .toList());
+  }
+
+  Future<void> atualizarPlanejamento(String orcamentoId, Planejamento planejamento) async {
+    try {
+      await _firestore
+          .collection('orcamentos')
+          .doc(orcamentoId)
+          .collection('planejamentos')
+          .doc(planejamento.id)
+          .update(planejamento.toMap());
+    } catch (e) {
+      throw Exception('Erro ao atualizar planejamento: $e');
+    }
+  }
+
+  Future<void> excluirPlanejamento(String orcamentoId, String planejamentoId) async {
+    try {
+      await _firestore
+          .collection('orcamentos')
+          .doc(orcamentoId)
+          .collection('planejamentos')
+          .doc(planejamentoId)
+          .delete();
+    } catch (e) {
+      throw Exception('Erro ao excluir planejamento: $e');
+    }
   }
 
   // CONFIGURAÇÃO DASHBOARD
