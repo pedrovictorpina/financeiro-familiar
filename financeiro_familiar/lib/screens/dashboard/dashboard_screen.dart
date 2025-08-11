@@ -689,6 +689,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildCreditCardsSection(BuildContext context, bool isWeb) {
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
+        final gastosPorCategoria = financeProvider.getGastosPorCategoria();
         final theme = Theme.of(context);
         
         return Container(
@@ -912,6 +913,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildExpensesByCategorySection(BuildContext context, bool isWeb) {
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
+        final theme = Theme.of(context);
         final gastosPorCategoria = financeProvider.getGastosPorCategoria();
         
         return Container(
@@ -975,6 +977,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: ListView.builder(
                             itemCount: gastosPorCategoria.length,
                             itemBuilder: (context, index) {
+                              final theme = Theme.of(context);
                               final categoriaNome = gastosPorCategoria.keys.elementAt(index);
                               final valor = gastosPorCategoria[categoriaNome]!;
                               final total = gastosPorCategoria.values.fold(0.0, (sum, v) => sum + v);
