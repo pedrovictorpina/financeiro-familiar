@@ -87,12 +87,18 @@ class UpdateService {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
+        final theme = Theme.of(context);
+        final cs = theme.colorScheme;
         return AlertDialog(
-          title: const Row(
+          backgroundColor: cs.surface,
+          title: Row(
             children: [
-              Icon(Icons.system_update, color: Colors.blue),
-              SizedBox(width: 8),
-              Text('Atualização Disponível'),
+              Icon(Icons.system_update, color: cs.primary),
+              const SizedBox(width: 8),
+              Text(
+                AppConfig.updateAvailableTitle,
+                style: TextStyle(color: cs.onSurface),
+              ),
             ],
           ),
           content: SingleChildScrollView(
@@ -101,25 +107,24 @@ class UpdateService {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Nova versão ${updateInfo['latestVersion']} disponível!\n'
-                  'Versão atual: ${updateInfo['currentVersion']}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  'Nova versão ${updateInfo['latestVersion']} disponível!\nVersão atual: ${updateInfo['currentVersion']}',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cs.onSurface),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'Novidades:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cs.onSurface),
                 ),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: cs.surfaceVariant,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     updateInfo['releaseNotes'] ?? 'Sem descrição disponível.',
-                    style: const TextStyle(fontSize: 12),
+                    style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
                   ),
                 ),
               ],
@@ -128,16 +133,20 @@ class UpdateService {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Mais Tarde'),
+              child: Text('Mais Tarde', style: TextStyle(color: cs.primary)),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _openReleaseInBrowser(updateInfo['releaseUrl']);
               },
-              child: const Text('Ver no GitHub'),
+              child: Text('Ver no GitHub', style: TextStyle(color: cs.primary)),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: cs.primary,
+                foregroundColor: cs.onPrimary,
+              ),
               onPressed: updateInfo['downloadUrl'] != null
                   ? () {
                       Navigator.of(context).pop();
@@ -177,13 +186,17 @@ class UpdateService {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => const AlertDialog(
+          builder: (context) => AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.surface,
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Baixando atualização...'),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(
+                  AppConfig.downloadingMessage,
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                ),
               ],
             ),
           ),
@@ -233,10 +246,11 @@ class UpdateService {
   }
   
   static void _showErrorSnackBar(BuildContext context, String message) {
+    final cs = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
+        content: Text(message, style: TextStyle(color: cs.onError)),
+        backgroundColor: cs.error,
         duration: const Duration(seconds: 5),
       ),
     );

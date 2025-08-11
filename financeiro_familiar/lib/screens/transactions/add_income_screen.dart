@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../providers/finance_provider.dart';
 import '../../models/transacao.dart';
 import '../../models/categoria.dart';
 import '../../models/conta.dart';
 import '../../utils/formatters.dart';
+import '../../utils/theme_extensions.dart';
 
 class AddIncomeScreen extends StatefulWidget {
   const AddIncomeScreen({super.key});
@@ -33,10 +35,12 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: theme.appBarTheme.backgroundColor,
         title: const Text(
           'Nova Receita',
           style: TextStyle(color: Colors.white),
@@ -202,7 +206,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   value: _categoriaId,
-                  dropdownColor: const Color(0xFF2A2A2A),
+                  dropdownColor: theme.cardColor,
                   style: const TextStyle(color: Colors.white),
                   decoration: const InputDecoration(
                     hintText: 'Selecione uma categoria',
@@ -341,7 +345,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2A2A2A),
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -401,9 +405,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: Colors.green,
-              surface: Color(0xFF2A2A2A),
+              surface: Theme.of(context).cardColor,
             ),
           ),
           child: child!,

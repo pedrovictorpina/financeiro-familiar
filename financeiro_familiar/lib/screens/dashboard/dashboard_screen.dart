@@ -6,6 +6,7 @@ import '../../providers/finance_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/formatters.dart';
 import '../../utils/constants.dart';
+import '../../utils/theme_extensions.dart';
 import '../../models/transacao.dart';
 import '../../models/meta.dart';
 import '../../models/conta.dart';
@@ -39,9 +40,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final isWeb = MediaQuery.of(context).size.width > 600;
+    final theme = Theme.of(context);
     
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Consumer<FinanceProvider>(
           builder: (context, financeProvider, child) {
@@ -99,16 +101,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildHeader(BuildContext context, bool isWeb) {
+    final theme = Theme.of(context);
     return Row(
       children: [
         Consumer<AuthProvider>(
           builder: (context, authProvider, child) {
             return CircleAvatar(
               radius: isWeb ? 24 : 20,
-              backgroundColor: Colors.grey[700],
+              backgroundColor: theme.colorScheme.surfaceVariant,
               child: Icon(
                 Icons.person,
-                color: Colors.white,
+                color: theme.colorScheme.onSurfaceVariant,
                 size: isWeb ? 24 : 20,
               ),
             );
@@ -120,18 +123,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onTap: _showMonthPicker,
             child: Row(
               children: [
-Text(
+                Text(
                   selectedMonth,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: theme.colorScheme.onSurface,
                     fontSize: isWeb ? 24 : 20,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(
+                Icon(
                   Icons.keyboard_arrow_down,
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                 ),
               ],
             ),
@@ -140,12 +143,12 @@ Text(
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFF8B5CF6),
+            color: theme.colorScheme.primary,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.card_giftcard,
-            color: Colors.white,
+            color: theme.colorScheme.onPrimary,
             size: 24,
           ),
         ),
@@ -154,12 +157,17 @@ Text(
   }
 
   Widget _buildBalanceCard(BuildContext context, FinanceProvider financeProvider, bool isWeb) {
+    final theme = Theme.of(context);
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(isWeb ? 24 : 20),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +175,7 @@ Text(
           Text(
             'Saldo em contas',
             style: TextStyle(
-              color: Colors.grey[400],
+              color: theme.colorScheme.onSurfaceVariant,
               fontSize: isWeb ? 16 : 14,
             ),
           ),
@@ -179,7 +187,7 @@ Text(
                     ? Formatters.formatCurrency(financeProvider.saldoTotal)
                     : '••••••',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                   fontSize: isWeb ? 32 : 28,
                   fontWeight: FontWeight.bold,
                 ),
@@ -194,12 +202,12 @@ Text(
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.grey[700],
+                    color: theme.colorScheme.surfaceVariant,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     _isBalanceVisible ? Icons.visibility : Icons.visibility_off,
-                    color: Colors.white,
+                    color: theme.colorScheme.onSurfaceVariant,
                     size: 16,
                   ),
                 ),
@@ -242,13 +250,18 @@ Text(
   }
 
   Widget _buildIncomeExpenseCard(BuildContext context, String title, String value, IconData icon, Color color, bool isWeb, VoidCallback onTap) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(isWeb ? 20 : 16),
         decoration: BoxDecoration(
-          color: const Color(0xFF2A2A2A),
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: theme.colorScheme.outline.withOpacity(0.2),
+            width: 1,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,7 +284,7 @@ Text(
                 Text(
                   title,
                   style: TextStyle(
-                    color: Colors.grey[400],
+                    color: theme.colorScheme.onSurfaceVariant,
                     fontSize: isWeb ? 14 : 12,
                   ),
                 ),
@@ -281,7 +294,7 @@ Text(
             Text(
               value,
               style: TextStyle(
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
                 fontSize: isWeb ? 20 : 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -293,6 +306,7 @@ Text(
   }
 
   Widget _buildProgressSection(BuildContext context, bool isWeb) {
+    final theme = Theme.of(context);
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
         final hasTransactions = financeProvider.transacoes.isNotEmpty;
@@ -312,8 +326,12 @@ Text(
         return Container(
           padding: EdgeInsets.all(isWeb ? 20 : 16),
           decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A),
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: theme.colorScheme.outline.withOpacity(0.2),
+              width: 1,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -321,7 +339,7 @@ Text(
               Text(
                 'Primeiros passos',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                   fontSize: isWeb ? 18 : 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -332,7 +350,7 @@ Text(
                   Text(
                     '${((completedSteps / 4) * 100).toInt()}%',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: theme.colorScheme.onSurface,
                       fontSize: isWeb ? 16 : 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -341,8 +359,8 @@ Text(
                   Expanded(
                     child: LinearProgressIndicator(
                       value: completedSteps / 4,
-                      backgroundColor: Colors.grey[700],
-                      valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B5CF6)),
+                      backgroundColor: theme.colorScheme.surfaceVariant,
+                      valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
                       minHeight: 6,
                     ),
                   ),
@@ -370,8 +388,8 @@ Text(
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFEF4444),
-                      foregroundColor: Colors.white,
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
                       padding: EdgeInsets.symmetric(
                         vertical: isWeb ? 16 : 14,
                         horizontal: 20,
@@ -398,6 +416,7 @@ Text(
   }
 
   Widget _buildProgressItem(String title, bool completed, bool isWeb) {
+    final theme = Theme.of(context);
     return Row(
       children: [
         Container(
@@ -405,7 +424,7 @@ Text(
           height: 20,
           decoration: BoxDecoration(
             color: completed ? Colors.green : Colors.transparent,
-            border: completed ? null : Border.all(color: Colors.grey[600]!),
+            border: completed ? null : Border.all(color: theme.colorScheme.outline),
             borderRadius: BorderRadius.circular(10),
           ),
           child: completed
@@ -421,7 +440,7 @@ Text(
           child: Text(
             title,
             style: TextStyle(
-              color: completed ? Colors.grey[400] : Colors.white,
+              color: completed ? theme.colorScheme.onSurfaceVariant : theme.colorScheme.onSurface,
               fontSize: isWeb ? 14 : 13,
               decoration: completed ? TextDecoration.lineThrough : null,
             ),
@@ -474,13 +493,18 @@ Text(
   }
 
   Widget _buildAccountsSection(BuildContext context, bool isWeb) {
+    final theme = Theme.of(context);
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
         return Container(
           padding: EdgeInsets.all(isWeb ? 20 : 16),
           decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A),
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: theme.colorScheme.outline.withOpacity(0.2),
+              width: 1,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -491,7 +515,7 @@ Text(
                   Text(
                     'Contas',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: theme.colorScheme.onSurface,
                       fontSize: isWeb ? 18 : 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -504,9 +528,9 @@ Text(
                         ),
                       );
                     },
-                    child: const Icon(
+                    child: Icon(
                       Icons.more_horiz,
-                      color: Colors.white,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -517,21 +541,21 @@ Text(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF3A3A3A),
+                    color: theme.colorScheme.surfaceVariant,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.account_balance_wallet,
-                        color: Colors.grey,
+                        color: theme.colorScheme.onSurfaceVariant,
                         size: 48,
                       ),
                       const SizedBox(height: 16),
                       Text(
                         'Nenhuma conta cadastrada',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: theme.colorScheme.onSurface,
                           fontSize: isWeb ? 16 : 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -541,7 +565,7 @@ Text(
                       Text(
                         'Adicione sua primeira conta para começar',
                         style: TextStyle(
-                          color: Colors.grey[400],
+                          color: theme.colorScheme.onSurfaceVariant,
                           fontSize: isWeb ? 14 : 12,
                         ),
                         textAlign: TextAlign.center,
@@ -574,7 +598,7 @@ Text(
                             Text(
                               conta.nome,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: theme.colorScheme.onSurface,
                                 fontSize: isWeb ? 16 : 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -582,7 +606,7 @@ Text(
                             Text(
                               Formatters.formatCurrency(conta.saldoAtual),
                               style: TextStyle(
-                                color: Colors.grey[400],
+                                color: theme.colorScheme.onSurfaceVariant,
                                 fontSize: isWeb ? 14 : 12,
                               ),
                             ),
@@ -606,13 +630,13 @@ Text(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8B5CF6),
+                    color: theme.colorScheme.primary,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     'ADICIONAR UMA CONTA',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: theme.colorScheme.onPrimary,
                       fontSize: isWeb ? 14 : 13,
                       fontWeight: FontWeight.w600,
                     ),
@@ -627,7 +651,7 @@ Text(
                   Text(
                     'Total',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: theme.colorScheme.onSurface,
                       fontSize: isWeb ? 16 : 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -635,7 +659,7 @@ Text(
                   Text(
                     Formatters.formatCurrency(financeProvider.saldoTotal),
                     style: TextStyle(
-                      color: Colors.white,
+                      color: theme.colorScheme.onSurface,
                       fontSize: isWeb ? 16 : 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -665,11 +689,14 @@ Text(
   Widget _buildCreditCardsSection(BuildContext context, bool isWeb) {
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
+        final theme = Theme.of(context);
+        
         return Container(
           padding: EdgeInsets.all(isWeb ? 20 : 16),
           decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A),
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: theme.colorScheme.outline),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -677,7 +704,7 @@ Text(
               Text(
                 'Cartões de crédito',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                   fontSize: isWeb ? 18 : 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -687,21 +714,22 @@ Text(
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF3A3A3A),
+                    color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: theme.colorScheme.outline),
                   ),
                   child: Column(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.credit_card,
-                        color: Colors.grey,
+                        color: theme.colorScheme.onSurfaceVariant,
                         size: 48,
                       ),
                       const SizedBox(height: 16),
                       Text(
                         'Ops! Você ainda não tem nenhum cartão\nde crédito cadastrado.',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: theme.colorScheme.onSurface,
                           fontSize: isWeb ? 16 : 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -711,7 +739,7 @@ Text(
                       Text(
                         'Melhore seu controle financeiro agora!',
                         style: TextStyle(
-                          color: Colors.grey[400],
+                          color: theme.colorScheme.onSurfaceVariant,
                           fontSize: isWeb ? 14 : 12,
                         ),
                         textAlign: TextAlign.center,
@@ -729,13 +757,13 @@ Text(
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF8B5CF6),
+                            color: theme.colorScheme.primary,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             'ADICIONAR NOVO CARTÃO',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: theme.colorScheme.onPrimary,
                               fontSize: isWeb ? 14 : 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -760,8 +788,9 @@ Text(
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF3A3A3A),
+                        color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: theme.colorScheme.outline),
                       ),
                       child: Column(
                         children: [
@@ -770,12 +799,12 @@ Text(
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF8B5CF6).withAlpha(51),
+                                  color: theme.colorScheme.primary.withAlpha(51),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.credit_card,
-                                  color: Color(0xFF8B5CF6),
+                                  color: theme.colorScheme.primary,
                                   size: 20,
                                 ),
                               ),
@@ -787,7 +816,7 @@ Text(
                                     Text(
                                       cartao.nome,
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: theme.colorScheme.onSurface,
                                         fontSize: isWeb ? 16 : 14,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -795,14 +824,14 @@ Text(
                                     Text(
                                       'Fatura: ${Formatters.formatCurrency(cartao.faturaAtualCalculada)}',
                                       style: TextStyle(
-                                        color: Colors.grey[400],
+                                        color: theme.colorScheme.onSurfaceVariant,
                                         fontSize: isWeb ? 14 : 12,
                                       ),
                                     ),
                                     Text(
                                       'Limite: ${Formatters.formatCurrency(cartao.limite)}',
                                       style: TextStyle(
-                                        color: Colors.grey[400],
+                                        color: theme.colorScheme.onSurfaceVariant,
                                         fontSize: isWeb ? 12 : 11,
                                       ),
                                     ),
@@ -835,7 +864,7 @@ Text(
                           const SizedBox(height: 12),
                           LinearProgressIndicator(
                             value: (cartao.percentualUtilizado / 100).clamp(0.0, 1.0),
-                            backgroundColor: Colors.grey[700],
+                            backgroundColor: theme.colorScheme.outline,
                             valueColor: AlwaysStoppedAnimation<Color>(
                               cartao.percentualUtilizado > 80 ? Colors.red : Colors.green,
                             ),
@@ -858,13 +887,13 @@ Text(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B5CF6),
+                      color: theme.colorScheme.primary,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       'ADICIONAR NOVO CARTÃO',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: theme.colorScheme.onPrimary,
                         fontSize: isWeb ? 14 : 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -897,7 +926,7 @@ Text(
               Text(
                 'Gastos por categoria',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                   fontSize: isWeb ? 18 : 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -907,23 +936,23 @@ Text(
                 Container(
                   height: 200,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF3A3A3A),
+                    color: theme.colorScheme.surfaceVariant,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.pie_chart_outline,
-                          color: Colors.grey,
+                          color: theme.colorScheme.onSurfaceVariant,
                           size: 48,
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
                           'Nenhum gasto registrado',
                           style: TextStyle(
-                            color: Colors.grey,
+                            color: theme.colorScheme.onSurfaceVariant,
                             fontSize: 16,
                           ),
                         ),
@@ -935,7 +964,7 @@ Text(
                 Container(
                   height: 200,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF3A3A3A),
+                    color: theme.colorScheme.surfaceVariant,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
@@ -968,7 +997,7 @@ Text(
                                       child: Text(
                                         categoriaNome,
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: theme.colorScheme.onSurface,
                                           fontSize: isWeb ? 14 : 12,
                                         ),
                                       ),
@@ -976,7 +1005,7 @@ Text(
                                     Text(
                                       '${percentage.toStringAsFixed(1)}%',
                                       style: TextStyle(
-                                        color: Colors.grey[400],
+                                        color: theme.colorScheme.onSurfaceVariant,
                                         fontSize: isWeb ? 12 : 11,
                                       ),
                                     ),
@@ -984,7 +1013,7 @@ Text(
                                     Text(
                                       Formatters.formatCurrency(valor),
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: theme.colorScheme.onSurface,
                                         fontSize: isWeb ? 14 : 12,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -1043,8 +1072,10 @@ Text(
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
+            final theme = Theme.of(context);
+            
             return Dialog(
-              backgroundColor: const Color(0xFF2A2A2A),
+              backgroundColor: theme.colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -1062,12 +1093,12 @@ Text(
                               _selectedYear--;
                             });
                           },
-                          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                          icon: Icon(Icons.arrow_back_ios, color: theme.colorScheme.onSurface),
                         ),
                         Text(
                           _selectedYear.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -1078,7 +1109,7 @@ Text(
                               _selectedYear++;
                             });
                           },
-                          icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                          icon: Icon(Icons.arrow_forward_ios, color: theme.colorScheme.onSurface),
                         ),
                       ],
                     ),
@@ -1110,9 +1141,9 @@ Text(
                         Expanded(
                           child: TextButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            child: const Text(
+                            child: Text(
                               'CANCELAR',
-                              style: TextStyle(color: Colors.grey),
+                              style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                             ),
                           ),
                         ),
@@ -1126,14 +1157,14 @@ Text(
                               Navigator.of(context).pop();
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF8B5CF6),
+                              backgroundColor: theme.colorScheme.primary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'MÊS ATUAL',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: theme.colorScheme.onPrimary),
                             ),
                           ),
                         ),
@@ -1151,6 +1182,7 @@ Text(
 
   Widget _buildMonthButton(String month, int monthNumber, StateSetter setDialogState) {
     final isSelected = _selectedMonth.month == monthNumber && _selectedMonth.year == _selectedYear;
+    final theme = Theme.of(context);
     
     return GestureDetector(
       onTap: () {
@@ -1164,14 +1196,14 @@ Text(
       },
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF8B5CF6) : const Color(0xFF3A3A3A),
+          color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Center(
           child: Text(
             month,
             style: TextStyle(
-              color: Colors.white,
+              color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),

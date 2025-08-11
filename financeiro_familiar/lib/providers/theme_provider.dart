@@ -56,20 +56,33 @@ class ThemeProvider extends ChangeNotifier {
 
   // Tema claro
   static ThemeData get lightTheme {
+    const lightColorScheme = ColorScheme.light(
+      primary: primaryColor,
+      secondary: secondaryColor,
+      error: errorColor,
+      surface: Colors.white,
+      surfaceVariant: Color(0xFFF5F5F5),
+      onSurface: Color(0xFF1A1A1A),
+      onSurfaceVariant: Color(0xFF666666),
+    );
+    
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryColor,
-        brightness: Brightness.light,
-      ),
+      colorScheme: lightColorScheme,
+      scaffoldBackgroundColor: Colors.white,
       appBarTheme: const AppBarTheme(
         centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 1,
+        backgroundColor: Colors.white,
+        foregroundColor: Color(0xFF1A1A1A),
+        iconTheme: IconThemeData(color: Color(0xFF1A1A1A)),
       ),
       cardTheme: CardThemeData(
         elevation: 2,
+        color: Colors.white,
+        shadowColor: Colors.black.withOpacity(0.1),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -87,31 +100,48 @@ class ThemeProvider extends ChangeNotifier {
           borderRadius: BorderRadius.circular(8),
         ),
         filled: true,
+        fillColor: const Color(0xFFF5F5F5),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         type: BottomNavigationBarType.fixed,
         elevation: 8,
+        backgroundColor: Colors.white,
       ),
+      dividerColor: const Color(0xFFE0E0E0),
+      iconTheme: const IconThemeData(color: Color(0xFF1A1A1A)),
     );
   }
 
   // Tema escuro
   static ThemeData get darkTheme {
+    const darkColorScheme = ColorScheme.dark(
+      primary: primaryColor,
+      secondary: secondaryColor,
+      error: errorColor,
+      surface: Color(0xFF1A1A1A),
+      surfaceVariant: Color(0xFF2A2A2A),
+      onSurface: Colors.white,
+      onSurfaceVariant: Color(0xFFB0B0B0),
+    );
+    
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryColor,
-        brightness: Brightness.dark,
-      ),
+      colorScheme: darkColorScheme,
+      scaffoldBackgroundColor: const Color(0xFF1A1A1A),
       appBarTheme: const AppBarTheme(
         centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 1,
+        backgroundColor: Color(0xFF1A1A1A),
+        foregroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       cardTheme: CardThemeData(
         elevation: 2,
+        color: const Color(0xFF2A2A2A),
+        shadowColor: Colors.black.withOpacity(0.3),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -129,12 +159,16 @@ class ThemeProvider extends ChangeNotifier {
           borderRadius: BorderRadius.circular(8),
         ),
         filled: true,
+        fillColor: const Color(0xFF2A2A2A),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         type: BottomNavigationBarType.fixed,
         elevation: 8,
+        backgroundColor: Color(0xFF1A1A1A),
       ),
+      dividerColor: const Color(0xFF3A3A3A),
+      iconTheme: const IconThemeData(color: Colors.white),
     );
   }
 

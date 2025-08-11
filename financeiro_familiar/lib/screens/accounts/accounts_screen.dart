@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/finance_provider.dart';
 import '../../models/conta.dart';
 import '../../utils/bank_utils.dart';
+import '../../utils/theme_extensions.dart';
 
 class AccountsScreen extends StatefulWidget {
   const AccountsScreen({super.key});
@@ -14,18 +15,20 @@ class AccountsScreen extends StatefulWidget {
 class _AccountsScreenState extends State<AccountsScreen> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
+        title: Text(
           'Contas Bancárias',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
       ),
@@ -45,29 +48,29 @@ class _AccountsScreenState extends State<AccountsScreen> {
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF10B981).withOpacity(0.2),
+                            color: theme.colorScheme.primary.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(60),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.account_balance_outlined,
                             size: 60,
-                            color: Color(0xFF10B981),
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                         const SizedBox(height: 24),
-                        const Text(
+                        Text(
                           'Nenhuma conta cadastrada',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: theme.colorScheme.onSurface,
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           'Adicione sua primeira conta bancária\npara começar a controlar suas finanças',
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: theme.colorScheme.onSurface.withOpacity(0.7),
                             fontSize: 16,
                             height: 1.5,
                           ),
@@ -92,7 +95,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2A2A2A),
+                          color: theme.cardColor,
                           borderRadius: BorderRadius.circular(12),
                           border: Border(
                             left: BorderSide(
@@ -123,8 +126,8 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                 children: [
                                   Text(
                                     conta.nome,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onSurface,
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -140,17 +143,17 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      const Text(
+                                      Text(
                                         ' • ',
                                         style: TextStyle(
-                                          color: Colors.white70,
+                                          color: theme.colorScheme.onSurface.withOpacity(0.7),
                                           fontSize: 12,
                                         ),
                                       ),
                                       Text(
                                         conta.tipoNome,
-                                        style: const TextStyle(
-                                          color: Colors.white70,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.onSurface.withOpacity(0.7),
                                           fontSize: 12,
                                         ),
                                       ),
@@ -165,16 +168,16 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                 Text(
                                   'R\$ ${conta.saldoAtual.toStringAsFixed(2)}',
                                   style: TextStyle(
-                                    color: conta.saldoAtual >= 0 ? const Color(0xFF10B981) : Colors.red,
+                                    color: conta.saldoAtual >= 0 ? theme.colorScheme.primary : Colors.red,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                const Text(
+                                Text(
                                   'Saldo atual',
                                   style: TextStyle(
-                                    color: Colors.white70,
+                                    color: theme.colorScheme.onSurface.withOpacity(0.7),
                                     fontSize: 12,
                                   ),
                                 ),
@@ -182,11 +185,11 @@ class _AccountsScreenState extends State<AccountsScreen> {
                             ),
                             const SizedBox(width: 8),
                             PopupMenuButton<String>(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.more_vert,
-                                color: Colors.white70,
+                                color: theme.colorScheme.onSurface.withOpacity(0.7),
                               ),
-                              color: const Color(0xFF2A2A2A),
+                              color: theme.cardColor,
                               onSelected: (value) {
                                 if (value == 'edit') {
                                   _showEditAccountDialog(conta);
@@ -195,13 +198,13 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                 }
                               },
                               itemBuilder: (context) => [
-                                const PopupMenuItem(
+                                PopupMenuItem(
                                   value: 'edit',
                                   child: Row(
                                     children: [
-                                      Icon(Icons.edit, color: Colors.white70, size: 20),
-                                      SizedBox(width: 8),
-                                      Text('Editar', style: TextStyle(color: Colors.white)),
+                                      Icon(Icons.edit, color: theme.colorScheme.onSurface.withOpacity(0.7), size: 20),
+                                      const SizedBox(width: 8),
+                                      Text('Editar', style: TextStyle(color: theme.colorScheme.onSurface)),
                                     ],
                                   ),
                                 ),
@@ -233,7 +236,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () => _showAddAccountDialog(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF10B981),
+                      backgroundColor: theme.colorScheme.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),

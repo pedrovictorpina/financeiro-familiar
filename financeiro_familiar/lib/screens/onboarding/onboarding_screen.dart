@@ -117,18 +117,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: Icon(Icons.close, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
+        title: Text(
           'Configuração Inicial',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
       ),
@@ -149,8 +151,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         height: 4,
                         decoration: BoxDecoration(
                           color: index <= _currentStep
-                              ? const Color(0xFF8B5CF6)
-                              : Colors.grey[700],
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.onSurface.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -160,8 +162,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 const SizedBox(height: 12),
                 Text(
                   'Passo ${_currentStep + 1} de 5',
-                  style: const TextStyle(
-                    color: Colors.white70,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                     fontSize: 14,
                   ),
                 ),
@@ -198,8 +200,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: OutlinedButton(
                       onPressed: _previousStep,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.white30),
+                        foregroundColor: theme.colorScheme.onSurface,
+                        side: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.3)),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       child: const Text('Voltar'),
@@ -211,8 +213,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: ElevatedButton(
                     onPressed: _currentStep == 4 ? _completeOnboarding : _nextStep,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B5CF6),
-                      foregroundColor: Colors.white,
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: _isCompleting
@@ -247,30 +249,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(60),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.account_balance_wallet,
                   size: 60,
-                  color: Color(0xFF8B5CF6),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 32),
               Text(
                 'Bem-vindo, ${authProvider.userData?.nome ?? 'Usuário'}!',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Vamos configurar seu app financeiro em alguns passos simples. Isso levará apenas alguns minutos!',
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 16,
                   height: 1.5,
                 ),
@@ -280,45 +282,45 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Column(
+                child: Column(
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.check_circle, color: Color(0xFF8B5CF6), size: 20),
-                        SizedBox(width: 12),
+                        Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary, size: 20),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             'Cadastrar conta bancária',
-                            style: TextStyle(color: Colors.white70),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Row(
                       children: [
-                        Icon(Icons.check_circle, color: Color(0xFF8B5CF6), size: 20),
-                        SizedBox(width: 12),
+                        Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary, size: 20),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             'Adicionar cartão de crédito',
-                            style: TextStyle(color: Colors.white70),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Row(
                       children: [
-                        Icon(Icons.check_circle, color: Color(0xFF8B5CF6), size: 20),
-                        SizedBox(width: 12),
+                        Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary, size: 20),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             'Configurar categorias',
-                            style: TextStyle(color: Colors.white70),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
                           ),
                         ),
                       ],

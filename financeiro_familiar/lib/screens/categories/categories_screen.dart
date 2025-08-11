@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/finance_provider.dart';
 import '../../models/categoria.dart';
+import '../../utils/theme_extensions.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -13,10 +14,12 @@ class CategoriesScreen extends StatefulWidget {
 class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -76,7 +79,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         ElevatedButton(
                           onPressed: _createDefaultCategories,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF8B5CF6),
+                            backgroundColor: theme.colorScheme.primary,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 24,
@@ -94,7 +97,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 Container(
                   margin: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2A2A2A),
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: DefaultTabController(
@@ -102,7 +105,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     child: Column(
                       children: [
                         TabBar(
-                          indicatorColor: const Color(0xFF8B5CF6),
+                          indicatorColor: theme.colorScheme.primary,
                           labelColor: Colors.white,
                           unselectedLabelColor: Colors.white70,
                           tabs: [
@@ -159,8 +162,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         child: OutlinedButton.icon(
                           onPressed: _createDefaultCategories,
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFF8B5CF6),
-                            side: const BorderSide(color: Color(0xFF8B5CF6)),
+                            foregroundColor: theme.colorScheme.primary,
+                            side: BorderSide(color: theme.colorScheme.primary),
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
                           icon: const Icon(Icons.auto_fix_high),
@@ -173,7 +176,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       child: ElevatedButton.icon(
                         onPressed: () => _showAddCategoryDialog(),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFEF4444),
+                          backgroundColor: Theme.of(context).colorScheme.error,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
@@ -296,14 +299,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   void _showAddCategoryDialog() {
     final nomeController = TextEditingController();
     TipoCategoria tipoSelecionado = TipoCategoria.despesa;
-    Color corSelecionada = const Color(0xFF8B5CF6);
+    Color corSelecionada = Theme.of(context).colorScheme.primary;
     IconData iconeSelecionado = Icons.category;
     
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: const Color(0xFF2A2A2A),
+          backgroundColor: Theme.of(context).cardColor,
           title: const Text(
             'Nova Categoria',
             style: TextStyle(color: Colors.white),
@@ -332,7 +335,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 DropdownButtonFormField<TipoCategoria>(
                   value: tipoSelecionado,
                   style: const TextStyle(color: Colors.white),
-                  dropdownColor: const Color(0xFF2A2A2A),
+                  dropdownColor: Theme.of(context).cardColor,
                   decoration: const InputDecoration(
                     labelText: 'Tipo',
                     labelStyle: TextStyle(color: Colors.white70),
@@ -412,7 +415,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 iconeSelecionado,
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFEF4444),
+                backgroundColor: Theme.of(context).colorScheme.error,
               ),
               child: const Text('Adicionar'),
             ),
