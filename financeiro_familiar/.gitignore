@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Avoid committing locally built APKs at repo root
+/app-*.apk
