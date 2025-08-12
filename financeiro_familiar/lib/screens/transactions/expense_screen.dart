@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/finance_provider.dart';
-import '../../utils/formatters.dart';
 import '../../models/transacao.dart';
 import '../../models/categoria.dart';
 import '../../models/conta.dart';
+import '../../utils/formatters.dart';
+import '../../utils/theme_extensions.dart';
 
 class ExpenseScreen extends StatefulWidget {
   const ExpenseScreen({super.key});
@@ -21,6 +22,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   String _searchText = '';
   String? _selectedCategoryId;
   String? _selectedAccountId;
+  DateTimeRange? _intervaloDatas;
 
   @override
   void dispose() {
@@ -68,15 +70,17 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        title: Text(
           'Despesas',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: theme.appBarTheme.foregroundColor),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: theme.appBarTheme.foregroundColor),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
@@ -128,7 +132,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        color: context.containerColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -142,16 +146,16 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                   children: [
                     Text(
                       Formatters.formatMonthName(_selectedMonth),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: context.primaryText,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(
+                    Icon(
                       Icons.keyboard_arrow_down,
-                      color: Colors.white,
+                      color: context.primaryText,
                     ),
                   ],
                 ),
@@ -159,13 +163,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.2),
+                  color: TransactionColors.getDespesaBackground(context),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   '$transactionCount despesas',
                   style: const TextStyle(
-                    color: Colors.red,
+                    color: TransactionColors.despesa,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -179,12 +183,12 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.2),
+                  color: TransactionColors.getDespesaBackground(context),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
                   Icons.arrow_downward,
-                  color: Colors.red,
+                  color: TransactionColors.despesa,
                   size: 20,
                 ),
               ),
@@ -195,14 +199,14 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                   Text(
                     'Total de despesas',
                     style: TextStyle(
-                      color: Colors.grey[400],
+                      color: context.secondaryText,
                       fontSize: 14,
                     ),
                   ),
                   Text(
                     Formatters.formatCurrency(totalValue),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: context.primaryText,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -244,7 +248,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        color: context.containerColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -268,8 +272,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               children: [
                 Text(
                   transacao.descricao,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -278,7 +282,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 Text(
                   categoria.nome,
                   style: TextStyle(
-                    color: Colors.grey[400],
+                    color: context.secondaryText,
                     fontSize: 14,
                   ),
                 ),
@@ -286,7 +290,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 Text(
                   '${conta.nome} • ${Formatters.formatDate(transacao.data)}',
                   style: TextStyle(
-                    color: Colors.grey[500],
+                    color: context.mutedText,
                     fontSize: 12,
                   ),
                 ),
@@ -299,7 +303,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               Text(
                 '-${Formatters.formatCurrency(transacao.valor)}',
                 style: const TextStyle(
-                  color: Colors.red,
+                  color: TransactionColors.despesa,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -309,13 +313,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                   margin: const EdgeInsets.only(top: 4),
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.2),
+                    color: context.infoColor.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Recorrente',
                     style: TextStyle(
-                      color: Colors.blue,
+                      color: context.infoColor,
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
                     ),
@@ -336,14 +340,14 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
           Icon(
             Icons.trending_down,
             size: 64,
-            color: Colors.grey[400],
+            color: context.iconColorMuted,
           ),
           const SizedBox(height: 16),
           Text(
             'Nenhuma despesa encontrada',
             style: TextStyle(
               fontSize: 18,
-              color: Colors.grey[400],
+              color: context.secondaryText,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -351,7 +355,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
           Text(
             'Tente ajustar os filtros ou selecionar outro mês',
             style: TextStyle(
-              color: Colors.grey[500],
+              color: context.mutedText,
               fontSize: 14,
             ),
             textAlign: TextAlign.center,
@@ -372,15 +376,15 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 ? () => setState(() => _currentPage--)
                 : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B5CF6),
+              backgroundColor: context.accentColor,
               foregroundColor: Colors.white,
             ),
             child: const Text('Anterior'),
           ),
           Text(
             'Página ${_currentPage + 1} de $totalPages',
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.primaryText,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -389,7 +393,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 ? () => setState(() => _currentPage++)
                 : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B5CF6),
+              backgroundColor: context.accentColor,
               foregroundColor: Colors.white,
             ),
             child: const Text('Próxima'),
@@ -420,18 +424,18 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A2A2A),
-        title: const Text(
+        backgroundColor: Theme.of(context).cardColor,
+        title: Text(
           'Buscar despesas',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: context.primaryText),
         ),
         content: TextField(
           controller: _searchController,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
+          style: TextStyle(color: context.primaryText),
+          decoration: InputDecoration(
             hintText: 'Digite para buscar...',
-            hintStyle: TextStyle(color: Colors.grey),
-            border: OutlineInputBorder(),
+            hintStyle: TextStyle(color: context.secondaryText),
+            border: const OutlineInputBorder(),
           ),
           autofocus: true,
         ),
@@ -468,29 +472,29 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       builder: (context) => Consumer<FinanceProvider>(
         builder: (context, financeProvider, child) {
           return AlertDialog(
-            backgroundColor: const Color(0xFF2A2A2A),
-            title: const Text(
+            backgroundColor: Theme.of(context).cardColor,
+            title: Text(
               'Filtros',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: context.primaryText),
             ),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Categoria',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: context.primaryText),
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String?>(
                     value: _selectedCategoryId,
-                    dropdownColor: const Color(0xFF2A2A2A),
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
+                    dropdownColor: context.dropdownColor,
+                    style: TextStyle(color: context.primaryText),
+                    decoration: InputDecoration(
                       hintText: 'Todas as categorias',
-                      hintStyle: TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(color: context.secondaryText),
+                      border: const OutlineInputBorder(),
                     ),
                     items: [
                       const DropdownMenuItem<String?>(
@@ -509,19 +513,19 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                     onChanged: (value) => setState(() => _selectedCategoryId = value),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Conta',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: context.primaryText),
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String?>(
                     value: _selectedAccountId,
-                    dropdownColor: const Color(0xFF2A2A2A),
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
+                    dropdownColor: context.dropdownColor,
+                    style: TextStyle(color: context.primaryText),
+                    decoration: InputDecoration(
                       hintText: 'Todas as contas',
-                      hintStyle: TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(color: context.secondaryText),
+                      border: const OutlineInputBorder(),
                     ),
                     items: [
                       const DropdownMenuItem<String?>(
@@ -566,5 +570,30 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         },
       ),
     );
+  }
+
+  Future<void> _selecionarPeriodo() async {
+    final agora = DateTime.now();
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(agora.year + 1),
+      builder: (context, child) {
+        final theme = Theme.of(context);
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: TransactionColors.despesa,
+              secondary: TransactionColors.despesa,
+              surface: theme.cardColor,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() => _intervaloDatas = picked);
+    }
   }
 }

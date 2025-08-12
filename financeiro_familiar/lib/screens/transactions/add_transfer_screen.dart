@@ -4,6 +4,7 @@ import '../../providers/finance_provider.dart';
 import '../../models/transacao.dart';
 import '../../models/conta.dart';
 import '../../utils/formatters.dart';
+import '../../utils/theme_extensions.dart';
 
 class AddTransferScreen extends StatefulWidget {
   const AddTransferScreen({super.key});
@@ -31,16 +32,18 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        title: Text(
           'Nova Transferência',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: theme.appBarTheme.foregroundColor),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: Icon(Icons.close, color: theme.appBarTheme.foregroundColor),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
@@ -76,7 +79,7 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: TransactionColors.getTransferenciaBackground(context),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: Colors.blue.withOpacity(0.3),
@@ -100,10 +103,10 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Text(
+                          Text(
                             'Valor da transferência',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: context.primaryText,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -114,8 +117,8 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                       TextFormField(
                         controller: _valorController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: context.primaryText,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
@@ -151,10 +154,10 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                 const SizedBox(height: 24),
 
                 // Conta de Origem
-                const Text(
+                Text(
                   'Conta de origem',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -162,8 +165,8 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   value: _contaOrigemId,
-                  dropdownColor: const Color(0xFF2A2A2A),
-                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: context.dropdownColor,
+                  style: TextStyle(color: context.primaryText),
                   decoration: const InputDecoration(
                     hintText: 'Selecione a conta de origem',
                     hintStyle: TextStyle(color: Colors.grey),
@@ -238,10 +241,10 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                 const SizedBox(height: 24),
 
                 // Conta de Destino
-                const Text(
+                Text(
                   'Conta de destino',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -249,8 +252,8 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   value: _contaDestinoId,
-                  dropdownColor: const Color(0xFF2A2A2A),
-                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: context.dropdownColor,
+                  style: TextStyle(color: context.primaryText),
                   decoration: const InputDecoration(
                     hintText: 'Selecione a conta de destino',
                     hintStyle: TextStyle(color: Colors.grey),
@@ -312,10 +315,10 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                 const SizedBox(height: 24),
 
                 // Descrição
-                const Text(
+                Text(
                   'Descrição (opcional)',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -323,7 +326,7 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _descricaoController,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: context.primaryText),
                   decoration: const InputDecoration(
                     hintText: 'Ex: Transferência para poupança, Pagamento...',
                     hintStyle: TextStyle(color: Colors.grey),
@@ -340,10 +343,10 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                 const SizedBox(height: 24),
 
                 // Data
-                const Text(
+                Text(
                   'Data',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -354,21 +357,21 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
+                      border: Border.all(color: context.borderColor),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.calendar_today,
-                          color: Colors.grey,
+                          color: context.iconColorMuted,
                           size: 20,
                         ),
                         const SizedBox(width: 12),
                         Text(
                           Formatters.formatDate(_dataSelecionada),
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.primaryText,
                             fontSize: 16,
                           ),
                         ),
@@ -410,17 +413,17 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.orange.withOpacity(0.1),
+            color: context.warningColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: Colors.orange.withOpacity(0.3),
+              color: context.warningColor.withOpacity(0.3),
             ),
           ),
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.warning,
-                color: Colors.orange,
+                color: context.warningColor,
                 size: 20,
               ),
               const SizedBox(width: 12),
@@ -428,10 +431,10 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Saldo insuficiente',
                       style: TextStyle(
-                        color: Colors.orange,
+                        color: context.warningColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -464,9 +467,9 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: Colors.blue,
-              surface: Color(0xFF2A2A2A),
+              surface: Theme.of(context).cardColor,
             ),
           ),
           child: child!,
@@ -513,9 +516,9 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
         if (mounted) {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('Transferência realizada com sucesso!'),
-              backgroundColor: Colors.blue,
+              backgroundColor: TransactionColors.transferencia,
             ),
           );
         }
@@ -524,7 +527,7 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(financeProvider.errorMessage ?? 'Erro ao realizar transferência'),
-              backgroundColor: Colors.red,
+              backgroundColor: context.errorColor,
             ),
           );
         }
@@ -532,9 +535,9 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Erro ao processar dados'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.errorColor,
           ),
         );
       }

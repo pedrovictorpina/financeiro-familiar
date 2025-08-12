@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/finance_provider.dart';
-import '../../utils/formatters.dart';
 import '../../models/transacao.dart';
 import '../../models/categoria.dart';
 import '../../models/conta.dart';
+import '../../utils/formatters.dart';
+import '../../utils/theme_extensions.dart';
 
 class IncomeScreen extends StatefulWidget {
   const IncomeScreen({super.key});
@@ -30,53 +31,36 @@ class _IncomeScreenState extends State<IncomeScreen> {
 
   List<Transacao> _getFilteredIncomes(List<Transacao> allTransactions) {
     return allTransactions.where((transacao) {
-      // Filtrar apenas receitas
       if (transacao.tipo != TipoTransacao.receita) return false;
-      
-      // Filtrar por mês selecionado
-      if (transacao.data.year != _selectedMonth.year || 
-          transacao.data.month != _selectedMonth.month) {
-        return false;
-      }
-      
-      // Filtrar por categoria se selecionada
-      if (_selectedCategoryId != null && 
-          transacao.categoriaId != _selectedCategoryId) {
-        return false;
-      }
-      
-      // Filtrar por conta se selecionada
-      if (_selectedAccountId != null && 
-          transacao.contaId != _selectedAccountId) {
-        return false;
-      }
-      
-      // Filtrar por texto de busca
+      if (transacao.data.year != _selectedMonth.year || transacao.data.month != _selectedMonth.month) return false;
+      if (_selectedCategoryId != null && transacao.categoriaId != _selectedCategoryId) return false;
+      if (_selectedAccountId != null && transacao.contaId != _selectedAccountId) return false;
       if (_searchText.isNotEmpty) {
         return transacao.descricao.toLowerCase().contains(_searchText.toLowerCase());
       }
-      
       return true;
     }).toList();
   }
 
-  List<Transacao> _getPaginatedIncomes(List<Transacao> filteredIncomes) {
+  List<Transacao> _getPaginatedIncomes(List<Transacao> filtered) {
     final startIndex = _currentPage * _itemsPerPage;
-    final endIndex = (startIndex + _itemsPerPage).clamp(0, filteredIncomes.length);
-    return filteredIncomes.sublist(startIndex, endIndex);
+    final endIndex = (startIndex + _itemsPerPage).clamp(0, filtered.length);
+    return filtered.sublist(startIndex, endIndex);
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        title: Text(
           'Receitas',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: theme.appBarTheme.foregroundColor),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: theme.appBarTheme.foregroundColor),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
@@ -91,30 +75,25 @@ class _IncomeScreenState extends State<IncomeScreen> {
       body: Consumer<FinanceProvider>(
         builder: (context, financeProvider, child) {
           final filteredIncomes = _getFilteredIncomes(financeProvider.transacoes);
-          final paginatedIncomes = _getPaginatedIncomes(filteredIncomes);
+          final paginated = _getPaginatedIncomes(filteredIncomes);
           final totalPages = (filteredIncomes.length / _itemsPerPage).ceil();
           final totalValue = filteredIncomes.fold(0.0, (sum, t) => sum + t.valor);
 
           return Column(
             children: [
-              // Header com resumo do mês
               _buildMonthHeader(totalValue, filteredIncomes.length),
-              
-              // Lista de receitas
               Expanded(
                 child: filteredIncomes.isEmpty
                     ? _buildEmptyState()
                     : ListView.builder(
                         padding: const EdgeInsets.all(16),
-                        itemCount: paginatedIncomes.length,
+                        itemCount: paginated.length,
                         itemBuilder: (context, index) {
-                          final transacao = paginatedIncomes[index];
+                          final transacao = paginated[index];
                           return _buildIncomeCard(context, transacao, financeProvider);
                         },
                       ),
               ),
-              
-              // Paginação
               if (totalPages > 1) _buildPagination(totalPages),
             ],
           );
@@ -128,7 +107,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        color: context.containerColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -142,16 +121,16 @@ class _IncomeScreenState extends State<IncomeScreen> {
                   children: [
                     Text(
                       Formatters.formatMonthName(_selectedMonth),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: context.primaryText,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(
+                    Icon(
                       Icons.keyboard_arrow_down,
-                      color: Colors.white,
+                      color: context.primaryText,
                     ),
                   ],
                 ),
@@ -159,13 +138,13 @@ class _IncomeScreenState extends State<IncomeScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.2),
+                  color: TransactionColors.getReceitaBackground(context),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   '$transactionCount receitas',
                   style: const TextStyle(
-                    color: Colors.green,
+                    color: TransactionColors.receita,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -179,12 +158,12 @@ class _IncomeScreenState extends State<IncomeScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.2),
+                  color: TransactionColors.getReceitaBackground(context),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
                   Icons.arrow_upward,
-                  color: Colors.green,
+                  color: TransactionColors.receita,
                   size: 20,
                 ),
               ),
@@ -195,14 +174,14 @@ class _IncomeScreenState extends State<IncomeScreen> {
                   Text(
                     'Total de receitas',
                     style: TextStyle(
-                      color: Colors.grey[400],
+                      color: context.secondaryText,
                       fontSize: 14,
                     ),
                   ),
                   Text(
                     Formatters.formatCurrency(totalValue),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: context.primaryText,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -227,7 +206,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
         icone: Icons.help_outline,
       ),
     );
-    
+
     final conta = financeProvider.contas.firstWhere(
       (c) => c.id == transacao.contaId,
       orElse: () => Conta(
@@ -244,7 +223,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        color: context.containerColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -268,8 +247,8 @@ class _IncomeScreenState extends State<IncomeScreen> {
               children: [
                 Text(
                   transacao.descricao,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -278,7 +257,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                 Text(
                   categoria.nome,
                   style: TextStyle(
-                    color: Colors.grey[400],
+                    color: context.secondaryText,
                     fontSize: 14,
                   ),
                 ),
@@ -286,7 +265,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                 Text(
                   '${conta.nome} • ${Formatters.formatDate(transacao.data)}',
                   style: TextStyle(
-                    color: Colors.grey[500],
+                    color: context.mutedText,
                     fontSize: 12,
                   ),
                 ),
@@ -299,7 +278,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
               Text(
                 '+${Formatters.formatCurrency(transacao.valor)}',
                 style: const TextStyle(
-                  color: Colors.green,
+                  color: TransactionColors.receita,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -309,13 +288,13 @@ class _IncomeScreenState extends State<IncomeScreen> {
                   margin: const EdgeInsets.only(top: 4),
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.2),
+                    color: context.infoColor.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Recorrente',
                     style: TextStyle(
-                      color: Colors.blue,
+                      color: context.infoColor,
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
                     ),
@@ -336,14 +315,14 @@ class _IncomeScreenState extends State<IncomeScreen> {
           Icon(
             Icons.trending_up,
             size: 64,
-            color: Colors.grey[400],
+            color: context.iconColorMuted,
           ),
           const SizedBox(height: 16),
           Text(
             'Nenhuma receita encontrada',
             style: TextStyle(
               fontSize: 18,
-              color: Colors.grey[400],
+              color: context.secondaryText,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -351,7 +330,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
           Text(
             'Tente ajustar os filtros ou selecionar outro mês',
             style: TextStyle(
-              color: Colors.grey[500],
+              color: context.mutedText,
               fontSize: 14,
             ),
             textAlign: TextAlign.center,
@@ -372,15 +351,15 @@ class _IncomeScreenState extends State<IncomeScreen> {
                 ? () => setState(() => _currentPage--)
                 : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B5CF6),
+              backgroundColor: context.accentColor,
               foregroundColor: Colors.white,
             ),
             child: const Text('Anterior'),
           ),
           Text(
             'Página ${_currentPage + 1} de $totalPages',
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.primaryText,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -389,7 +368,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                 ? () => setState(() => _currentPage++)
                 : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B5CF6),
+              backgroundColor: context.accentColor,
               foregroundColor: Colors.white,
             ),
             child: const Text('Próxima'),
@@ -407,11 +386,11 @@ class _IncomeScreenState extends State<IncomeScreen> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
       initialDatePickerMode: DatePickerMode.year,
     );
-    
+
     if (picked != null) {
       setState(() {
         _selectedMonth = DateTime(picked.year, picked.month);
-        _currentPage = 0; // Reset pagination
+        _currentPage = 0;
       });
     }
   }
@@ -420,18 +399,18 @@ class _IncomeScreenState extends State<IncomeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A2A2A),
-        title: const Text(
+        backgroundColor: Theme.of(context).cardColor,
+        title: Text(
           'Buscar receitas',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: context.primaryText),
         ),
         content: TextField(
           controller: _searchController,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
+          style: TextStyle(color: context.primaryText),
+          decoration: InputDecoration(
             hintText: 'Digite para buscar...',
-            hintStyle: TextStyle(color: Colors.grey),
-            border: OutlineInputBorder(),
+            hintStyle: TextStyle(color: context.secondaryText),
+            border: const OutlineInputBorder(),
           ),
           autofocus: true,
         ),
@@ -468,29 +447,29 @@ class _IncomeScreenState extends State<IncomeScreen> {
       builder: (context) => Consumer<FinanceProvider>(
         builder: (context, financeProvider, child) {
           return AlertDialog(
-            backgroundColor: const Color(0xFF2A2A2A),
-            title: const Text(
+            backgroundColor: Theme.of(context).cardColor,
+            title: Text(
               'Filtros',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: context.primaryText),
             ),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Categoria',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: context.primaryText),
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String?>(
                     value: _selectedCategoryId,
-                    dropdownColor: const Color(0xFF2A2A2A),
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
+                    dropdownColor: context.dropdownColor,
+                    style: TextStyle(color: context.primaryText),
+                    decoration: InputDecoration(
                       hintText: 'Todas as categorias',
-                      hintStyle: TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(color: context.secondaryText),
+                      border: const OutlineInputBorder(),
                     ),
                     items: [
                       const DropdownMenuItem<String?>(
@@ -509,19 +488,19 @@ class _IncomeScreenState extends State<IncomeScreen> {
                     onChanged: (value) => setState(() => _selectedCategoryId = value),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Conta',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: context.primaryText),
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String?>(
                     value: _selectedAccountId,
-                    dropdownColor: const Color(0xFF2A2A2A),
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
+                    dropdownColor: context.dropdownColor,
+                    style: TextStyle(color: context.primaryText),
+                    decoration: InputDecoration(
                       hintText: 'Todas as contas',
-                      hintStyle: TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(color: context.secondaryText),
+                      border: const OutlineInputBorder(),
                     ),
                     items: [
                       const DropdownMenuItem<String?>(

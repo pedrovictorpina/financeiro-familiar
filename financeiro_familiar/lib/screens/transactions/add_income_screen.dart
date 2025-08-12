@@ -41,12 +41,12 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.appBarTheme.backgroundColor,
-        title: const Text(
+        title: Text(
           'Nova Receita',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: theme.appBarTheme.foregroundColor),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: Icon(Icons.close, color: theme.appBarTheme.foregroundColor),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
@@ -58,13 +58,13 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                      valueColor: AlwaysStoppedAnimation<Color>(TransactionColors.receita),
                     ),
                   )
                 : const Text(
                     'Salvar',
                     style: TextStyle(
-                      color: Colors.green,
+                      color: TransactionColors.receita,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -86,10 +86,10 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: TransactionColors.getReceitaBackground(context),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Colors.green.withOpacity(0.3),
+                      color: TransactionColors.receita.withOpacity(0.3),
                     ),
                   ),
                   child: Column(
@@ -100,20 +100,20 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.2),
+                              color: TransactionColors.receita.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(
                               Icons.arrow_upward,
-                              color: Colors.green,
+                              color: TransactionColors.receita,
                               size: 20,
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Text(
+                          Text(
                             'Valor da receita',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: context.primaryText,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -124,21 +124,21 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                       TextFormField(
                         controller: _valorController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: context.primaryText,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'R\$ 0,00',
                           hintStyle: TextStyle(
-                            color: Colors.grey,
+                            color: context.secondaryText,
                             fontSize: 24,
                           ),
                           border: InputBorder.none,
                           prefixText: 'R\$ ',
                           prefixStyle: TextStyle(
-                            color: Colors.green,
+                            color: TransactionColors.receita,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -161,10 +161,10 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 const SizedBox(height: 24),
 
                 // Descrição
-                const Text(
+                Text(
                   'Descrição',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -172,16 +172,16 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _descricaoController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: context.primaryText),
+                  decoration: InputDecoration(
                     hintText: 'Ex: Salário, Freelance, Venda...',
-                    hintStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: context.secondaryText),
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
+                      borderSide: BorderSide(color: context.borderColor),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.green),
+                      borderSide: BorderSide(color: TransactionColors.receita),
                     ),
                   ),
                   validator: (value) {
@@ -195,10 +195,10 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 const SizedBox(height: 24),
 
                 // Categoria
-                const Text(
+                Text(
                   'Categoria',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -206,17 +206,17 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   value: _categoriaId,
-                  dropdownColor: theme.cardColor,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
+                  dropdownColor: context.dropdownColor,
+                  style: TextStyle(color: context.primaryText),
+                  decoration: InputDecoration(
                     hintText: 'Selecione uma categoria',
-                    hintStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: context.secondaryText),
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
+                      borderSide: BorderSide(color: context.borderColor),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.green),
+                      borderSide: BorderSide(color: TransactionColors.receita),
                     ),
                   ),
                   items: categoriasReceita.map((categoria) {
@@ -247,10 +247,10 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 const SizedBox(height: 24),
 
                 // Conta
-                const Text(
+                Text(
                   'Conta',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -258,17 +258,17 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   value: _contaId,
-                  dropdownColor: const Color(0xFF2A2A2A),
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
+                  dropdownColor: context.dropdownColor,
+                  style: TextStyle(color: context.primaryText),
+                  decoration: InputDecoration(
                     hintText: 'Selecione uma conta',
-                    hintStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: context.secondaryText),
                     border: OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
+                      borderSide: BorderSide(color: context.borderColor),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.green),
+                      borderSide: BorderSide(color: TransactionColors.receita),
                     ),
                   ),
                   items: financeProvider.contas.map((conta) {
@@ -302,10 +302,10 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 const SizedBox(height: 24),
 
                 // Data
-                const Text(
+                Text(
                   'Data',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -316,21 +316,21 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
+                      border: Border.all(color: context.borderColor),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.calendar_today,
-                          color: Colors.grey,
+                          color: context.iconColorMuted,
                           size: 20,
                         ),
                         const SizedBox(width: 12),
                         Text(
                           Formatters.formatDate(_dataSelecionada),
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.primaryText,
                             fontSize: 16,
                           ),
                         ),
@@ -345,25 +345,25 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.cardColor,
+                    color: context.containerColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.repeat,
-                        color: Colors.white,
+                        color: context.iconColor,
                         size: 20,
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Receita recorrente',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: context.primaryText,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -371,7 +371,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                             Text(
                               'Esta receita se repete mensalmente',
                               style: TextStyle(
-                                color: Colors.grey,
+                                color: context.secondaryText,
                                 fontSize: 14,
                               ),
                             ),
@@ -381,7 +381,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                       Switch(
                         value: _recorrente,
                         onChanged: (value) => setState(() => _recorrente = value),
-                        activeColor: Colors.green,
+                        activeColor: TransactionColors.receita,
                       ),
                     ],
                   ),
@@ -406,7 +406,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.dark(
-              primary: Colors.green,
+              primary: TransactionColors.receita,
               surface: Theme.of(context).cardColor,
             ),
           ),
@@ -450,9 +450,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
         if (mounted) {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('Receita adicionada com sucesso!'),
-              backgroundColor: Colors.green,
+              backgroundColor: TransactionColors.receita,
             ),
           );
         }
@@ -461,7 +461,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(financeProvider.errorMessage ?? 'Erro ao adicionar receita'),
-              backgroundColor: Colors.red,
+              backgroundColor: context.errorColor,
             ),
           );
         }
@@ -469,9 +469,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Erro ao processar dados'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.errorColor,
           ),
         );
       }

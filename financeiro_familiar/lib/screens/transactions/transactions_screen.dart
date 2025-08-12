@@ -5,6 +5,7 @@ import '../../utils/formatters.dart';
 import '../../models/transacao.dart';
 import '../../models/categoria.dart';
 import '../../models/conta.dart';
+import '../../utils/theme_extensions.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
@@ -57,7 +58,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   Icon(
                     Icons.receipt_long_outlined,
                     size: 64,
-                    color: Colors.grey[400],
+                    color: context.iconColorMuted,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -66,7 +67,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         : 'Nenhuma transação registrada',
                     style: TextStyle(
                       fontSize: 18,
-                      color: Colors.grey[600],
+                      color: context.secondaryText,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -74,7 +75,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     _temFiltrosAtivos()
                         ? 'Tente ajustar os filtros'
                         : 'Adicione sua primeira transação',
-                    style: TextStyle(color: Colors.grey[500]),
+                    style: TextStyle(color: context.mutedText),
                   ),
                   if (_temFiltrosAtivos()) ...[
                     const SizedBox(height: 16),
@@ -185,17 +186,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     
     switch (transacao.tipo) {
       case TipoTransacao.receita:
-        cor = Colors.green;
+        cor = TransactionColors.receita;
         icone = Icons.arrow_upward;
         sinal = '+';
         break;
       case TipoTransacao.despesa:
-        cor = Colors.red;
+        cor = TransactionColors.despesa;
         icone = Icons.arrow_downward;
         sinal = '-';
         break;
       case TipoTransacao.transferencia:
-        cor = Colors.blue;
+        cor = TransactionColors.transferencia;
         icone = Icons.swap_horiz;
         sinal = '';
         break;
@@ -649,9 +650,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w500,
-                color: Colors.grey,
+                color: context.secondaryText,
               ),
             ),
           ),

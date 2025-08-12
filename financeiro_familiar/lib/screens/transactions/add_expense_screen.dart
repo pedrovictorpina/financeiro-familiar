@@ -41,12 +41,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.appBarTheme.backgroundColor,
-        title: const Text(
+        title: Text(
           'Nova Despesa',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: theme.appBarTheme.foregroundColor),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: Icon(Icons.close, color: theme.appBarTheme.foregroundColor),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
@@ -110,10 +110,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Text(
+                          Text(
                             'Valor da despesa',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: context.primaryText,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -124,8 +124,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       TextFormField(
                         controller: _valorController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: context.primaryText,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
@@ -161,10 +161,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 const SizedBox(height: 24),
 
                 // Descrição
-                const Text(
+                Text(
                   'Descrição',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -172,7 +172,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _descricaoController,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: context.primaryText),
                   decoration: const InputDecoration(
                     hintText: 'Ex: Supermercado, Combustível, Conta de luz...',
                     hintStyle: TextStyle(color: Colors.grey),
@@ -195,10 +195,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 const SizedBox(height: 24),
 
                 // Categoria
-                const Text(
+                Text(
                   'Categoria',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -206,8 +206,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   value: _categoriaId,
-                  dropdownColor: theme.cardColor,
-                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: context.dropdownColor,
+                  style: TextStyle(color: context.primaryText),
                   decoration: const InputDecoration(
                     hintText: 'Selecione uma categoria',
                     hintStyle: TextStyle(color: Colors.grey),
@@ -247,10 +247,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 const SizedBox(height: 24),
 
                 // Conta
-                const Text(
+                Text(
                   'Conta',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -258,8 +258,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   value: _contaId,
-                  dropdownColor: theme.cardColor,
-                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: context.dropdownColor,
+                  style: TextStyle(color: context.primaryText),
                   decoration: const InputDecoration(
                     hintText: 'Selecione uma conta',
                     hintStyle: TextStyle(color: Colors.grey),
@@ -302,10 +302,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 const SizedBox(height: 24),
 
                 // Data
-                const Text(
+                Text(
                   'Data',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: context.primaryText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -329,8 +329,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         const SizedBox(width: 12),
                         Text(
                           Formatters.formatDate(_dataSelecionada),
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.primaryText,
                             fontSize: 16,
                           ),
                         ),
@@ -345,25 +345,25 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.cardColor,
+                    color: context.containerColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.repeat,
-                        color: Colors.white,
+                        color: context.iconColor,
                         size: 20,
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Despesa recorrente',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: context.primaryText,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -450,9 +450,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         if (mounted) {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('Despesa adicionada com sucesso!'),
-              backgroundColor: Colors.red,
+              backgroundColor: TransactionColors.despesa,
             ),
           );
         }
@@ -461,7 +461,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(financeProvider.errorMessage ?? 'Erro ao adicionar despesa'),
-              backgroundColor: Colors.red,
+              backgroundColor: context.errorColor,
             ),
           );
         }
@@ -469,9 +469,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Erro ao processar dados'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.errorColor,
           ),
         );
       }
