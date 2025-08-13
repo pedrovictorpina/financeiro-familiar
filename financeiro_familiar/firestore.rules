@@ -1,41 +1,103 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // REGRAS TEMPORÁRIAS PARA DESENVOLVIMENTO E TESTES
-    // IMPORTANTE: Substitua por regras mais restritivas em produção
+    // REGRAS DE PRODUÇÃO - SEGURANÇA APRIMORADA
     
-    // Permitir acesso a usuários autenticados (regra temporária para testes)
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    // Funções auxiliares para validação
+    function isAuthenticated() {
+      return request.auth != null;
     }
     
-    // REGRAS DE PRODUÇÃO (comentadas - descomente e ajuste quando necessário):
-    /*
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAuthorizedForBudget(orcamentoId) {
+      return isAuthenticated() && 
+        request.auth.uid in get(/databases/$(database)/documents/orcamentos/$(orcamentoId)).data.usuariosVinculados;
+    }
+    
+    function isValidUserData() {
+      return request.resource.data.keys().hasAll(['nome', 'email', 'uid']) &&
+        request.resource.data.uid == request.auth.uid;
+    }
+    
+    function isValidOrcamentoData() {
+      return request.resource.data.keys().hasAll(['nome', 'criadorUid', 'usuariosVinculados', 'mesAtual', 'dataCriacao']) &&
+        request.resource.data.criadorUid == request.auth.uid &&
+        request.auth.uid in request.resource.data.usuariosVinculados;
+    }
+    
+    function isValidTransacaoData() {
+      return request.resource.data.keys().hasAll(['tipo', 'valor', 'data', 'descricao', 'criadoPor', 'timestamp']) &&
+        request.resource.data.criadoPor == request.auth.uid &&
+        request.resource.data.valor is number &&
+        request.resource.data.valor > 0;
+    }
+    
     // Regras para usuários - apenas o próprio usuário pode acessar seus dados
     match /usuarios/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isOwner(userId);
+      allow create: if isAuthenticated() && isValidUserData();
     }
     
     // Regras para orçamentos - apenas usuários vinculados podem acessar
     match /orcamentos/{orcamentoId} {
-      allow read, write: if request.auth != null && 
+      allow read: if isAuthenticated() && 
         request.auth.uid in resource.data.usuariosVinculados;
       
-      // Permitir criação de orçamento se o usuário está autenticado
-      allow create: if request.auth != null && 
-        request.auth.uid in request.resource.data.usuariosVinculados;
+      allow write: if isAuthenticated() && 
+        request.auth.uid in resource.data.usuariosVinculados;
+      
+      allow create: if isAuthenticated() && isValidOrcamentoData();
       
       // Subcoleções do orçamento
-      match /{subcollection}/{document} {
-        allow read, write: if request.auth != null && 
-          request.auth.uid in get(/databases/$(database)/documents/orcamentos/$(orcamentoId)).data.usuariosVinculados;
+      match /transacoes/{transacaoId} {
+        allow read, delete: if isAuthorizedForBudget(orcamentoId);
+        allow create: if isAuthorizedForBudget(orcamentoId) && isValidTransacaoData();
+        allow update: if isAuthorizedForBudget(orcamentoId) && 
+          isValidTransacaoData() &&
+          resource.data.criadoPor == request.auth.uid; // Só pode editar suas próprias transações
+      }
+      
+      match /categorias/{categoriaId} {
+        allow read, write: if isAuthorizedForBudget(orcamentoId);
+        allow create: if isAuthorizedForBudget(orcamentoId) &&
+          request.resource.data.keys().hasAll(['nome', 'tipo', 'cor']);
+      }
+      
+      match /contas/{contaId} {
+        allow read, write: if isAuthorizedForBudget(orcamentoId);
+        allow create: if isAuthorizedForBudget(orcamentoId) &&
+          request.resource.data.keys().hasAll(['nome', 'tipo', 'saldoAtual']);
+      }
+      
+      match /cartoes/{cartaoId} {
+        allow read, write: if isAuthorizedForBudget(orcamentoId);
+        allow create: if isAuthorizedForBudget(orcamentoId) &&
+          request.resource.data.keys().hasAll(['nome', 'bandeira', 'limite']);
+      }
+      
+      match /metas/{metaId} {
+        allow read, write: if isAuthorizedForBudget(orcamentoId);
+        allow create: if isAuthorizedForBudget(orcamentoId) &&
+          request.resource.data.keys().hasAll(['nome', 'valorAlvo', 'valorAtual', 'dataLimite']);
+      }
+      
+      match /planejamentos/{planejamentoId} {
+        allow read, write: if isAuthorizedForBudget(orcamentoId);
+        allow create: if isAuthorizedForBudget(orcamentoId) &&
+          request.resource.data.keys().hasAll(['categoriaId', 'valorPlanejado', 'mes']);
+      }
+      
+      match /config_dashboard/{configId} {
+        allow read, write: if isAuthorizedForBudget(orcamentoId);
       }
     }
     
-    // Coleção de teste (para testes de conexão)
+    // Coleção de teste (apenas para desenvolvimento/testes de conexão)
     match /test/{document} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAuthenticated();
     }
-    */
   }
 }

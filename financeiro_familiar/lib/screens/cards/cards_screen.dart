@@ -75,6 +75,7 @@ class CardsScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'fab-cards',
         onPressed: () => _adicionarCartao(context),
         backgroundColor: const Color(0xFF8B5CF6),
         child: const Icon(Icons.add, color: Colors.white),

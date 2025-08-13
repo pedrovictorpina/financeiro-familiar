@@ -16,6 +16,7 @@ import '../categories/categories_screen.dart';
 import '../accounts/accounts_screen.dart';
 import '../../test_firebase_connection.dart';
 import '../../services/update_service.dart';
+import '../../services/notification_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -64,6 +65,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               
               // Seção de aparência
               _buildAppearanceSection(context, themeProvider),
+              
+              const SizedBox(height: 24),
+              
+              // Seção de notificações
+              _buildNotificationsSection(context, authProvider, financeProvider),
               
               const SizedBox(height: 24),
               
@@ -517,6 +523,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Widget _buildNotificationsSection(BuildContext context, AuthProvider authProvider, FinanceProvider financeProvider) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Notificações',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.notifications),
+              title: const Text('Lembrete de fatura'),
+              subtitle: Text(
+                'Notificar ${authProvider.userData?.reminderDays ?? 3} ${(authProvider.userData?.reminderDays ?? 3) == 1 ? 'dia' : 'dias'} antes do vencimento'
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _selecionarDiasLembrete(authProvider, financeProvider),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.notification_important),
+              title: const Text('Testar notificação'),
+              subtitle: const Text('Enviar uma notificação de teste'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _testarNotificacao(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _configurarDashboard() {
     showDialog(
       context: context,
@@ -783,6 +827,93 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  void _selecionarDiasLembrete(AuthProvider authProvider, FinanceProvider financeProvider) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Lembrete de Fatura'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Quantos dias antes do vencimento deseja ser notificado?'),
+            const SizedBox(height: 16),
+            ...List.generate(5, (index) {
+              final dias = index + 1;
+              return RadioListTile<int>(
+                title: Text('$dias ${dias == 1 ? 'dia' : 'dias'} antes'),
+                value: dias,
+                groupValue: authProvider.userData?.reminderDays ?? 3,
+                onChanged: (value) async {
+                  if (value != null && authProvider.userData != null) {
+                    try {
+                      // Atualizar dados do usuário
+                      final usuarioAtualizado = authProvider.userData!.copyWith(
+                        reminderDays: value,
+                      );
+                      
+                      await authProvider.updateUserData(usuarioAtualizado);
+                      
+                      // Reagendar notificações com novos dias
+                      final notificationService = NotificationService();
+                      await notificationService.scheduleCardReminders(
+                        cartoes: financeProvider.cartoes,
+                        reminderDays: value,
+                      );
+                      
+                      if (mounted) {
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Lembrete configurado para $value ${value == 1 ? 'dia' : 'dias'} antes'),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Erro ao salvar configuração: $e')),
+                        );
+                      }
+                    }
+                  }
+                },
+              );
+            }),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _testarNotificacao() async {
+    try {
+      final notificationService = NotificationService();
+      await notificationService.showTestNotification();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Notificação de teste enviada!'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao enviar notificação: $e')),
+        );
+      }
+    }
   }
 
   void _mostrarSobre() {

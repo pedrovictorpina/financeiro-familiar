@@ -7,9 +7,13 @@ import '../../models/categoria.dart';
 import '../../models/conta.dart';
 import '../../utils/formatters.dart';
 import '../../utils/theme_extensions.dart';
+import '../../utils/currency_input_formatter.dart';
+import '../../providers/auth_provider.dart';
 
 class AddIncomeScreen extends StatefulWidget {
-  const AddIncomeScreen({super.key});
+  final Transacao? transacao; // Opcional para modo de edição
+
+  const AddIncomeScreen({super.key, this.transacao});
 
   @override
   State<AddIncomeScreen> createState() => _AddIncomeScreenState();
@@ -27,6 +31,22 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    
+    // Se é modo de edição, preenche os campos
+    if (widget.transacao != null) {
+      final transacao = widget.transacao!;
+      _descricaoController.text = transacao.descricao;
+      _valorController.text = CurrencyInputFormatter.formatValue(transacao.valor);
+      _categoriaId = transacao.categoriaId;
+      _contaId = transacao.contaId;
+      _dataSelecionada = transacao.data;
+      _recorrente = transacao.recorrente;
+    }
+  }
+
+  @override
   void dispose() {
     _descricaoController.dispose();
     _valorController.dispose();
@@ -36,13 +56,14 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isEditMode = widget.transacao != null;
     
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.appBarTheme.backgroundColor,
         title: Text(
-          'Nova Receita',
+          isEditMode ? 'Editar Receita' : 'Nova Receita',
           style: TextStyle(color: theme.appBarTheme.foregroundColor),
         ),
         leading: IconButton(
@@ -61,9 +82,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                       valueColor: AlwaysStoppedAnimation<Color>(TransactionColors.receita),
                     ),
                   )
-                : const Text(
-                    'Salvar',
-                    style: TextStyle(
+                : Text(
+                    isEditMode ? 'Atualizar' : 'Salvar',
+                    style: const TextStyle(
                       color: TransactionColors.receita,
                       fontWeight: FontWeight.w600,
                     ),
@@ -124,6 +145,10 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                       TextFormField(
                         controller: _valorController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          CurrencyInputFormatter(),
+                        ],
                         style: TextStyle(
                           color: context.primaryText,
                           fontSize: 24,
@@ -147,7 +172,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira o valor';
                           }
-                          final valor = double.tryParse(value.replaceAll(',', '.'));
+                          final valor = CurrencyInputFormatter.parseValue(value);
                           if (valor == null || valor <= 0) {
                             return 'Por favor, insira um valor válido';
                           }
@@ -428,39 +453,55 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final valor = double.parse(_valorController.text.replaceAll(',', '.'));
+      final parsed = CurrencyInputFormatter.parseValue(_valorController.text) ?? 0.0;
+      final valor = parsed;
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userId = authProvider.user?.uid ?? 'unknown';
+      final isEditMode = widget.transacao != null;
       
-      final transacao = Transacao(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        tipo: TipoTransacao.receita,
-        valor: valor,
-        data: _dataSelecionada,
-        descricao: _descricaoController.text.trim(),
-        categoriaId: _categoriaId!,
-        contaId: _contaId!,
-        recorrente: _recorrente,
-        criadoPor: 'user', // TODO: Usar ID do usuário logado
-        timestamp: DateTime.now(),
-      );
+      final transacao = isEditMode
+          ? widget.transacao!.copyWith(
+              valor: valor,
+              data: _dataSelecionada,
+              descricao: _descricaoController.text.trim(),
+              categoriaId: _categoriaId!,
+              contaId: _contaId!,
+              recorrente: _recorrente,
+            )
+          : Transacao(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              tipo: TipoTransacao.receita,
+              valor: valor,
+              data: _dataSelecionada,
+              descricao: _descricaoController.text.trim(),
+              categoriaId: _categoriaId!,
+              contaId: _contaId!,
+              recorrente: _recorrente,
+              criadoPor: userId,
+              timestamp: DateTime.now(),
+            );
 
       final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
-      final success = await financeProvider.adicionarTransacao(transacao);
+      final success = isEditMode
+          ? await financeProvider.atualizarTransacao(transacao)
+          : await financeProvider.adicionarTransacao(transacao);
 
       if (success) {
         if (mounted) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(true);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Receita adicionada com sucesso!'),
+              content: Text(isEditMode ? 'Receita atualizada com sucesso!' : 'Receita adicionada com sucesso!'),
               backgroundColor: TransactionColors.receita,
             ),
           );
         }
       } else {
         if (mounted) {
+          final msg = financeProvider.errorMessage ?? (isEditMode ? 'Erro ao atualizar receita' : 'Erro ao adicionar receita');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(financeProvider.errorMessage ?? 'Erro ao adicionar receita'),
+              content: Text(msg),
               backgroundColor: context.errorColor,
             ),
           );

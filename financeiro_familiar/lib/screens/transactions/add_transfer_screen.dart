@@ -5,6 +5,7 @@ import '../../models/transacao.dart';
 import '../../models/conta.dart';
 import '../../utils/formatters.dart';
 import '../../utils/theme_extensions.dart';
+import '../../providers/auth_provider.dart';
 
 class AddTransferScreen extends StatefulWidget {
   const AddTransferScreen({super.key});
@@ -487,13 +488,55 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
       return;
     }
 
+    // Validações adicionais antes de salvar
+    final valor = double.tryParse(_valorController.text.replaceAll(',', '.')) ?? 0;
+    
+    // Verificar se as contas são diferentes
+    if (_contaOrigemId == _contaDestinoId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('A conta de origem deve ser diferente da conta de destino'),
+          backgroundColor: context.errorColor,
+        ),
+      );
+      return;
+    }
+
+    // Verificar saldo suficiente na conta de origem
+    final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+    final contaOrigem = financeProvider.contas.firstWhere(
+      (c) => c.id == _contaOrigemId,
+      orElse: () => Conta(
+        id: '',
+        nome: '',
+        tipo: TipoConta.banco,
+        saldoAtual: 0,
+        saldoPrevisto: 0,
+        cor: Colors.grey,
+      ),
+    );
+
+    if (valor > contaOrigem.saldoAtual) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Saldo insuficiente na conta de origem. Saldo disponível: ${Formatters.formatCurrency(contaOrigem.saldoAtual)}'
+          ),
+          backgroundColor: context.errorColor,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
-      final valor = double.parse(_valorController.text.replaceAll(',', '.'));
       final descricao = _descricaoController.text.trim().isEmpty
           ? 'Transferência entre contas'
           : _descricaoController.text.trim();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userId = authProvider.user?.uid ?? 'unknown';
       
       final transacao = Transacao(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -505,11 +548,10 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
         contaId: _contaOrigemId!,
         contaDestinoId: _contaDestinoId!,
         recorrente: false,
-        criadoPor: 'user', // TODO: Usar ID do usuário logado
+        criadoPor: userId,
         timestamp: DateTime.now(),
       );
 
-      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
       final success = await financeProvider.adicionarTransacao(transacao);
 
       if (success) {

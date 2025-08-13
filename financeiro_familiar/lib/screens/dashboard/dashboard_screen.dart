@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/finance_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/notifications_provider.dart';
 import '../../utils/formatters.dart';
 import '../../utils/constants.dart';
 import '../../utils/theme_extensions.dart';
@@ -140,17 +141,97 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
         ),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            Icons.card_giftcard,
-            color: theme.colorScheme.onPrimary,
-            size: 24,
-          ),
+        Consumer<NotificationsProvider>(
+          builder: (context, notifications, _) {
+            final hasUnread = notifications.hasUnread;
+            final count = notifications.unreadCount;
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) {
+                        final theme = Theme.of(ctx);
+                        return Dialog(
+                          backgroundColor: theme.colorScheme.surface,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          child: Container(
+                            constraints: const BoxConstraints(maxHeight: 420, minWidth: 320),
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Notificações', style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.w600)),
+                                    TextButton(
+                                      onPressed: () => notifications.markAllAsRead(),
+                                      child: const Text('Marcar todas como lidas'),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Expanded(
+                                  child: notifications.notifications.isEmpty
+                                      ? Center(child: Text('Sem notificações', style: TextStyle(color: theme.colorScheme.onSurfaceVariant)))
+                                      : ListView.builder(
+                                          itemCount: notifications.notifications.length,
+                                          itemBuilder: (ctx, index) {
+                                            final n = notifications.notifications[index];
+                                            return ListTile(
+                                              leading: Icon(n.isRead ? Icons.notifications_none : Icons.notifications_active, color: theme.colorScheme.primary),
+                                              title: Text(n.title, style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w600)),
+                                              subtitle: Text(n.message, style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
+                                              trailing: Text(Formatters.formatDateTime(n.createdAt), style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12)),
+                                              onTap: () => notifications.markAsRead(n.id),
+                                            );
+                                          },
+                                        ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      hasUnread ? Icons.notifications_active : Icons.notifications_none,
+                      color: theme.colorScheme.onPrimary,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                if (hasUnread)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: theme.colorScheme.onPrimary, width: 1),
+                      ),
+                      child: Text(
+                        count > 9 ? '9+' : '$count',
+                        style: TextStyle(color: theme.colorScheme.onPrimary, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
       ],
     );
@@ -226,7 +307,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: _buildIncomeExpenseCard(
             context,
             'Receitas',
-            Formatters.formatCurrency(financeProvider.receitasMes),
+            Formatters.formatCurrency(financeProvider.getReceitasMes(_selectedMonth)),
             Icons.arrow_upward,
             Colors.green,
             isWeb,
@@ -238,7 +319,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: _buildIncomeExpenseCard(
             context,
             'Despesas',
-            Formatters.formatCurrency(financeProvider.despesasMes),
+            Formatters.formatCurrency(financeProvider.getDespesasMes(_selectedMonth)),
             Icons.arrow_downward,
             Colors.red,
             isWeb,
@@ -689,7 +770,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildCreditCardsSection(BuildContext context, bool isWeb) {
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
-        final gastosPorCategoria = financeProvider.getGastosPorCategoria();
+        final gastosPorCategoria = financeProvider.getGastosPorCategoria(_selectedMonth);
         final theme = Theme.of(context);
         
         return Container(
@@ -914,7 +995,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
         final theme = Theme.of(context);
-        final gastosPorCategoria = financeProvider.getGastosPorCategoria();
+        final gastosPorCategoria = financeProvider.getGastosPorCategoria(_selectedMonth);
         
         return Container(
           padding: EdgeInsets.all(isWeb ? 20 : 16),

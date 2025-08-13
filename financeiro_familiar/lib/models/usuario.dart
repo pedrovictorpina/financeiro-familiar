@@ -4,6 +4,7 @@ class Usuario {
   final String email;
   final List<String> orcamentos;
   final DateTime dataCriacao;
+  final int reminderDays; // 1 a 5 dias antes do vencimento
 
   Usuario({
     required this.uid,
@@ -11,6 +12,7 @@ class Usuario {
     required this.email,
     required this.orcamentos,
     required this.dataCriacao,
+    this.reminderDays = 3,
   });
 
   factory Usuario.fromMap(Map<String, dynamic> map) {
@@ -20,6 +22,9 @@ class Usuario {
       email: map['email'] ?? '',
       orcamentos: List<String>.from(map['orcamentos'] ?? []),
       dataCriacao: DateTime.fromMillisecondsSinceEpoch(map['dataCriacao'] ?? 0),
+      reminderDays: (map['reminderDays'] ?? 3) is int
+          ? (map['reminderDays'] ?? 3)
+          : int.tryParse(map['reminderDays']?.toString() ?? '3') ?? 3,
     );
   }
 
@@ -30,6 +35,7 @@ class Usuario {
       'email': email,
       'orcamentos': orcamentos,
       'dataCriacao': dataCriacao.millisecondsSinceEpoch,
+      'reminderDays': reminderDays,
     };
   }
 
@@ -39,6 +45,7 @@ class Usuario {
     String? email,
     List<String>? orcamentos,
     DateTime? dataCriacao,
+    int? reminderDays,
   }) {
     return Usuario(
       uid: uid ?? this.uid,
@@ -46,6 +53,7 @@ class Usuario {
       email: email ?? this.email,
       orcamentos: orcamentos ?? this.orcamentos,
       dataCriacao: dataCriacao ?? this.dataCriacao,
+      reminderDays: reminderDays ?? this.reminderDays,
     );
   }
 }

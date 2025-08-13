@@ -106,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           floatingActionButton: _currentIndex == 1 // Mostrar FAB apenas na tela de transações
               ? FloatingActionButton(
+                  heroTag: 'fab-transactions',
                   onPressed: () {
                     _showAddTransactionModal(context);
                   },

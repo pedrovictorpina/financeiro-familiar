@@ -66,6 +66,54 @@ class FinanceProvider extends ChangeNotifier {
 
   double get saldoMes => receitasMes - despesasMes;
 
+  // Novos métodos para filtragem por mês
+  double getReceitasMes(DateTime mes) {
+    return _transacoes
+        .where((t) => t.tipo == TipoTransacao.receita && 
+                     t.data.month == mes.month && 
+                     t.data.year == mes.year)
+        .fold(0.0, (sum, t) => sum + t.valor);
+  }
+
+  double getDespesasMes(DateTime mes) {
+    return _transacoes
+        .where((t) => t.tipo == TipoTransacao.despesa && 
+                     t.data.month == mes.month && 
+                     t.data.year == mes.year)
+        .fold(0.0, (sum, t) => sum + t.valor);
+  }
+
+  double getSaldoMes(DateTime mes) {
+    return getReceitasMes(mes) - getDespesasMes(mes);
+  }
+
+  // Atualizar método getGastosPorCategoria para aceitar mês
+  Map<String, double> getGastosPorCategoria([DateTime? mes]) {
+    final mesReferencia = mes ?? DateTime.now();
+    final gastos = <String, double>{};
+    
+    for (final transacao in _transacoes) {
+      if (transacao.tipo == TipoTransacao.despesa &&
+          transacao.data.month == mesReferencia.month &&
+          transacao.data.year == mesReferencia.year) {
+        final categoria = _categorias.firstWhere(
+          (c) => c.id == transacao.categoriaId,
+          orElse: () => Categoria(
+            id: '',
+            nome: 'Sem categoria',
+            tipo: TipoCategoria.despesa,
+            cor: Colors.grey,
+            icone: Icons.help_outline,
+          ),
+        );
+        
+        gastos[categoria.nome] = (gastos[categoria.nome] ?? 0) + transacao.valor;
+      }
+    }
+    
+    return gastos;
+  }
+
   // ORÇAMENTOS
   void carregarOrcamentos(String uid) {
     print('DEBUG: Iniciando carregamento de orçamentos para UID: $uid');
@@ -535,28 +583,9 @@ class FinanceProvider extends ChangeNotifier {
     return _transacoes.where((t) => t.categoriaId == categoriaId).toList();
   }
 
-  Map<String, double> getGastosPorCategoria() {
-    final gastos = <String, double>{};
-    
-    for (final transacao in _transacoes) {
-      if (transacao.tipo == TipoTransacao.despesa) {
-        final categoria = _categorias.firstWhere(
-          (c) => c.id == transacao.categoriaId,
-          orElse: () => Categoria(
-            id: '',
-            nome: 'Sem categoria',
-            tipo: TipoCategoria.despesa,
-            cor: Colors.grey,
-            icone: Icons.help_outline,
-          ),
-        );
-        
-        gastos[categoria.nome] = (gastos[categoria.nome] ?? 0) + transacao.valor;
-      }
-    }
-    
-    return gastos;
-  }
+  // Método getGastosPorCategoria sem filtro de mês foi removido para evitar duplicidade.
+  // Utilize getGastosPorCategoria([DateTime? mes]) definido anteriormente, passando o mês desejado ou null para usar o mês atual.
+
 
   // Método para atualizar orçamento
   Future<bool> atualizarOrcamento(dynamic orcamento) async {

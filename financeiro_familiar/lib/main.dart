@@ -7,6 +7,7 @@ import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/finance_provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/notifications_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'services/update_service.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationsProvider()),
         ChangeNotifierProxyProvider<AuthProvider, FinanceProvider>(
           create: (_) => FinanceProvider(),
           update: (_, authProvider, financeProvider) {

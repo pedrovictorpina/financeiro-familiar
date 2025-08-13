@@ -571,63 +571,256 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       ),
     );
 
+    Color cor;
+    IconData icone;
+    String sinal;
+    
+    switch (transacao.tipo) {
+      case TipoTransacao.receita:
+        cor = TransactionColors.receita;
+        icone = Icons.arrow_upward;
+        sinal = '+';
+        break;
+      case TipoTransacao.despesa:
+        cor = TransactionColors.despesa;
+        icone = Icons.arrow_downward;
+        sinal = '-';
+        break;
+      case TipoTransacao.transferencia:
+        cor = TransactionColors.transferencia;
+        icone = Icons.swap_horiz;
+        sinal = '';
+        break;
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return DraggableScrollableSheet(
-          initialChildSize: 0.6,
-          maxChildSize: 0.9,
-          minChildSize: 0.3,
+          initialChildSize: 0.7,
+          maxChildSize: 0.95,
+          minChildSize: 0.5,
           builder: (context, scrollController) {
             return Container(
-              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Detalhes da Transação',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
+                  // Header com indicador e botões de ação
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Container(
+                      height: 4,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(2),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          // TODO: Implementar edição
-                        },
-                        icon: const Icon(Icons.edit),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          // TODO: Implementar exclusão
-                        },
-                        icon: const Icon(Icons.delete),
-                      ),
-                    ],
+                    ),
                   ),
-                  const Divider(),
+                  
+                  // Cabeçalho principal com valor em destaque
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          cor.withOpacity(0.1),
+                          cor.withOpacity(0.05),
+                        ],
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: cor.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                icone,
+                                color: cor,
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _getTipoTransacaoNome(transacao.tipo),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: cor,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    transacao.descricao,
+                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Column(
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    // TODO: Implementar edição
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Edição em desenvolvimento')),
+                                    );
+                                  },
+                                  icon: Icon(Icons.edit_outlined, color: Theme.of(context).colorScheme.primary),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                IconButton(
+                                  onPressed: () {
+                                    // TODO: Implementar exclusão
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Exclusão em desenvolvimento')),
+                                    );
+                                  },
+                                  icon: Icon(Icons.delete_outline, color: Colors.red.shade600),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: Colors.red.withOpacity(0.1),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        
+                        // Valor em destaque
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '$sinal${Formatters.formatCurrency(transacao.valor)}',
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: cor,
+                                ),
+                              ),
+                              if (transacao.recorrente) ...[
+                                const SizedBox(width: 12),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.repeat,
+                                        size: 16,
+                                        color: Colors.blue.shade600,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Recorrente',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.blue.shade600,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Lista de detalhes
                   Expanded(
                     child: ListView(
                       controller: scrollController,
+                      padding: const EdgeInsets.all(24),
                       children: [
-                        _buildDetailRow('Descrição', transacao.descricao),
-                        _buildDetailRow('Tipo', _getTipoTransacaoNome(transacao.tipo)),
-                        _buildDetailRow('Valor', Formatters.formatCurrency(transacao.valor)),
-                        _buildDetailRow('Data', Formatters.formatDate(transacao.data)),
-                        _buildDetailRow('Categoria', categoria.nome),
-                        _buildDetailRow('Conta', conta.nome),
-                        _buildDetailRow('Recorrente', transacao.recorrente ? 'Sim' : 'Não'),
-                        if (transacao.contaDestinoId != null) ...[
-                          _buildDetailRow('Conta Destino', 
-                            financeProvider.contas.firstWhere(
-                              (c) => c.id == transacao.contaDestinoId,
-                              orElse: () => conta,
-                            ).nome,
+                        _buildModernDetailSection('Informações Gerais', [
+                          _buildModernDetailRow(
+                            Icons.calendar_today_outlined,
+                            'Data',
+                            Formatters.formatDate(transacao.data),
+                            Theme.of(context).colorScheme.primary,
                           ),
-                        ],
-                        _buildDetailRow('Criado em', Formatters.formatDateTime(transacao.timestamp)),
+                          _buildModernDetailRow(
+                            categoria.icone,
+                            'Categoria',
+                            categoria.nome,
+                            categoria.cor,
+                          ),
+                          _buildModernDetailRow(
+                            Icons.account_balance_wallet_outlined,
+                            'Conta',
+                            conta.nome,
+                            conta.cor,
+                          ),
+                          if (transacao.contaDestinoId != null)
+                            _buildModernDetailRow(
+                              Icons.arrow_forward,
+                              'Conta Destino',
+                              financeProvider.contas.firstWhere(
+                                (c) => c.id == transacao.contaDestinoId,
+                                orElse: () => conta,
+                              ).nome,
+                              Colors.orange,
+                            ),
+                        ]),
+                        
+                        const SizedBox(height: 24),
+                        
+                        _buildModernDetailSection('Informações do Sistema', [
+                          _buildModernDetailRow(
+                            Icons.access_time,
+                            'Criado em',
+                            Formatters.formatDateTime(transacao.timestamp),
+                            Colors.grey,
+                          ),
+                        ]),
                       ],
                     ),
                   ),
@@ -637,6 +830,92 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildModernDetailSection(String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(children: children),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildModernDetailRow(IconData icon, String label, String value, Color iconColor) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: iconColor,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            flex: 2,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

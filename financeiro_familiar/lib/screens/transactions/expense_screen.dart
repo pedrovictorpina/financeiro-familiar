@@ -4,8 +4,27 @@ import '../../providers/finance_provider.dart';
 import '../../models/transacao.dart';
 import '../../models/categoria.dart';
 import '../../models/conta.dart';
+import '../../models/cartao.dart';
 import '../../utils/formatters.dart';
 import '../../utils/theme_extensions.dart';
+import 'add_expense_screen.dart'; // Added for edit mode navigation
+
+// Classe auxiliar para representar faturas de cartão como itens de despesa
+class CardInvoiceItem {
+  final String cardId;
+  final String cardName;
+  final double amount;
+  final DateTime date;
+  final Color cardColor;
+
+  CardInvoiceItem({
+    required this.cardId,
+    required this.cardName,
+    required this.amount,
+    required this.date,
+    required this.cardColor,
+  });
+}
 
 class ExpenseScreen extends StatefulWidget {
   const ExpenseScreen({super.key});
@@ -28,6 +47,25 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  List<CardInvoiceItem> _getCardInvoicesForMonth(List<Cartao> cartoes) {
+    final invoices = <CardInvoiceItem>[];
+    
+    for (final cartao in cartoes) {
+      final faturaValor = cartao.getFaturaMes(_selectedMonth.month, _selectedMonth.year);
+      if (faturaValor > 0) {
+        invoices.add(CardInvoiceItem(
+          cardId: cartao.id,
+          cardName: cartao.nome,
+          amount: faturaValor,
+          date: DateTime(_selectedMonth.year, _selectedMonth.month, cartao.vencimentoDia),
+          cardColor: cartao.cor,
+        ));
+      }
+    }
+    
+    return invoices;
   }
 
   List<Transacao> _getFilteredExpenses(List<Transacao> allTransactions) {
@@ -62,10 +100,28 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     }).toList();
   }
 
-  List<Transacao> _getPaginatedExpenses(List<Transacao> filteredExpenses) {
-    final startIndex = _currentPage * _itemsPerPage;
-    final endIndex = (startIndex + _itemsPerPage).clamp(0, filteredExpenses.length);
-    return filteredExpenses.sublist(startIndex, endIndex);
+  List<Widget> _getAllExpenseItems(List<Transacao> filteredExpenses, List<CardInvoiceItem> cardInvoices, FinanceProvider financeProvider) {
+    final items = <Widget>[];
+    
+    // Adicionar transações regulares
+    for (final transacao in filteredExpenses) {
+      items.add(_buildExpenseCard(context, transacao, financeProvider));
+    }
+    
+    // Adicionar faturas de cartão (apenas se não há filtro de categoria ou conta)
+    if (_selectedCategoryId == null && _selectedAccountId == null) {
+      for (final invoice in cardInvoices) {
+        // Filtrar por texto de busca se aplicável
+        if (_searchText.isNotEmpty && 
+            !invoice.cardName.toLowerCase().contains(_searchText.toLowerCase()) &&
+            !'fatura'.toLowerCase().contains(_searchText.toLowerCase())) {
+          continue;
+        }
+        items.add(_buildCardInvoiceCard(context, invoice));
+      }
+    }
+    
+    return items;
   }
 
   @override
@@ -95,26 +151,38 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       body: Consumer<FinanceProvider>(
         builder: (context, financeProvider, child) {
           final filteredExpenses = _getFilteredExpenses(financeProvider.transacoes);
-          final paginatedExpenses = _getPaginatedExpenses(filteredExpenses);
-          final totalPages = (filteredExpenses.length / _itemsPerPage).ceil();
-          final totalValue = filteredExpenses.fold(0.0, (sum, t) => sum + t.valor);
+          final cardInvoices = _getCardInvoicesForMonth(financeProvider.cartoes);
+          final allItems = _getAllExpenseItems(filteredExpenses, cardInvoices, financeProvider);
+          
+          // Calcular totais
+          final transactionsTotal = filteredExpenses.fold(0.0, (sum, t) => sum + t.valor);
+          final invoicesTotal = (_selectedCategoryId == null && _selectedAccountId == null) 
+              ? cardInvoices.fold(0.0, (sum, invoice) => sum + invoice.amount)
+              : 0.0;
+          final totalValue = transactionsTotal + invoicesTotal;
+          final invoiceCount = (_selectedCategoryId == null && _selectedAccountId == null) 
+              ? cardInvoices.length 
+              : 0;
+          
+          // Paginação
+          final startIndex = _currentPage * _itemsPerPage;
+          final endIndex = (startIndex + _itemsPerPage).clamp(0, allItems.length);
+          final paginatedItems = allItems.sublist(startIndex, endIndex);
+          final totalPages = (allItems.length / _itemsPerPage).ceil();
 
           return Column(
             children: [
               // Header com resumo do mês
-              _buildMonthHeader(totalValue, filteredExpenses.length),
+              _buildMonthHeader(totalValue, filteredExpenses.length, invoiceCount),
               
-              // Lista de despesas
+              // Lista de despesas e faturas
               Expanded(
-                child: filteredExpenses.isEmpty
+                child: allItems.isEmpty
                     ? _buildEmptyState()
                     : ListView.builder(
                         padding: const EdgeInsets.all(16),
-                        itemCount: paginatedExpenses.length,
-                        itemBuilder: (context, index) {
-                          final transacao = paginatedExpenses[index];
-                          return _buildExpenseCard(context, transacao, financeProvider);
-                        },
+                        itemCount: paginatedItems.length,
+                        itemBuilder: (context, index) => paginatedItems[index],
                       ),
               ),
               
@@ -127,7 +195,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     );
   }
 
-  Widget _buildMonthHeader(double totalValue, int transactionCount) {
+  Widget _buildMonthHeader(double totalValue, int transactionCount, int invoiceCount) {
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
@@ -160,20 +228,43 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: TransactionColors.getDespesaBackground(context),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  '$transactionCount despesas',
-                  style: const TextStyle(
-                    color: TransactionColors.despesa,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (transactionCount > 0)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: TransactionColors.getDespesaBackground(context),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '$transactionCount despesas',
+                        style: const TextStyle(
+                          color: TransactionColors.despesa,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  if (invoiceCount > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '$invoiceCount faturas',
+                        style: const TextStyle(
+                          color: Colors.orange,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
@@ -212,6 +303,100 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                     ),
                   ),
                 ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCardInvoiceCard(BuildContext context, CardInvoiceItem invoice) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: context.containerColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border(
+          left: BorderSide(
+            width: 4,
+            color: invoice.cardColor,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: invoice.cardColor.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              Icons.credit_card,
+              color: invoice.cardColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Fatura ${invoice.cardName}',
+                  style: TextStyle(
+                    color: context.primaryText,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Cartão de Crédito',
+                  style: TextStyle(
+                    color: context.secondaryText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Vencimento: ${Formatters.formatDate(invoice.date)}',
+                  style: TextStyle(
+                    color: context.mutedText,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '-${Formatters.formatCurrency(invoice.amount)}',
+                style: TextStyle(
+                  color: invoice.cardColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text(
+                  'Fatura',
+                  style: TextStyle(
+                    color: Colors.orange,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ],
           ),
@@ -325,6 +510,54 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                     ),
                   ),
                 ),
+            ],
+          ),
+          const SizedBox(width: 8),
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: context.mutedText),
+            onSelected: (value) async {
+              if (value == 'editar') {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => AddExpenseScreen(transacao: transacao),
+                  ),
+                );
+              } else if (value == 'excluir') {
+                final confirm = await _confirmarExclusao(transacao);
+                if (confirm == true) {
+                  final success = await financeProvider.deletarTransacao(transacao.id);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(success ? 'Despesa excluída com sucesso!' : (financeProvider.errorMessage ?? 'Erro ao excluir despesa')),
+                        backgroundColor: success ? Colors.green : context.errorColor,
+                      ),
+                    );
+                  }
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'editar',
+                child: Row(
+                  children: const [
+                    Icon(Icons.edit, size: 18),
+                    SizedBox(width: 8),
+                    Text('Editar'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'excluir',
+                child: Row(
+                  children: const [
+                    Icon(Icons.delete, size: 18, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Excluir'),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
@@ -595,5 +828,29 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     if (picked != null) {
       setState(() => _intervaloDatas = picked);
     }
+  }
+
+  Future<bool?> _confirmarExclusao(Transacao transacao) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        title: Text('Excluir despesa', style: TextStyle(color: context.primaryText)),
+        content: Text(
+          'Deseja realmente excluir a despesa "${transacao.descricao}" no valor de -${Formatters.formatCurrency(transacao.valor)}?',
+          style: TextStyle(color: context.secondaryText),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('Cancelar', style: TextStyle(color: context.primaryText)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Excluir', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -76,6 +76,7 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'fab-planning',
         onPressed: () {
           if (_tabController.index == 0) {
             _adicionarPlanejamento();

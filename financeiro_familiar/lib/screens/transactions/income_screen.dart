@@ -6,6 +6,7 @@ import '../../models/categoria.dart';
 import '../../models/conta.dart';
 import '../../utils/formatters.dart';
 import '../../utils/theme_extensions.dart';
+import 'add_income_screen.dart'; // Added for edit mode navigation
 
 class IncomeScreen extends StatefulWidget {
   const IncomeScreen({super.key});
@@ -301,6 +302,78 @@ class _IncomeScreenState extends State<IncomeScreen> {
                   ),
                 ),
             ],
+          ),
+          const SizedBox(width: 8),
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: context.mutedText),
+            onSelected: (value) async {
+              if (value == 'editar') {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => AddIncomeScreen(transacao: transacao),
+                  ),
+                );
+              } else if (value == 'excluir') {
+                final confirm = await _confirmarExclusao(transacao);
+                if (confirm == true) {
+                  final success = await financeProvider.deletarTransacao(transacao.id);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(success ? 'Receita excluída com sucesso!' : (financeProvider.errorMessage ?? 'Erro ao excluir receita')),
+                        backgroundColor: success ? Colors.green : context.errorColor,
+                      ),
+                    );
+                  }
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'editar',
+                child: Row(
+                  children: const [
+                    Icon(Icons.edit, size: 18),
+                    SizedBox(width: 8),
+                    Text('Editar'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'excluir',
+                child: Row(
+                  children: const [
+                    Icon(Icons.delete, size: 18, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Excluir'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<bool?> _confirmarExclusao(Transacao transacao) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        title: Text('Excluir receita', style: TextStyle(color: context.primaryText)),
+        content: Text(
+          'Deseja realmente excluir a receita "${transacao.descricao}" no valor de +${Formatters.formatCurrency(transacao.valor)}?',
+          style: TextStyle(color: context.secondaryText),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('Cancelar', style: TextStyle(color: context.primaryText)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Excluir', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
