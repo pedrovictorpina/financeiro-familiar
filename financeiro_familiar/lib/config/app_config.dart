@@ -19,6 +19,8 @@ class AppConfig {
   // Mensagens
   static const String updateAvailableTitle = 'Atualização Disponível';
   static const String updateAvailableMessage = 'Uma nova versão do aplicativo está disponível!';
+  static const String appUpToDateTitle = 'App Atualizado! 🎉';
+  static const String appUpToDateMessage = 'Você está usando a versão mais recente do aplicativo.';
   static const String downloadingMessage = 'Baixando atualização...';
   static const String installingMessage = 'Instalando atualização...';
   

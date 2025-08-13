@@ -1051,7 +1051,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
 
     try {
-      await UpdateService.checkForUpdatesOnStartup(context);
+      await UpdateService.checkForUpdatesAndNotify(context);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

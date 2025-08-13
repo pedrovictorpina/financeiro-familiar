@@ -45,6 +45,14 @@ class UpdateService {
             'downloadUrl': _getApkDownloadUrl(releaseData['assets']),
             'releaseUrl': releaseData['html_url'],
           };
+        } else {
+          return {
+            'hasUpdate': false,
+            'currentVersion': currentVersion,
+            'latestVersion': latestVersion,
+            'releaseNotes': releaseData['body'] ?? '',
+            'releaseUrl': releaseData['html_url'],
+          };
         }
       }
       
@@ -161,6 +169,68 @@ class UpdateService {
     );
   }
   
+  static Future<void> showUpToDateDialog(BuildContext context, Map<String, dynamic> updateInfo) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        final cs = Theme.of(context).colorScheme;
+        return AlertDialog(
+          backgroundColor: cs.surface,
+          title: Row(
+            children: [
+              Icon(Icons.verified, color: cs.primary),
+              const SizedBox(width: 8),
+              Text(AppConfig.appUpToDateTitle, style: TextStyle(color: cs.onSurface)),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${AppConfig.appUpToDateMessage}\nVersão atual: ${updateInfo['currentVersion']}',
+                  style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w500),
+                ),
+                if (updateInfo['releaseNotes'] != null && (updateInfo['releaseNotes'] as String).trim().isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text('Novidades desta versão:', style: TextStyle(fontWeight: FontWeight.bold, color: cs.onSurface)),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: cs.surfaceVariant,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      updateInfo['releaseNotes'],
+                      style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+                    ),
+                  ),
+                ]
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Fechar', style: TextStyle(color: cs.primary)),
+            ),
+            if (updateInfo['releaseUrl'] != null)
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _openReleaseInBrowser(updateInfo['releaseUrl']);
+                },
+                child: Text('Ver no GitHub', style: TextStyle(color: cs.primary)),
+              ),
+          ],
+        );
+      },
+    );
+  }
+  
   static Future<void> _openReleaseInBrowser(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
@@ -259,13 +329,31 @@ class UpdateService {
   static Future<void> checkForUpdatesOnStartup(BuildContext context) async {
     final updateInfo = await checkForUpdates();
     
-    if (updateInfo != null && updateInfo['hasUpdate'] == true) {
+    if (updateInfo != null) {
       // Aguardar um pouco para garantir que a UI esteja pronta
-      await Future.delayed(const Duration(seconds: 2));
-      
+      await Future.delayed(const Duration(seconds: 1));
       if (context.mounted) {
-        await showUpdateDialog(context, updateInfo);
+        if (updateInfo['hasUpdate'] == true) {
+          await showUpdateDialog(context, updateInfo);
+        } else {
+          // Opcional: não mostrar automaticamente ao iniciar; apenas quando usuário tocar em "Verificar Atualizações"
+        }
       }
+    }
+  }
+  
+  // Exposição para uso explícito a partir de Configurações
+  static Future<void> checkForUpdatesAndNotify(BuildContext context) async {
+    final updateInfo = await checkForUpdates();
+    if (!context.mounted) return;
+    if (updateInfo == null) {
+      _showErrorSnackBar(context, 'Não foi possível verificar atualizações agora.');
+      return;
+    }
+    if (updateInfo['hasUpdate'] == true) {
+      await showUpdateDialog(context, updateInfo);
+    } else {
+      await showUpToDateDialog(context, updateInfo);
     }
   }
 }
