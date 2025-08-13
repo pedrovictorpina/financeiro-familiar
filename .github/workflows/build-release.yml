@@ -32,7 +32,8 @@ jobs:
         flutter-version: 'latest'
         channel: 'stable'
         cache: true
-      flutter doctor
+
+    - name: Flutter Doctor
       run: flutter doctor -v
       
     - name: Prepare signing keys (if provided)
