@@ -31,7 +31,10 @@ jobs:
       with:
         flutter-version: 'latest'
         channel: 'stable'
-        
+        cache: true
+      flutter doctor
+      run: flutter doctor -v
+      
     - name: Prepare signing keys (if provided)
       if: ${{ secrets.KEYSTORE_BASE64 != '' }}
       run: |
@@ -49,13 +52,13 @@ jobs:
       run: flutter pub get
       
     - name: Run tests
-      run: flutter test
+      run: flutter test --reporter expanded
       
     - name: Build APK
-      run: flutter build apk --release
+      run: flutter build apk --release --verbose
       
     - name: Build App Bundle
-      run: flutter build appbundle --release
+      run: flutter build appbundle --release --verbose
       
     - name: Get version from pubspec.yaml
       id: version
@@ -108,3 +111,13 @@ jobs:
         asset_path: build/app/outputs/bundle/release/app-release.aab
         asset_name: financeiro-familiar-v${{ steps.version.outputs.version }}.aab
         asset_content_type: application/octet-stream
+    - name: Upload build reports on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-build-logs
+        path: |
+          build/**/reports/**
+          **/flutter_export_environment.sh
+          **/*.log
+        if-no-files-found: warn
