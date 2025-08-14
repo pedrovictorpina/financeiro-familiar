@@ -51,10 +51,7 @@ class CardsScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Adicione seu primeiro cartão de crédito',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.grey[500], fontSize: 14),
                   ),
                 ],
               ),
@@ -83,10 +80,14 @@ class CardsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCardItem(BuildContext context, Cartao cartao, FinanceProvider financeProvider) {
+  Widget _buildCardItem(
+    BuildContext context,
+    Cartao cartao,
+    FinanceProvider financeProvider,
+  ) {
     final percentualUtilizado = cartao.percentualUtilizado;
     final limiteDisponivel = cartao.limiteDisponivel;
-    
+
     Color corProgresso;
     if (percentualUtilizado >= 90) {
       corProgresso = Colors.red;
@@ -112,11 +113,7 @@ class CardsScreen extends StatelessWidget {
                     color: cartao.cor.withAlpha(51),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    Icons.credit_card,
-                    color: cartao.cor,
-                    size: 24,
-                  ),
+                  child: Icon(Icons.credit_card, color: cartao.cor, size: 24),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -132,11 +129,9 @@ class CardsScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        AppConstants.cartaoBandeiras[cartao.bandeira ?? ''] ?? (cartao.bandeira ?? ''),
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 14,
-                        ),
+                        AppConstants.cartaoBandeiras[cartao.bandeira ?? ''] ??
+                            (cartao.bandeira ?? ''),
+                        style: TextStyle(color: Colors.grey[400], fontSize: 14),
                       ),
                     ],
                   ),
@@ -164,7 +159,10 @@ class CardsScreen extends StatelessWidget {
                         children: [
                           Icon(Icons.info, color: Colors.blue, size: 20),
                           SizedBox(width: 8),
-                          Text('Ver Detalhes', style: TextStyle(color: Colors.white)),
+                          Text(
+                            'Ver Detalhes',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ],
                       ),
                     ),
@@ -193,7 +191,7 @@ class CardsScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Informações do limite
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -203,10 +201,7 @@ class CardsScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Limite Total',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.grey[400], fontSize: 12),
                     ),
                     Text(
                       Formatters.formatCurrency(cartao.limite),
@@ -223,10 +218,7 @@ class CardsScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Disponível',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.grey[400], fontSize: 12),
                     ),
                     Text(
                       Formatters.formatCurrency(limiteDisponivel),
@@ -240,9 +232,9 @@ class CardsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Barra de progresso
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,10 +244,7 @@ class CardsScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Fatura Atual',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.grey[400], fontSize: 12),
                     ),
                     Text(
                       '${percentualUtilizado.toStringAsFixed(1)}%',
@@ -284,9 +273,9 @@ class CardsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Datas importantes
             Row(
               children: [
@@ -296,10 +285,7 @@ class CardsScreen extends StatelessWidget {
                     children: [
                       Text(
                         'Fechamento',
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.grey[400], fontSize: 12),
                       ),
                       Text(
                         'Dia ${cartao.fechamentoDia}',
@@ -318,10 +304,7 @@ class CardsScreen extends StatelessWidget {
                     children: [
                       Text(
                         'Vencimento',
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.grey[400], fontSize: 12),
                       ),
                       Text(
                         'Dia ${cartao.vencimentoDia}',
@@ -343,11 +326,9 @@ class CardsScreen extends StatelessWidget {
   }
 
   void _adicionarCartao(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const AddEditCardScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const AddEditCardScreen()));
   }
 
   void _verDetalhesCartao(BuildContext context, Cartao cartao) {
@@ -366,7 +347,11 @@ class CardsScreen extends StatelessWidget {
     );
   }
 
-  void _confirmarDelecao(BuildContext context, Cartao cartao, FinanceProvider financeProvider) {
+  void _confirmarDelecao(
+    BuildContext context,
+    Cartao cartao,
+    FinanceProvider financeProvider,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -382,37 +367,29 @@ class CardsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(color: Colors.grey),
-            ),
+            child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () async {
               Navigator.of(context).pop();
-              
+
               final sucesso = await financeProvider.deletarCartao(cartao.id!);
-              
+
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      sucesso 
-                        ? 'Cartão deletado com sucesso'
-                        : 'Erro ao deletar cartão',
+                      sucesso
+                          ? 'Cartão deletado com sucesso'
+                          : 'Erro ao deletar cartão',
                     ),
                     backgroundColor: sucesso ? Colors.green : Colors.red,
                   ),
                 );
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text(
-              'Deletar',
-              style: TextStyle(color: Colors.white),
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Deletar', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

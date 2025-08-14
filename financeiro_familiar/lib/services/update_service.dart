@@ -10,7 +10,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../config/app_config.dart';
 
 class UpdateService {
-  
   static Future<Map<String, dynamic>?> checkForUpdates() async {
     try {
       // Verificar se a configuração está correta
@@ -18,23 +17,26 @@ class UpdateService {
         debugPrint('UpdateService: ${AppConfig.configurationError}');
         return null;
       }
-      
+
       // Obter versão atual do app
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version;
-      
+
       // Consultar última release no GitHub
-      final response = await http.get(
-        Uri.parse(AppConfig.latestReleaseUrl),
-        headers: {
-          'Accept': 'application/vnd.github.v3+json',
-        },
-      ).timeout(const Duration(seconds: 30));
-      
+      final response = await http
+          .get(
+            Uri.parse(AppConfig.latestReleaseUrl),
+            headers: {'Accept': 'application/vnd.github.v3+json'},
+          )
+          .timeout(const Duration(seconds: 30));
+
       if (response.statusCode == 200) {
         final releaseData = json.decode(response.body);
-        final latestVersion = releaseData['tag_name'].toString().replaceAll('v', '');
-        
+        final latestVersion = releaseData['tag_name'].toString().replaceAll(
+          'v',
+          '',
+        );
+
         // Comparar versões
         if (_isNewerVersion(currentVersion, latestVersion)) {
           return {
@@ -55,17 +57,14 @@ class UpdateService {
           };
         }
       }
-      
-      return {
-        'hasUpdate': false,
-        'currentVersion': currentVersion,
-      };
+
+      return {'hasUpdate': false, 'currentVersion': currentVersion};
     } catch (e) {
       debugPrint('Erro ao verificar atualizações: $e');
       return null;
     }
   }
-  
+
   static String? _getApkDownloadUrl(List<dynamic> assets) {
     for (var asset in assets) {
       if (asset['name'].toString().endsWith('.apk')) {
@@ -74,23 +73,26 @@ class UpdateService {
     }
     return null;
   }
-  
+
   static bool _isNewerVersion(String current, String latest) {
     final currentParts = current.split('.').map(int.parse).toList();
     final latestParts = latest.split('.').map(int.parse).toList();
-    
+
     for (int i = 0; i < 3; i++) {
       final currentPart = i < currentParts.length ? currentParts[i] : 0;
       final latestPart = i < latestParts.length ? latestParts[i] : 0;
-      
+
       if (latestPart > currentPart) return true;
       if (latestPart < currentPart) return false;
     }
-    
+
     return false;
   }
-  
-  static Future<void> showUpdateDialog(BuildContext context, Map<String, dynamic> updateInfo) async {
+
+  static Future<void> showUpdateDialog(
+    BuildContext context,
+    Map<String, dynamic> updateInfo,
+  ) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -116,12 +118,18 @@ class UpdateService {
               children: [
                 Text(
                   'Nova versão ${updateInfo['latestVersion']} disponível!\nVersão atual: ${updateInfo['currentVersion']}',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: cs.onSurface),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: cs.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'Novidades:',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: cs.onSurface),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: cs.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Container(
@@ -158,7 +166,10 @@ class UpdateService {
               onPressed: updateInfo['downloadUrl'] != null
                   ? () {
                       Navigator.of(context).pop();
-                      downloadAndInstallUpdate(context, updateInfo['downloadUrl']);
+                      downloadAndInstallUpdate(
+                        context,
+                        updateInfo['downloadUrl'],
+                      );
                     }
                   : null,
               child: const Text('Baixar e Instalar'),
@@ -168,8 +179,11 @@ class UpdateService {
       },
     );
   }
-  
-  static Future<void> showUpToDateDialog(BuildContext context, Map<String, dynamic> updateInfo) async {
+
+  static Future<void> showUpToDateDialog(
+    BuildContext context,
+    Map<String, dynamic> updateInfo,
+  ) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -181,7 +195,10 @@ class UpdateService {
             children: [
               Icon(Icons.verified, color: cs.primary),
               const SizedBox(width: 8),
-              Text(AppConfig.appUpToDateTitle, style: TextStyle(color: cs.onSurface)),
+              Text(
+                AppConfig.appUpToDateTitle,
+                style: TextStyle(color: cs.onSurface),
+              ),
             ],
           ),
           content: SingleChildScrollView(
@@ -191,11 +208,23 @@ class UpdateService {
               children: [
                 Text(
                   '${AppConfig.appUpToDateMessage}\nVersão atual: ${updateInfo['currentVersion']}',
-                  style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-                if (updateInfo['releaseNotes'] != null && (updateInfo['releaseNotes'] as String).trim().isNotEmpty) ...[
+                if (updateInfo['releaseNotes'] != null &&
+                    (updateInfo['releaseNotes'] as String)
+                        .trim()
+                        .isNotEmpty) ...[
                   const SizedBox(height: 16),
-                  Text('Novidades desta versão:', style: TextStyle(fontWeight: FontWeight.bold, color: cs.onSurface)),
+                  Text(
+                    'Novidades desta versão:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: cs.onSurface,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -205,10 +234,13 @@ class UpdateService {
                     ),
                     child: Text(
                       updateInfo['releaseNotes'],
-                      style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: cs.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ]
+                ],
               ],
             ),
           ),
@@ -223,34 +255,43 @@ class UpdateService {
                   Navigator.of(context).pop();
                   _openReleaseInBrowser(updateInfo['releaseUrl']);
                 },
-                child: Text('Ver no GitHub', style: TextStyle(color: cs.primary)),
+                child: Text(
+                  'Ver no GitHub',
+                  style: TextStyle(color: cs.primary),
+                ),
               ),
           ],
         );
       },
     );
   }
-  
+
   static Future<void> _openReleaseInBrowser(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
-  
-  static Future<void> downloadAndInstallUpdate(BuildContext context, String downloadUrl) async {
+
+  static Future<void> downloadAndInstallUpdate(
+    BuildContext context,
+    String downloadUrl,
+  ) async {
     try {
       // Verificar permissões
       if (Platform.isAndroid) {
         final status = await Permission.requestInstallPackages.request();
         if (!status.isGranted) {
           if (context.mounted) {
-            _showErrorSnackBar(context, 'Permissão para instalar aplicativos negada.');
+            _showErrorSnackBar(
+              context,
+              'Permissão para instalar aplicativos negada.',
+            );
           }
           return;
         }
       }
-      
+
       // Mostrar dialog de progresso
       if (context.mounted) {
         showDialog(
@@ -265,19 +306,21 @@ class UpdateService {
                 const SizedBox(height: 16),
                 Text(
                   AppConfig.downloadingMessage,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
               ],
             ),
           ),
         );
       }
-      
+
       // Baixar o APK
       final dio = Dio();
       final tempDir = await getTemporaryDirectory();
       final filePath = '${tempDir.path}/update.apk';
-      
+
       await dio.download(
         downloadUrl,
         filePath,
@@ -288,24 +331,29 @@ class UpdateService {
           }
         },
       );
-      
+
       // Fechar dialog de progresso
       if (context.mounted) {
         Navigator.of(context).pop();
       }
-      
+
       // Abrir o APK para instalação manual
       if (Platform.isAndroid) {
         final uri = Uri.file(filePath);
         if (await canLaunchUrl(uri)) {
           await launchUrl(uri);
         } else if (context.mounted) {
-          _showErrorSnackBar(context, 'Não foi possível abrir o arquivo APK para instalação.');
+          _showErrorSnackBar(
+            context,
+            'Não foi possível abrir o arquivo APK para instalação.',
+          );
         }
       } else if (context.mounted) {
-        _showErrorSnackBar(context, 'Download de APK disponível apenas no Android.');
+        _showErrorSnackBar(
+          context,
+          'Download de APK disponível apenas no Android.',
+        );
       }
-      
     } catch (e) {
       // Fechar dialog de progresso se estiver aberto
       if (context.mounted) {
@@ -314,7 +362,7 @@ class UpdateService {
       }
     }
   }
-  
+
   static void _showErrorSnackBar(BuildContext context, String message) {
     final cs = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -325,10 +373,10 @@ class UpdateService {
       ),
     );
   }
-  
+
   static Future<void> checkForUpdatesOnStartup(BuildContext context) async {
     final updateInfo = await checkForUpdates();
-    
+
     if (updateInfo != null) {
       // Aguardar um pouco para garantir que a UI esteja pronta
       await Future.delayed(const Duration(seconds: 1));
@@ -341,13 +389,16 @@ class UpdateService {
       }
     }
   }
-  
+
   // Exposição para uso explícito a partir de Configurações
   static Future<void> checkForUpdatesAndNotify(BuildContext context) async {
     final updateInfo = await checkForUpdates();
     if (!context.mounted) return;
     if (updateInfo == null) {
-      _showErrorSnackBar(context, 'Não foi possível verificar atualizações agora.');
+      _showErrorSnackBar(
+        context,
+        'Não foi possível verificar atualizações agora.',
+      );
       return;
     }
     if (updateInfo['hasUpdate'] == true) {

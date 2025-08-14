@@ -15,7 +15,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -34,7 +34,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       body: Consumer<FinanceProvider>(
         builder: (context, financeProvider, child) {
           final categorias = financeProvider.categorias;
-          
+
           return Column(
             children: [
               if (categorias.isEmpty) ...[
@@ -115,7 +115,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                 children: [
                                   const Icon(Icons.trending_up, size: 16),
                                   const SizedBox(width: 8),
-                                  Text('Receitas (${categorias.where((c) => c.tipo == TipoCategoria.receita).length})'),
+                                  Text(
+                                    'Receitas (${categorias.where((c) => c.tipo == TipoCategoria.receita).length})',
+                                  ),
                                 ],
                               ),
                             ),
@@ -125,7 +127,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                 children: [
                                   const Icon(Icons.trending_down, size: 16),
                                   const SizedBox(width: 8),
-                                  Text('Despesas (${categorias.where((c) => c.tipo == TipoCategoria.despesa).length})'),
+                                  Text(
+                                    'Despesas (${categorias.where((c) => c.tipo == TipoCategoria.despesa).length})',
+                                  ),
                                 ],
                               ),
                             ),
@@ -136,11 +140,19 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           child: TabBarView(
                             children: [
                               _buildCategoryList(
-                                categorias.where((c) => c.tipo == TipoCategoria.receita).toList(),
+                                categorias
+                                    .where(
+                                      (c) => c.tipo == TipoCategoria.receita,
+                                    )
+                                    .toList(),
                                 TipoCategoria.receita,
                               ),
                               _buildCategoryList(
-                                categorias.where((c) => c.tipo == TipoCategoria.despesa).toList(),
+                                categorias
+                                    .where(
+                                      (c) => c.tipo == TipoCategoria.despesa,
+                                    )
+                                    .toList(),
                                 TipoCategoria.despesa,
                               ),
                             ],
@@ -151,7 +163,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   ),
                 ),
               ],
-              
+
               // Botões de ação
               Container(
                 padding: const EdgeInsets.all(16),
@@ -204,17 +216,16 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              tipo == TipoCategoria.receita ? Icons.trending_up : Icons.trending_down,
+              tipo == TipoCategoria.receita
+                  ? Icons.trending_up
+                  : Icons.trending_down,
               size: 48,
               color: Colors.white30,
             ),
             const SizedBox(height: 16),
             Text(
               'Nenhuma categoria de ${tipo == TipoCategoria.receita ? 'receita' : 'despesa'}',
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 16,
-              ),
+              style: const TextStyle(color: Colors.white70, fontSize: 16),
             ),
           ],
         ),
@@ -239,14 +250,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                    color: categoria.cor.withAlpha(51),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Icon(
-                    categoria.icone,
-                    color: categoria.cor,
-                    size: 24,
-                  ),
+                  color: categoria.cor.withAlpha(51),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Icon(categoria.icone, color: categoria.cor, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -277,13 +284,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 decoration: BoxDecoration(
                   color: tipo == TipoCategoria.receita
                       ? Colors.green.withAlpha(51)
-                        : Colors.red.withAlpha(51),
+                      : Colors.red.withAlpha(51),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   tipo == TipoCategoria.receita ? 'Receita' : 'Despesa',
                   style: TextStyle(
-                    color: tipo == TipoCategoria.receita ? Colors.green : Colors.red,
+                    color: tipo == TipoCategoria.receita
+                        ? Colors.green
+                        : Colors.red,
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                   ),
@@ -301,7 +310,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     TipoCategoria tipoSelecionado = TipoCategoria.despesa;
     Color corSelecionada = Theme.of(context).colorScheme.primary;
     IconData iconeSelecionado = Icons.category;
-    
+
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -364,10 +373,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 ),
                 const SizedBox(height: 16),
                 // Seletor de cor
-                const Text(
-                  'Cor',
-                  style: TextStyle(color: Colors.white70),
-                ),
+                const Text('Cor', style: TextStyle(color: Colors.white70)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -390,7 +396,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               : null,
                         ),
                         child: isSelected
-                            ? const Icon(Icons.check, color: Colors.white, size: 16)
+                            ? const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 16,
+                              )
                             : null,
                       ),
                     );
@@ -438,7 +448,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     ];
   }
 
-  void _addCategory(String nome, TipoCategoria tipo, Color cor, IconData icone) {
+  void _addCategory(
+    String nome,
+    TipoCategoria tipo,
+    Color cor,
+    IconData icone,
+  ) {
     if (nome.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -457,7 +472,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       icone: icone,
     );
 
-    final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+    final financeProvider = Provider.of<FinanceProvider>(
+      context,
+      listen: false,
+    );
     financeProvider.adicionarCategoria(categoria).then((success) {
       if (success) {
         Navigator.of(context).pop();
@@ -470,7 +488,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(financeProvider.errorMessage ?? 'Erro ao adicionar categoria'),
+            content: Text(
+              financeProvider.errorMessage ?? 'Erro ao adicionar categoria',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -479,8 +499,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   }
 
   void _createDefaultCategories() {
-    final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
-    
+    final financeProvider = Provider.of<FinanceProvider>(
+      context,
+      listen: false,
+    );
+
     final categoriasPadrao = [
       // Receitas
       Categoria(
@@ -504,7 +527,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         cor: const Color(0xFF8B5CF6),
         icone: Icons.trending_up,
       ),
-      
+
       // Despesas
       Categoria(
         id: 'despesa_alimentacao',

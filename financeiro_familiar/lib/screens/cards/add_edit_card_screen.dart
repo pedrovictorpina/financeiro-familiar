@@ -8,7 +8,7 @@ import '../../utils/formatters.dart';
 
 class AddEditCardScreen extends StatefulWidget {
   final Cartao? cartao;
-  
+
   const AddEditCardScreen({super.key, this.cartao});
 
   @override
@@ -22,7 +22,7 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
 
   final _fechamentoDiaController = TextEditingController();
   final _vencimentoDiaController = TextEditingController();
-  
+
   String _bandeiraSelecionada = 'visa';
   Color _corSelecionada = const Color(0xFF8B5CF6);
   bool _isLoading = false;
@@ -49,7 +49,9 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
   void _preencherCampos() {
     final cartao = widget.cartao!;
     _nomeController.text = cartao.nome;
-    _limiteController.text = cartao.limite.toStringAsFixed(2).replaceAll('.', ',');
+    _limiteController.text = cartao.limite
+        .toStringAsFixed(2)
+        .replaceAll('.', ',');
 
     _fechamentoDiaController.text = cartao.fechamentoDia.toString();
     _vencimentoDiaController.text = cartao.vencimentoDia.toString();
@@ -70,7 +72,7 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
   @override
   Widget build(BuildContext context) {
     final isEdicao = widget.cartao != null;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(isEdicao ? 'Editar Cartão' : 'Novo Cartão'),
@@ -100,18 +102,20 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
             // Preview do cartão
             _buildCardPreview(),
             const SizedBox(height: 24),
-            
+
             // Campos do formulário
             _buildFormFields(),
-            
+
             const SizedBox(height: 32),
-            
+
             // Botões
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+                    onPressed: _isLoading
+                        ? null
+                        : () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
                       side: const BorderSide(color: Colors.grey),
@@ -147,10 +151,7 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            _corSelecionada,
-            _corSelecionada.withOpacity(0.8),
-          ],
+          colors: [_corSelecionada, _corSelecionada.withOpacity(0.8)],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
@@ -169,13 +170,10 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(
-                  Icons.credit_card,
-                  color: Colors.white,
-                  size: 32,
-                ),
+                const Icon(Icons.credit_card, color: Colors.white, size: 32),
                 Text(
-                  AppConstants.cartaoBandeiras[_bandeiraSelecionada] ?? _bandeiraSelecionada.toUpperCase(),
+                  AppConstants.cartaoBandeiras[_bandeiraSelecionada] ??
+                      _bandeiraSelecionada.toUpperCase(),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -186,7 +184,9 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
             ),
             const Spacer(),
             Text(
-              _nomeController.text.isEmpty ? 'Nome do Cartão' : _nomeController.text,
+              _nomeController.text.isEmpty
+                  ? 'Nome do Cartão'
+                  : _nomeController.text,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -202,15 +202,12 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
                   children: [
                     const Text(
                       'Limite',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                     Text(
-                      _limiteController.text.isEmpty 
-                        ? 'R\$ 0,00' 
-                        : 'R\$ ${_limiteController.text}',
+                      _limiteController.text.isEmpty
+                          ? 'R\$ 0,00'
+                          : 'R\$ ${_limiteController.text}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -224,15 +221,12 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
                   children: [
                     const Text(
                       'Vencimento',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                     Text(
-                      _vencimentoDiaController.text.isEmpty 
-                        ? 'Dia --' 
-                        : 'Dia ${_vencimentoDiaController.text}',
+                      _vencimentoDiaController.text.isEmpty
+                          ? 'Dia --'
+                          : 'Dia ${_vencimentoDiaController.text}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -271,9 +265,9 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
           },
           onChanged: (value) => setState(() {}),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Bandeira
         DropdownButtonFormField<String>(
           value: _bandeiraSelecionada,
@@ -285,10 +279,7 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
           style: const TextStyle(color: Colors.white),
           dropdownColor: const Color(0xFF2A2A2A),
           items: AppConstants.cartaoBandeiras.entries.map((entry) {
-            return DropdownMenuItem(
-              value: entry.key,
-              child: Text(entry.value),
-            );
+            return DropdownMenuItem(value: entry.key, child: Text(entry.value));
           }).toList(),
           onChanged: (value) {
             setState(() {
@@ -296,9 +287,9 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
             });
           },
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Limite
         TextFormField(
           controller: _limiteController,
@@ -326,11 +317,9 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
           },
           onChanged: (value) => setState(() {}),
         ),
-        
 
-        
         const SizedBox(height: 16),
-        
+
         // Dias de fechamento e vencimento
         Row(
           children: [
@@ -393,9 +382,9 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 24),
-        
+
         // Seletor de cor
         const Text(
           'Cor do Cartão',
@@ -420,25 +409,21 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
                   color: cor,
                   shape: BoxShape.circle,
                   border: isSelected
-                    ? Border.all(color: Colors.white, width: 3)
-                    : null,
+                      ? Border.all(color: Colors.white, width: 3)
+                      : null,
                   boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: cor.withOpacity(0.5),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ]
-                    : null,
+                      ? [
+                          BoxShadow(
+                            color: cor.withOpacity(0.5),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          ),
+                        ]
+                      : null,
                 ),
                 child: isSelected
-                  ? const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 24,
-                    )
-                  : null,
+                    ? const Icon(Icons.check, color: Colors.white, size: 24)
+                    : null,
               ),
             );
           }).toList(),
@@ -450,14 +435,19 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
   Future<void> _salvarCartao() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
-    
+    final financeProvider = Provider.of<FinanceProvider>(
+      context,
+      listen: false,
+    );
+
     // Verificar se há um orçamento selecionado
     if (financeProvider.orcamentoAtual == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Nenhum orçamento selecionado. Selecione um orçamento nas configurações.'),
+            content: Text(
+              'Nenhum orçamento selecionado. Selecione um orçamento nas configurações.',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -499,9 +489,9 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                widget.cartao != null 
-                  ? 'Cartão atualizado com sucesso'
-                  : 'Cartão adicionado com sucesso',
+                widget.cartao != null
+                    ? 'Cartão atualizado com sucesso'
+                    : 'Cartão adicionado com sucesso',
               ),
               backgroundColor: Colors.green,
             ),
@@ -520,10 +510,7 @@ class _AddEditCardScreenState extends State<AddEditCardScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {

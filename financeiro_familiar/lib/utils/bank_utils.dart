@@ -111,9 +111,5 @@ class BankInfo {
   final Color color;
   final IconData icon;
 
-  const BankInfo({
-    required this.name,
-    required this.color,
-    required this.icon,
-  });
+  const BankInfo({required this.name, required this.color, required this.icon});
 }

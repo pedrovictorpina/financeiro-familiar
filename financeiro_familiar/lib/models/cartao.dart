@@ -25,7 +25,9 @@ class Cartao {
 
   factory Cartao.fromMap(Map<String, dynamic> map, String id) {
     print('DEBUG: fromMap - dados recebidos: $map');
-    final faturasMensais = List<Map<String, dynamic>>.from(map['faturasMensais'] ?? []);
+    final faturasMensais = List<Map<String, dynamic>>.from(
+      map['faturasMensais'] ?? [],
+    );
     print('DEBUG: fromMap - faturasMensais processadas: $faturasMensais');
     return Cartao(
       id: id,
@@ -84,7 +86,7 @@ class Cartao {
     if (faturasMensais.isEmpty) {
       return faturaAtual;
     }
-    
+
     // Ordena as faturas por ano e mês (mais recente primeiro)
     final faturasOrdenadas = List<Map<String, dynamic>>.from(faturasMensais);
     faturasOrdenadas.sort((a, b) {
@@ -92,26 +94,30 @@ class Cartao {
       final anoB = b['ano'] ?? 0;
       final mesA = a['mes'] ?? 0;
       final mesB = b['mes'] ?? 0;
-      
+
       if (anoA != anoB) {
         return anoB.compareTo(anoA); // Ano mais recente primeiro
       }
       return mesB.compareTo(mesA); // Mês mais recente primeiro
     });
-    
+
     // Retorna o valor da fatura mais recente
     final faturaMaisRecente = faturasOrdenadas.first;
     return faturaMaisRecente['valor']?.toDouble() ?? 0.0;
   }
-  
+
   double get limiteDisponivel => limite - totalFaturasMensais;
-  
-  double get percentualUtilizado => limite > 0 ? (totalFaturasMensais / limite) * 100 : 0;
-  
+
+  double get percentualUtilizado =>
+      limite > 0 ? (totalFaturasMensais / limite) * 100 : 0;
+
   double get totalFaturasMensais {
-    return faturasMensais.fold(0.0, (sum, fatura) => sum + (fatura['valor']?.toDouble() ?? 0.0));
+    return faturasMensais.fold(
+      0.0,
+      (sum, fatura) => sum + (fatura['valor']?.toDouble() ?? 0.0),
+    );
   }
-  
+
   // Método para obter a fatura de um mês específico
   double getFaturaMes(int mes, int ano) {
     final fatura = faturasMensais.firstWhere(
@@ -124,22 +130,22 @@ class Cartao {
   DateTime get proximoFechamento {
     final now = DateTime.now();
     var fechamento = DateTime(now.year, now.month, fechamentoDia);
-    
+
     if (fechamento.isBefore(now)) {
       fechamento = DateTime(now.year, now.month + 1, fechamentoDia);
     }
-    
+
     return fechamento;
   }
 
   DateTime get proximoVencimento {
     final now = DateTime.now();
     var vencimento = DateTime(now.year, now.month, vencimentoDia);
-    
+
     if (vencimento.isBefore(now)) {
       vencimento = DateTime(now.year, now.month + 1, vencimentoDia);
     }
-    
+
     return vencimento;
   }
 
@@ -147,7 +153,7 @@ class Cartao {
     if (colorString == null || colorString.isEmpty) {
       return const Color(0xFF8B5CF6); // Cor padrão
     }
-    
+
     try {
       // Remove o '#' se presente e converte para int
       String hexColor = colorString.replaceAll('#', '');

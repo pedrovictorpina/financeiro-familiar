@@ -14,7 +14,9 @@ class FirestoreService {
   // ORÇAMENTOS
   Future<String> criarOrcamento(Orcamento orcamento) async {
     try {
-      final docRef = await _firestore.collection('orcamentos').add(orcamento.toMap());
+      final docRef = await _firestore
+          .collection('orcamentos')
+          .add(orcamento.toMap());
       return docRef.id;
     } catch (e) {
       throw Exception('Erro ao criar orçamento: $e');
@@ -26,15 +28,20 @@ class FirestoreService {
         .collection('orcamentos')
         .where('usuariosVinculados', arrayContains: uid)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Orcamento.fromMap(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Orcamento.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
-  Future<void> adicionarUsuarioAoOrcamento(String orcamentoId, String uid) async {
+  Future<void> adicionarUsuarioAoOrcamento(
+    String orcamentoId,
+    String uid,
+  ) async {
     try {
       await _firestore.collection('orcamentos').doc(orcamentoId).update({
-        'usuariosVinculados': FieldValue.arrayUnion([uid])
+        'usuariosVinculados': FieldValue.arrayUnion([uid]),
       });
     } catch (e) {
       throw Exception('Erro ao adicionar usuário ao orçamento: $e');
@@ -42,7 +49,10 @@ class FirestoreService {
   }
 
   // TRANSAÇÕES
-  Future<String> adicionarTransacao(String orcamentoId, Transacao transacao) async {
+  Future<String> adicionarTransacao(
+    String orcamentoId,
+    Transacao transacao,
+  ) async {
     try {
       final docRef = await _firestore
           .collection('orcamentos')
@@ -62,12 +72,17 @@ class FirestoreService {
         .collection('transacoes')
         .orderBy('timestamp', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Transacao.fromMap(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Transacao.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
-  Future<void> atualizarTransacao(String orcamentoId, Transacao transacao) async {
+  Future<void> atualizarTransacao(
+    String orcamentoId,
+    Transacao transacao,
+  ) async {
     try {
       await _firestore
           .collection('orcamentos')
@@ -94,7 +109,10 @@ class FirestoreService {
   }
 
   // CATEGORIAS
-  Future<String> adicionarCategoria(String orcamentoId, Categoria categoria) async {
+  Future<String> adicionarCategoria(
+    String orcamentoId,
+    Categoria categoria,
+  ) async {
     try {
       final docRef = await _firestore
           .collection('orcamentos')
@@ -113,9 +131,11 @@ class FirestoreService {
         .doc(orcamentoId)
         .collection('categorias')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Categoria.fromMap(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Categoria.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   // CONTAS
@@ -138,12 +158,18 @@ class FirestoreService {
         .doc(orcamentoId)
         .collection('contas')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Conta.fromMap(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Conta.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
-  Future<void> atualizarSaldoConta(String orcamentoId, String contaId, double novoSaldo) async {
+  Future<void> atualizarSaldoConta(
+    String orcamentoId,
+    String contaId,
+    double novoSaldo,
+  ) async {
     try {
       await _firestore
           .collection('orcamentos')
@@ -202,9 +228,11 @@ class FirestoreService {
         .doc(orcamentoId)
         .collection('cartoes')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Cartao.fromMap(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Cartao.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<void> atualizarCartao(String orcamentoId, Cartao cartao) async {
@@ -253,12 +281,18 @@ class FirestoreService {
         .doc(orcamentoId)
         .collection('metas')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Meta.fromMap(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Meta.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
-  Future<void> atualizarProgressoMeta(String orcamentoId, String metaId, double novoValor) async {
+  Future<void> atualizarProgressoMeta(
+    String orcamentoId,
+    String metaId,
+    double novoValor,
+  ) async {
     try {
       await _firestore
           .collection('orcamentos')
@@ -298,7 +332,10 @@ class FirestoreService {
   }
 
   // PLANEJAMENTOS
-  Future<String> adicionarPlanejamento(String orcamentoId, Planejamento planejamento) async {
+  Future<String> adicionarPlanejamento(
+    String orcamentoId,
+    Planejamento planejamento,
+  ) async {
     try {
       final docRef = await _firestore
           .collection('orcamentos')
@@ -318,12 +355,17 @@ class FirestoreService {
         .collection('planejamentos')
         .where('mes', isEqualTo: mes)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Planejamento.fromMap(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Planejamento.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
-  Future<void> atualizarPlanejamento(String orcamentoId, Planejamento planejamento) async {
+  Future<void> atualizarPlanejamento(
+    String orcamentoId,
+    Planejamento planejamento,
+  ) async {
     try {
       await _firestore
           .collection('orcamentos')
@@ -336,7 +378,10 @@ class FirestoreService {
     }
   }
 
-  Future<void> excluirPlanejamento(String orcamentoId, String planejamentoId) async {
+  Future<void> excluirPlanejamento(
+    String orcamentoId,
+    String planejamentoId,
+  ) async {
     try {
       await _firestore
           .collection('orcamentos')
@@ -350,20 +395,23 @@ class FirestoreService {
   }
 
   // CONFIGURAÇÃO DASHBOARD
-  Future<void> salvarConfigDashboard(String orcamentoId, List<ConfigDashboard> configs) async {
+  Future<void> salvarConfigDashboard(
+    String orcamentoId,
+    List<ConfigDashboard> configs,
+  ) async {
     try {
       final batch = _firestore.batch();
-      
+
       for (final config in configs) {
         final docRef = _firestore
             .collection('orcamentos')
             .doc(orcamentoId)
             .collection('config_dashboard')
             .doc(config.cardId.toString().split('.').last);
-        
+
         batch.set(docRef, config.toMap());
       }
-      
+
       await batch.commit();
     } catch (e) {
       throw Exception('Erro ao salvar configuração do dashboard: $e');
@@ -377,8 +425,10 @@ class FirestoreService {
         .collection('config_dashboard')
         .orderBy('ordem')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => ConfigDashboard.fromMap(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => ConfigDashboard.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
   }
 }

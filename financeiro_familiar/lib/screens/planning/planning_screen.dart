@@ -16,7 +16,8 @@ class PlanningScreen extends StatefulWidget {
   State<PlanningScreen> createState() => _PlanningScreenState();
 }
 
-class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStateMixin {
+class _PlanningScreenState extends State<PlanningScreen>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   DateTime _mesSelecionado = DateTime.now();
 
@@ -24,11 +25,14 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    
+
     // Carregar planejamentos do mês selecionado após o orçamento ser carregado
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
-      
+      final financeProvider = Provider.of<FinanceProvider>(
+        context,
+        listen: false,
+      );
+
       // Aguardar o orçamento ser carregado antes de carregar planejamentos
       if (financeProvider.orcamentoAtual != null) {
         financeProvider.carregarPlanejamentosMes(_mesSelecionado);
@@ -70,10 +74,7 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildOrcamentoTab(),
-          _buildMetasTab(),
-        ],
+        children: [_buildOrcamentoTab(), _buildMetasTab()],
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'fab-planning',
@@ -92,17 +93,15 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
   Widget _buildOrcamentoTab() {
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
-        final planejamentos = financeProvider.planejamentos
-            .where((p) {
-              final partes = p.mes.split('-');
-              if (partes.length >= 2) {
-                final ano = int.tryParse(partes[0]) ?? 0;
-                final mes = int.tryParse(partes[1]) ?? 0;
-                return ano == _mesSelecionado.year && mes == _mesSelecionado.month;
-              }
-              return false;
-            })
-            .toList();
+        final planejamentos = financeProvider.planejamentos.where((p) {
+          final partes = p.mes.split('-');
+          if (partes.length >= 2) {
+            final ano = int.tryParse(partes[0]) ?? 0;
+            final mes = int.tryParse(partes[1]) ?? 0;
+            return ano == _mesSelecionado.year && mes == _mesSelecionado.month;
+          }
+          return false;
+        }).toList();
 
         if (planejamentos.isEmpty) {
           return Center(
@@ -117,10 +116,7 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                 const SizedBox(height: 16),
                 Text(
                   'Nenhum orçamento definido',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -138,9 +134,17 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
           );
         }
 
-        final totalLimite = planejamentos.fold<double>(0, (sum, p) => sum + p.limite);
-        final totalGasto = planejamentos.fold<double>(0, (sum, p) => sum + p.gastoAtual);
-        final percentualGeral = totalLimite > 0 ? (totalGasto / totalLimite) * 100 : 0;
+        final totalLimite = planejamentos.fold<double>(
+          0,
+          (sum, p) => sum + p.limite,
+        );
+        final totalGasto = planejamentos.fold<double>(
+          0,
+          (sum, p) => sum + p.gastoAtual,
+        );
+        final percentualGeral = totalLimite > 0
+            ? (totalGasto / totalLimite) * 100
+            : 0;
 
         return Column(
           children: [
@@ -163,9 +167,8 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                       const SizedBox(width: 8),
                       Text(
                         Formatters.formatMonthName(_mesSelecionado),
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -182,10 +185,13 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                             ),
                             Text(
                               Formatters.formatCurrency(totalLimite),
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
                             ),
                           ],
                         ),
@@ -200,10 +206,13 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                             ),
                             Text(
                               Formatters.formatCurrency(totalGasto),
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: _getCorPorcentagem(percentualGeral.toDouble()),
-                              ),
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: _getCorPorcentagem(
+                                      percentualGeral.toDouble(),
+                                    ),
+                                  ),
                             ),
                           ],
                         ),
@@ -217,11 +226,16 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             Text(
-                              Formatters.formatCurrency(totalLimite - totalGasto),
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: totalLimite - totalGasto >= 0 ? Colors.green : Colors.red,
+                              Formatters.formatCurrency(
+                                totalLimite - totalGasto,
                               ),
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: totalLimite - totalGasto >= 0
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
                             ),
                           ],
                         ),
@@ -231,7 +245,9 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                   const SizedBox(height: 16),
                   LinearProgressIndicator(
                     value: percentualGeral / 100,
-                    backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.surfaceVariant,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       _getCorPorcentagem(percentualGeral.toDouble()),
                     ),
@@ -244,7 +260,7 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                 ],
               ),
             ),
-            
+
             // Lista de planejamentos
             Expanded(
               child: ListView.builder(
@@ -252,7 +268,11 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                 itemCount: planejamentos.length,
                 itemBuilder: (context, index) {
                   final planejamento = planejamentos[index];
-                  return _buildPlanejamentoCard(context, planejamento, financeProvider);
+                  return _buildPlanejamentoCard(
+                    context,
+                    planejamento,
+                    financeProvider,
+                  );
                 },
               ),
             ),
@@ -270,18 +290,11 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.flag_outlined,
-                  size: 64,
-                  color: Colors.grey[400],
-                ),
+                Icon(Icons.flag_outlined, size: 64, color: Colors.grey[400]),
                 const SizedBox(height: 16),
                 Text(
                   'Nenhuma meta definida',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -311,7 +324,11 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
     );
   }
 
-  Widget _buildPlanejamentoCard(BuildContext context, Planejamento planejamento, FinanceProvider financeProvider) {
+  Widget _buildPlanejamentoCard(
+    BuildContext context,
+    Planejamento planejamento,
+    FinanceProvider financeProvider,
+  ) {
     final categoria = financeProvider.categorias.firstWhere(
       (c) => c.id == planejamento.categoriaId,
       orElse: () => Categoria(
@@ -337,11 +354,7 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
               children: [
                 CircleAvatar(
                   backgroundColor: categoria.cor.withAlpha(51),
-                  child: Icon(
-                    categoria.icone,
-                    color: categoria.cor,
-                    size: 20,
-                  ),
+                  child: Icon(categoria.icone, color: categoria.cor, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -366,11 +379,7 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                     ],
                   ),
                 ),
-                Icon(
-                  iconeStatus,
-                  color: cor,
-                  size: 20,
-                ),
+                Icon(iconeStatus, color: cor, size: 20),
                 const SizedBox(width: 8),
                 PopupMenuButton(
                   itemBuilder: (context) => [
@@ -458,7 +467,9 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: planejamento.saldoRestante >= 0 ? Colors.green : Colors.red,
+                          color: planejamento.saldoRestante >= 0
+                              ? Colors.green
+                              : Colors.red,
                         ),
                       ),
                     ],
@@ -483,8 +494,14 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
     );
   }
 
-  Widget _buildMetaCard(BuildContext context, meta, FinanceProvider financeProvider) {
-    final cor = meta.isCompleta ? Colors.green : Theme.of(context).colorScheme.primary;
+  Widget _buildMetaCard(
+    BuildContext context,
+    meta,
+    FinanceProvider financeProvider,
+  ) {
+    final cor = meta.isCompleta
+        ? Colors.green
+        : Theme.of(context).colorScheme.primary;
     final icone = meta.isCompleta ? Icons.check_circle : Icons.flag_outlined;
 
     return Card(
@@ -497,12 +514,19 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Color(int.parse(meta.cor!.replaceFirst('#', '0xFF'))).withAlpha(51),
+                  backgroundColor: Color(
+                    int.parse(meta.cor!.replaceFirst('#', '0xFF')),
+                  ).withAlpha(51),
                   child: Icon(
                     meta.icone != null
-                        ? IconData(int.parse(meta.icone!), fontFamily: 'MaterialIcons')
+                        ? IconData(
+                            int.parse(meta.icone!),
+                            fontFamily: 'MaterialIcons',
+                          )
                         : Icons.flag_outlined,
-                    color: Color(int.parse(meta.cor!.replaceFirst('#', '0xFF'))),
+                    color: Color(
+                      int.parse(meta.cor!.replaceFirst('#', '0xFF')),
+                    ),
                     size: 20,
                   ),
                 ),
@@ -526,11 +550,7 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                     ],
                   ),
                 ),
-                Icon(
-                  icone,
-                  color: cor,
-                  size: 20,
-                ),
+                Icon(icone, color: cor, size: 20),
                 const SizedBox(width: 8),
                 PopupMenuButton(
                   itemBuilder: (context) => [
@@ -630,7 +650,9 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: meta.valorRestante <= 0 ? Colors.green : Colors.orange,
+                          color: meta.valorRestante <= 0
+                              ? Colors.green
+                              : Colors.orange,
                         ),
                       ),
                     ],
@@ -719,14 +741,17 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
         );
       },
     );
-    
+
     if (data != null) {
       setState(() {
         _mesSelecionado = DateTime(data.year, data.month);
       });
-      
+
       // Carregar planejamentos do novo mês selecionado
-      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+      final financeProvider = Provider.of<FinanceProvider>(
+        context,
+        listen: false,
+      );
       financeProvider.carregarPlanejamentosMes(_mesSelecionado);
     }
   }
@@ -757,19 +782,38 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Excluir Planejamento'),
-        content: const Text('Tem certeza que deseja excluir este planejamento?'),
+        content: const Text(
+          'Tem certeza que deseja excluir este planejamento?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
-              // TODO: Implementar exclusão
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Planejamento excluído')),
+            onPressed: () async {
+              final financeProvider = Provider.of<FinanceProvider>(
+                context,
+                listen: false,
               );
+              final success = await financeProvider.excluirPlanejamento(id);
+              if (!mounted) return;
+              Navigator.of(context).pop();
+              if (success) {
+                financeProvider.carregarPlanejamentosMes(_mesSelecionado);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Planejamento excluído com sucesso'),
+                  ),
+                );
+              } else {
+                final msg =
+                    financeProvider.errorMessage ??
+                    'Erro ao excluir planejamento';
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(msg)));
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Excluir'),
@@ -782,27 +826,21 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
   void _adicionarMeta() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const AddGoalScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const AddGoalScreen()),
     );
   }
 
   void _editarMeta(meta) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => AddGoalScreen(meta: meta),
-      ),
+      MaterialPageRoute(builder: (context) => AddGoalScreen(meta: meta)),
     );
   }
 
   void _adicionarValorMeta(meta) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => AddGoalValueScreen(meta: meta),
-      ),
+      MaterialPageRoute(builder: (context) => AddGoalValueScreen(meta: meta)),
     );
   }
 
@@ -818,12 +856,25 @@ class _PlanningScreenState extends State<PlanningScreen> with TickerProviderStat
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
-              // TODO: Implementar exclusão
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Meta excluída')),
+            onPressed: () async {
+              final financeProvider = Provider.of<FinanceProvider>(
+                context,
+                listen: false,
               );
+              final success = await financeProvider.excluirMeta(id);
+              if (!mounted) return;
+              Navigator.of(context).pop();
+              if (success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Meta excluída com sucesso')),
+                );
+              } else {
+                final msg =
+                    financeProvider.errorMessage ?? 'Erro ao excluir meta';
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(msg)));
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Excluir'),

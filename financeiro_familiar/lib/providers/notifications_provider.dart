@@ -68,16 +68,16 @@ class AppNotification {
 
 class NotificationsProvider extends ChangeNotifier {
   static const String _notificationsKey = 'app_notifications';
-  
+
   List<AppNotification> _notifications = [];
-  
+
   List<AppNotification> get notifications => _notifications;
-  
-  List<AppNotification> get unreadNotifications => 
+
+  List<AppNotification> get unreadNotifications =>
       _notifications.where((n) => !n.isRead).toList();
-  
+
   int get unreadCount => unreadNotifications.length;
-  
+
   bool get hasUnread => unreadCount > 0;
 
   NotificationsProvider() {
@@ -88,13 +88,13 @@ class NotificationsProvider extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final notificationsJson = prefs.getString(_notificationsKey);
-      
+
       if (notificationsJson != null) {
         final List<dynamic> decoded = json.decode(notificationsJson);
         _notifications = decoded
             .map((item) => AppNotification.fromJson(item))
             .toList();
-        
+
         // Ordenar por data de criação (mais recentes primeiro)
         _notifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         notifyListeners();
@@ -132,12 +132,12 @@ class NotificationsProvider extends ChangeNotifier {
     );
 
     _notifications.insert(0, notification);
-    
+
     // Manter apenas as últimas 50 notificações
     if (_notifications.length > 50) {
       _notifications = _notifications.take(50).toList();
     }
-    
+
     await _saveNotifications();
     notifyListeners();
   }
@@ -172,11 +172,16 @@ class NotificationsProvider extends ChangeNotifier {
   }
 
   // Métodos para adicionar tipos específicos de notificações
-  Future<void> addTransactionNotification(String type, double amount, String description) async {
+  Future<void> addTransactionNotification(
+    String type,
+    double amount,
+    String description,
+  ) async {
     final isIncome = type == 'receita';
     await addNotification(
       title: isIncome ? 'Nova Receita' : 'Nova Despesa',
-      message: '${isIncome ? "Receita" : "Despesa"} de R\$ ${amount.toStringAsFixed(2)} - $description',
+      message:
+          '${isIncome ? "Receita" : "Despesa"} de R\$ ${amount.toStringAsFixed(2)} - $description',
       actionType: 'transaction',
       data: {'type': type, 'amount': amount, 'description': description},
     );
@@ -185,17 +190,23 @@ class NotificationsProvider extends ChangeNotifier {
   Future<void> addCardPaymentReminder(String cardName, int daysUntilDue) async {
     await addNotification(
       title: 'Lembrete de Fatura',
-      message: 'A fatura do cartão $cardName vence em $daysUntilDue ${daysUntilDue == 1 ? "dia" : "dias"}!',
+      message:
+          'A fatura do cartão $cardName vence em $daysUntilDue ${daysUntilDue == 1 ? "dia" : "dias"}!',
       actionType: 'card_reminder',
       data: {'cardName': cardName, 'daysUntilDue': daysUntilDue},
     );
   }
 
-  Future<void> addBudgetAlert(String categoryName, double spent, double budget) async {
+  Future<void> addBudgetAlert(
+    String categoryName,
+    double spent,
+    double budget,
+  ) async {
     final percentage = (spent / budget * 100).round();
     await addNotification(
       title: 'Alerta de Orçamento',
-      message: 'Você gastou $percentage% do orçamento da categoria $categoryName',
+      message:
+          'Você gastou $percentage% do orçamento da categoria $categoryName',
       actionType: 'budget_alert',
       data: {'categoryName': categoryName, 'spent': spent, 'budget': budget},
     );

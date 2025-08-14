@@ -29,20 +29,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
   DateTime _selectedMonth = DateTime.now();
   bool _isBalanceVisible = true;
   int _selectedYear = DateTime.now().year;
-  
+
   String get selectedMonth {
     const months = [
-      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro',
     ];
     return months[_selectedMonth.month - 1];
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final isWeb = MediaQuery.of(context).size.width > 600;
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
@@ -62,19 +72,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   // Só mostra a seção de progresso se não estiver 100% completa
                   Consumer<FinanceProvider>(
                     builder: (context, financeProvider, child) {
-                      final hasTransactions = financeProvider.transacoes.isNotEmpty;
-                      final hasCategories = financeProvider.categorias.isNotEmpty;
+                      final hasTransactions =
+                          financeProvider.transacoes.isNotEmpty;
+                      final hasCategories =
+                          financeProvider.categorias.isNotEmpty;
                       final hasAccounts = financeProvider.contas.isNotEmpty;
                       final hasCards = financeProvider.cartoes.isNotEmpty;
                       final hasBudget = financeProvider.orcamentos.isNotEmpty;
-                      
-                      int completedSteps = 1; // Informações iniciais sempre completas
-                       if (hasAccounts) completedSteps++;
-                       if (hasCards) completedSteps++;
-                       if (hasCategories) completedSteps++;
-                       // Finaliza quando tem transações (guia interativo concluído)
-                       if (hasTransactions) completedSteps = 4;
-                      
+
+                      int completedSteps =
+                          1; // Informações iniciais sempre completas
+                      if (hasAccounts) completedSteps++;
+                      if (hasCards) completedSteps++;
+                      if (hasCategories) completedSteps++;
+                      // Finaliza quando tem transações (guia interativo concluído)
+                      if (hasTransactions) completedSteps = 4;
+
                       // Só mostra se não estiver 100% completo
                       if (completedSteps < 4) {
                         return Column(
@@ -87,7 +100,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       return const SizedBox.shrink();
                     },
                   ),
-              _buildAccountsSection(context, isWeb),
+                  _buildAccountsSection(context, isWeb),
                   const SizedBox(height: 24),
                   _buildCreditCardsSection(context, isWeb),
                   const SizedBox(height: 24),
@@ -156,38 +169,99 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         final theme = Theme.of(ctx);
                         return Dialog(
                           backgroundColor: theme.colorScheme.surface,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           child: Container(
-                            constraints: const BoxConstraints(maxHeight: 420, minWidth: 320),
+                            constraints: const BoxConstraints(
+                              maxHeight: 420,
+                              minWidth: 320,
+                            ),
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Notificações', style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.w600)),
+                                    Text(
+                                      'Notificações',
+                                      style: TextStyle(
+                                        color: theme.colorScheme.onSurface,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                     TextButton(
-                                      onPressed: () => notifications.markAllAsRead(),
-                                      child: const Text('Marcar todas como lidas'),
-                                    )
+                                      onPressed: () =>
+                                          notifications.markAllAsRead(),
+                                      child: const Text(
+                                        'Marcar todas como lidas',
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 8),
                                 Expanded(
                                   child: notifications.notifications.isEmpty
-                                      ? Center(child: Text('Sem notificações', style: TextStyle(color: theme.colorScheme.onSurfaceVariant)))
+                                      ? Center(
+                                          child: Text(
+                                            'Sem notificações',
+                                            style: TextStyle(
+                                              color: theme
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                            ),
+                                          ),
+                                        )
                                       : ListView.builder(
-                                          itemCount: notifications.notifications.length,
+                                          itemCount: notifications
+                                              .notifications
+                                              .length,
                                           itemBuilder: (ctx, index) {
-                                            final n = notifications.notifications[index];
+                                            final n = notifications
+                                                .notifications[index];
                                             return ListTile(
-                                              leading: Icon(n.isRead ? Icons.notifications_none : Icons.notifications_active, color: theme.colorScheme.primary),
-                                              title: Text(n.title, style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w600)),
-                                              subtitle: Text(n.message, style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
-                                              trailing: Text(Formatters.formatDateTime(n.createdAt), style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12)),
-                                              onTap: () => notifications.markAsRead(n.id),
+                                              leading: Icon(
+                                                n.isRead
+                                                    ? Icons.notifications_none
+                                                    : Icons
+                                                          .notifications_active,
+                                                color:
+                                                    theme.colorScheme.primary,
+                                              ),
+                                              title: Text(
+                                                n.title,
+                                                style: TextStyle(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurface,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              subtitle: Text(
+                                                n.message,
+                                                style: TextStyle(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                              ),
+                                              trailing: Text(
+                                                Formatters.formatDateTime(
+                                                  n.createdAt,
+                                                ),
+                                                style: TextStyle(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              onTap: () => notifications
+                                                  .markAsRead(n.id),
                                             );
                                           },
                                         ),
@@ -206,7 +280,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      hasUnread ? Icons.notifications_active : Icons.notifications_none,
+                      hasUnread
+                          ? Icons.notifications_active
+                          : Icons.notifications_none,
                       color: theme.colorScheme.onPrimary,
                       size: 24,
                     ),
@@ -217,15 +293,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     right: -2,
                     top: -2,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.redAccent,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: theme.colorScheme.onPrimary, width: 1),
+                        border: Border.all(
+                          color: theme.colorScheme.onPrimary,
+                          width: 1,
+                        ),
                       ),
                       child: Text(
                         count > 9 ? '9+' : '$count',
-                        style: TextStyle(color: theme.colorScheme.onPrimary, fontSize: 10, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: theme.colorScheme.onPrimary,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -237,7 +323,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildBalanceCard(BuildContext context, FinanceProvider financeProvider, bool isWeb) {
+  Widget _buildBalanceCard(
+    BuildContext context,
+    FinanceProvider financeProvider,
+    bool isWeb,
+  ) {
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
@@ -264,7 +354,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Row(
             children: [
               Text(
-                _isBalanceVisible 
+                _isBalanceVisible
                     ? Formatters.formatCurrency(financeProvider.saldoTotal)
                     : '••••••',
                 style: TextStyle(
@@ -300,14 +390,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildIncomeExpenseCards(BuildContext context, FinanceProvider financeProvider, bool isWeb) {
+  Widget _buildIncomeExpenseCards(
+    BuildContext context,
+    FinanceProvider financeProvider,
+    bool isWeb,
+  ) {
     return Row(
       children: [
         Expanded(
           child: _buildIncomeExpenseCard(
             context,
             'Receitas',
-            Formatters.formatCurrency(financeProvider.getReceitasMes(_selectedMonth)),
+            Formatters.formatCurrency(
+              financeProvider.getReceitasMes(_selectedMonth),
+            ),
             Icons.arrow_upward,
             Colors.green,
             isWeb,
@@ -319,7 +415,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: _buildIncomeExpenseCard(
             context,
             'Despesas',
-            Formatters.formatCurrency(financeProvider.getDespesasMes(_selectedMonth)),
+            Formatters.formatCurrency(
+              financeProvider.getDespesasMes(_selectedMonth),
+            ),
             Icons.arrow_downward,
             Colors.red,
             isWeb,
@@ -330,7 +428,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildIncomeExpenseCard(BuildContext context, String title, String value, IconData icon, Color color, bool isWeb, VoidCallback onTap) {
+  Widget _buildIncomeExpenseCard(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+    bool isWeb,
+    VoidCallback onTap,
+  ) {
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
@@ -355,11 +461,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     color: color.withAlpha(51),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    icon,
-                    color: color,
-                    size: 16,
-                  ),
+                  child: Icon(icon, color: color, size: 16),
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -396,14 +498,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final hasCards = financeProvider.cartoes.isNotEmpty;
         final hasBudget = financeProvider.orcamentos.isNotEmpty;
         // Removido seção de metas temporariamente
-        
+
         int completedSteps = 1; // Informações iniciais sempre completas
-         if (hasAccounts) completedSteps++;
-         if (hasCards) completedSteps++;
-         if (hasCategories) completedSteps++;
-         // Finaliza quando tem transações (guia interativo concluído)
-         if (hasTransactions) completedSteps = 4;
-        
+        if (hasAccounts) completedSteps++;
+        if (hasCards) completedSteps++;
+        if (hasCategories) completedSteps++;
+        // Finaliza quando tem transações (guia interativo concluído)
+        if (hasTransactions) completedSteps = 4;
+
         return Container(
           padding: EdgeInsets.all(isWeb ? 20 : 16),
           decoration: BoxDecoration(
@@ -441,20 +543,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: LinearProgressIndicator(
                       value: completedSteps / 4,
                       backgroundColor: theme.colorScheme.surfaceVariant,
-                      valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        theme.colorScheme.primary,
+                      ),
                       minHeight: 6,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              _buildProgressItem('Preencha as informações iniciais', true, isWeb),
+              _buildProgressItem(
+                'Preencha as informações iniciais',
+                true,
+                isWeb,
+              ),
               const SizedBox(height: 12),
-              _buildProgressItem('Cadastre uma conta bancária', hasAccounts, isWeb),
+              _buildProgressItem(
+                'Cadastre uma conta bancária',
+                hasAccounts,
+                isWeb,
+              ),
               const SizedBox(height: 12),
-              _buildProgressItem('Cadastre um cartão de crédito', hasCards, isWeb),
+              _buildProgressItem(
+                'Cadastre um cartão de crédito',
+                hasCards,
+                isWeb,
+              ),
               const SizedBox(height: 12),
-              _buildProgressItem('Configure suas categorias', hasCategories, isWeb),
+              _buildProgressItem(
+                'Configure suas categorias',
+                hasCategories,
+                isWeb,
+              ),
               const SizedBox(height: 20),
               // Botão para iniciar o guia interativo
               if (completedSteps < 4)
@@ -505,15 +625,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           height: 20,
           decoration: BoxDecoration(
             color: completed ? Colors.green : Colors.transparent,
-            border: completed ? null : Border.all(color: theme.colorScheme.outline),
+            border: completed
+                ? null
+                : Border.all(color: theme.colorScheme.outline),
             borderRadius: BorderRadius.circular(10),
           ),
           child: completed
-              ? const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  size: 14,
-                )
+              ? const Icon(Icons.check, color: Colors.white, size: 14)
               : null,
         ),
         const SizedBox(width: 12),
@@ -521,17 +639,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Text(
             title,
             style: TextStyle(
-              color: completed ? theme.colorScheme.onSurfaceVariant : theme.colorScheme.onSurface,
+              color: completed
+                  ? theme.colorScheme.onSurfaceVariant
+                  : theme.colorScheme.onSurface,
               fontSize: isWeb ? 14 : 13,
               decoration: completed ? TextDecoration.lineThrough : null,
             ),
           ),
         ),
-        if (completed)
-          const Text(
-            '🎉',
-            style: TextStyle(fontSize: 16),
-          ),
+        if (completed) const Text('🎉', style: TextStyle(fontSize: 16)),
       ],
     );
   }
@@ -550,11 +666,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: completed
-                ? const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 12,
-                  )
+                ? const Icon(Icons.check, color: Colors.white, size: 12)
                 : null,
           ),
           const SizedBox(width: 12),
@@ -655,48 +767,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ] else ...[
-                ...financeProvider.contas.take(3).map((conta) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: conta.cor.withAlpha(51),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          _getContaIcon(conta.tipo),
-                          color: conta.cor,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                ...financeProvider.contas
+                    .take(3)
+                    .map(
+                      (conta) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
                           children: [
-                            Text(
-                              conta.nome,
-                              style: TextStyle(
-                                color: theme.colorScheme.onSurface,
-                                fontSize: isWeb ? 16 : 14,
-                                fontWeight: FontWeight.w500,
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: conta.cor.withAlpha(51),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                _getContaIcon(conta.tipo),
+                                color: conta.cor,
+                                size: 20,
                               ),
                             ),
-                            Text(
-                              Formatters.formatCurrency(conta.saldoAtual),
-                              style: TextStyle(
-                                color: theme.colorScheme.onSurfaceVariant,
-                                fontSize: isWeb ? 14 : 12,
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    conta.nome,
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onSurface,
+                                      fontSize: isWeb ? 16 : 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    Formatters.formatCurrency(conta.saldoAtual),
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                      fontSize: isWeb ? 14 : 12,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                )),
+                    ),
               ],
               const SizedBox(height: 16),
               GestureDetector(
@@ -770,9 +886,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildCreditCardsSection(BuildContext context, bool isWeb) {
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
-        final gastosPorCategoria = financeProvider.getGastosPorCategoria(_selectedMonth);
+        final gastosPorCategoria = financeProvider.getGastosPorCategoria(
+          _selectedMonth,
+        );
         final theme = Theme.of(context);
-        
+
         return Container(
           padding: EdgeInsets.all(isWeb ? 20 : 16),
           decoration: BoxDecoration(
@@ -857,106 +975,129 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ] else ...[
-                ...financeProvider.cartoes.take(3).map((cartao) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => CardDetailsScreen(cartao: cartao),
-                          ),
-                        );
-                      },
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: theme.colorScheme.outline),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary.withAlpha(51),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Icon(
-                                  Icons.credit_card,
-                                  color: theme.colorScheme.primary,
-                                  size: 20,
-                                ),
+                ...financeProvider.cartoes
+                    .take(3)
+                    .map(
+                      (cartao) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    CardDetailsScreen(cartao: cartao),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: theme.colorScheme.outline,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
                                   children: [
-                                    Text(
-                                      cartao.nome,
-                                      style: TextStyle(
-                                        color: theme.colorScheme.onSurface,
-                                        fontSize: isWeb ? 16 : 14,
-                                        fontWeight: FontWeight.w500,
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: theme.colorScheme.primary
+                                            .withAlpha(51),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        Icons.credit_card,
+                                        color: theme.colorScheme.primary,
+                                        size: 20,
                                       ),
                                     ),
-                                    Text(
-                                      'Fatura: ${Formatters.formatCurrency(cartao.faturaAtualCalculada)}',
-                                      style: TextStyle(
-                                        color: theme.colorScheme.onSurfaceVariant,
-                                        fontSize: isWeb ? 14 : 12,
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            cartao.nome,
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.onSurface,
+                                              fontSize: isWeb ? 16 : 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Fatura: ${Formatters.formatCurrency(cartao.faturaAtualCalculada)}',
+                                            style: TextStyle(
+                                              color: theme
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                              fontSize: isWeb ? 14 : 12,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Limite: ${Formatters.formatCurrency(cartao.limite)}',
+                                            style: TextStyle(
+                                              color: theme
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                              fontSize: isWeb ? 12 : 11,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Disponível: ${Formatters.formatCurrency(cartao.limiteDisponivel)}',
+                                            style: TextStyle(
+                                              color: cartao.limiteDisponivel > 0
+                                                  ? Colors.green[400]
+                                                  : Colors.red[400],
+                                              fontSize: isWeb ? 12 : 11,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    Text(
-                                      'Limite: ${Formatters.formatCurrency(cartao.limite)}',
-                                      style: TextStyle(
-                                        color: theme.colorScheme.onSurfaceVariant,
-                                        fontSize: isWeb ? 12 : 11,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Disponível: ${Formatters.formatCurrency(cartao.limiteDisponivel)}',
-                                      style: TextStyle(
-                                        color: cartao.limiteDisponivel > 0 ? Colors.green[400] : Colors.red[400],
-                                        fontSize: isWeb ? 12 : 11,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          '${cartao.percentualUtilizado.toStringAsFixed(1)}%',
+                                          style: TextStyle(
+                                            color:
+                                                cartao.percentualUtilizado > 80
+                                                ? Colors.red
+                                                : Colors.green,
+                                            fontSize: isWeb ? 14 : 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    '${cartao.percentualUtilizado.toStringAsFixed(1)}%',
-                                    style: TextStyle(
-                                      color: cartao.percentualUtilizado > 80 ? Colors.red : Colors.green,
-                                      fontSize: isWeb ? 14 : 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                const SizedBox(height: 12),
+                                LinearProgressIndicator(
+                                  value: (cartao.percentualUtilizado / 100)
+                                      .clamp(0.0, 1.0),
+                                  backgroundColor: theme.colorScheme.outline,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    cartao.percentualUtilizado > 80
+                                        ? Colors.red
+                                        : Colors.green,
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          LinearProgressIndicator(
-                            value: (cartao.percentualUtilizado / 100).clamp(0.0, 1.0),
-                            backgroundColor: theme.colorScheme.outline,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              cartao.percentualUtilizado > 80 ? Colors.red : Colors.green,
+                                  minHeight: 6,
+                                ),
+                              ],
                             ),
-                            minHeight: 6,
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                )),
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).push(
@@ -995,8 +1136,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
         final theme = Theme.of(context);
-        final gastosPorCategoria = financeProvider.getGastosPorCategoria(_selectedMonth);
-        
+        final gastosPorCategoria = financeProvider.getGastosPorCategoria(
+          _selectedMonth,
+        );
+
         return Container(
           padding: EdgeInsets.all(isWeb ? 20 : 16),
           decoration: BoxDecoration(
@@ -1059,11 +1202,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             itemCount: gastosPorCategoria.length,
                             itemBuilder: (context, index) {
                               final theme = Theme.of(context);
-                              final categoriaNome = gastosPorCategoria.keys.elementAt(index);
+                              final categoriaNome = gastosPorCategoria.keys
+                                  .elementAt(index);
                               final valor = gastosPorCategoria[categoriaNome]!;
-                              final total = gastosPorCategoria.values.fold(0.0, (sum, v) => sum + v);
+                              final total = gastosPorCategoria.values.fold(
+                                0.0,
+                                (sum, v) => sum + v,
+                              );
                               final percentage = (valor / total * 100);
-                              
+
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 8),
                                 child: Row(
@@ -1089,7 +1236,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     Text(
                                       '${percentage.toStringAsFixed(1)}%',
                                       style: TextStyle(
-                                        color: theme.colorScheme.onSurfaceVariant,
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
                                         fontSize: isWeb ? 12 : 11,
                                       ),
                                     ),
@@ -1135,19 +1283,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _navigateToIncomes(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const IncomeScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const IncomeScreen()));
   }
 
   void _navigateToExpenses(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const ExpenseScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const ExpenseScreen()));
   }
 
   void _showMonthPicker() {
@@ -1157,7 +1301,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             final theme = Theme.of(context);
-            
+
             return Dialog(
               backgroundColor: theme.colorScheme.surface,
               shape: RoundedRectangleBorder(
@@ -1177,7 +1321,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               _selectedYear--;
                             });
                           },
-                          icon: Icon(Icons.arrow_back_ios, color: theme.colorScheme.onSurface),
+                          icon: Icon(
+                            Icons.arrow_back_ios,
+                            color: theme.colorScheme.onSurface,
+                          ),
                         ),
                         Text(
                           _selectedYear.toString(),
@@ -1193,7 +1340,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               _selectedYear++;
                             });
                           },
-                          icon: Icon(Icons.arrow_forward_ios, color: theme.colorScheme.onSurface),
+                          icon: Icon(
+                            Icons.arrow_forward_ios,
+                            color: theme.colorScheme.onSurface,
+                          ),
                         ),
                       ],
                     ),
@@ -1227,7 +1377,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             onPressed: () => Navigator.of(context).pop(),
                             child: Text(
                               'CANCELAR',
-                              style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
                             ),
                           ),
                         ),
@@ -1248,7 +1400,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                             child: Text(
                               'MÊS ATUAL',
-                              style: TextStyle(color: theme.colorScheme.onPrimary),
+                              style: TextStyle(
+                                color: theme.colorScheme.onPrimary,
+                              ),
                             ),
                           ),
                         ),
@@ -1264,10 +1418,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildMonthButton(String month, int monthNumber, StateSetter setDialogState) {
-    final isSelected = _selectedMonth.month == monthNumber && _selectedMonth.year == _selectedYear;
+  Widget _buildMonthButton(
+    String month,
+    int monthNumber,
+    StateSetter setDialogState,
+  ) {
+    final isSelected =
+        _selectedMonth.month == monthNumber &&
+        _selectedMonth.year == _selectedYear;
     final theme = Theme.of(context);
-    
+
     return GestureDetector(
       onTap: () {
         setDialogState(() {
@@ -1280,14 +1440,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant,
+          color: isSelected
+              ? theme.colorScheme.primary
+              : theme.colorScheme.surfaceVariant,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Center(
           child: Text(
             month,
             style: TextStyle(
-              color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
+              color: isSelected
+                  ? theme.colorScheme.onPrimary
+                  : theme.colorScheme.onSurfaceVariant,
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),

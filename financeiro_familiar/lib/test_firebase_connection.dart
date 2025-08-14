@@ -36,12 +36,12 @@ class FirebaseConnectionTest {
         'timestamp': FieldValue.serverTimestamp(),
         'status': 'connected',
       });
-      
+
       // Lê o documento para confirmar
       final doc = await _firestore.collection('test').doc('connection').get();
       if (doc.exists) {
         _log('✅ Conexão com Firestore estabelecida');
-        
+
         // Remove o documento de teste
         await _firestore.collection('test').doc('connection').delete();
         return true;
@@ -71,24 +71,39 @@ class FirebaseConnectionTest {
   static Future<void> checkDatabaseStructure() async {
     try {
       _log('\n📊 Verificando estrutura do banco de dados...');
-      
+
       // Verifica coleção de usuários
       final usuarios = await _firestore.collection('usuarios').limit(1).get();
       final usuariosCount = usuarios.docs.length;
-      _log('📁 Coleção "usuarios": ${usuarios.docs.isEmpty ? "Vazia" : "$usuariosCount documento(s)"}');
-      
+      _log(
+        '📁 Coleção "usuarios": ${usuarios.docs.isEmpty ? "Vazia" : "$usuariosCount documento(s)"}',
+      );
+
       // Verifica coleção de orçamentos
-      final orcamentos = await _firestore.collection('orcamentos').limit(1).get();
+      final orcamentos = await _firestore
+          .collection('orcamentos')
+          .limit(1)
+          .get();
       final orcamentosCount = orcamentos.docs.length;
-      _log('📁 Coleção "orcamentos": ${orcamentos.docs.isEmpty ? "Vazia" : "$orcamentosCount documento(s)"}');
-      
+      _log(
+        '📁 Coleção "orcamentos": ${orcamentos.docs.isEmpty ? "Vazia" : "$orcamentosCount documento(s)"}',
+      );
+
       if (orcamentos.docs.isNotEmpty) {
         final orcamentoId = orcamentos.docs.first.id;
         _log('\n🔍 Verificando subcoleções do orçamento: $orcamentoId');
-        
+
         // Verifica subcoleções
-        final subcollections = ['transacoes', 'categorias', 'contas', 'cartoes', 'metas', 'planejamentos', 'config_dashboard'];
-        
+        final subcollections = [
+          'transacoes',
+          'categorias',
+          'contas',
+          'cartoes',
+          'metas',
+          'planejamentos',
+          'config_dashboard',
+        ];
+
         for (final subcollection in subcollections) {
           try {
             final docs = await _firestore
@@ -98,7 +113,9 @@ class FirebaseConnectionTest {
                 .limit(1)
                 .get();
             final docsCount = docs.docs.length;
-            _log('  📂 $subcollection: ${docs.docs.isEmpty ? "Vazia" : "$docsCount documento(s)"}');
+            _log(
+              '  📂 $subcollection: ${docs.docs.isEmpty ? "Vazia" : "$docsCount documento(s)"}',
+            );
           } catch (e) {
             _log('  ❌ Erro ao verificar $subcollection: $e');
           }
@@ -113,7 +130,7 @@ class FirebaseConnectionTest {
   static Future<void> testCRUDOperations() async {
     try {
       _log('\n🧪 Testando operações CRUD...');
-      
+
       // Teste de criação de usuário de teste
       final testUser = Usuario(
         uid: 'test_user_${DateTime.now().millisecondsSinceEpoch}',
@@ -122,27 +139,32 @@ class FirebaseConnectionTest {
         orcamentos: [],
         dataCriacao: DateTime.now(),
       );
-      
+
       // CREATE - Criar usuário
-      await _firestore.collection('usuarios').doc(testUser.uid).set(testUser.toMap());
+      await _firestore
+          .collection('usuarios')
+          .doc(testUser.uid)
+          .set(testUser.toMap());
       _log('✅ CREATE: Usuário criado');
-      
+
       // READ - Ler usuário
-      final userDoc = await _firestore.collection('usuarios').doc(testUser.uid).get();
+      final userDoc = await _firestore
+          .collection('usuarios')
+          .doc(testUser.uid)
+          .get();
       if (userDoc.exists) {
         _log('✅ READ: Usuário lido com sucesso');
       }
-      
+
       // UPDATE - Atualizar usuário
       await _firestore.collection('usuarios').doc(testUser.uid).update({
         'nome': 'Usuário Teste Atualizado',
       });
       _log('✅ UPDATE: Usuário atualizado');
-      
+
       // DELETE - Deletar usuário
       await _firestore.collection('usuarios').doc(testUser.uid).delete();
       _log('✅ DELETE: Usuário deletado');
-      
     } catch (e) {
       _log('❌ Erro nas operações CRUD: $e');
     }
@@ -153,32 +175,32 @@ class FirebaseConnectionTest {
     _logs.clear();
     _log('🚀 Iniciando testes de conexão Firebase...');
     _log('=' * 50);
-    
+
     // Teste 1: Inicialização
     final initSuccess = await testFirebaseInitialization();
     if (!initSuccess) {
       _log('❌ Falha na inicialização. Parando testes.');
       return _logs;
     }
-    
+
     // Teste 2: Conexão Firestore
     final firestoreSuccess = await testFirestoreConnection();
     if (!firestoreSuccess) {
       _log('❌ Falha na conexão Firestore.');
     }
-    
+
     // Teste 3: Firebase Auth
     await testFirebaseAuth();
-    
+
     // Teste 4: Estrutura do banco
     await checkDatabaseStructure();
-    
+
     // Teste 5: Operações CRUD
     await testCRUDOperations();
-    
+
     _log('\n${'=' * 50}');
     _log('🏁 Testes concluídos!');
-    
+
     return List.from(_logs);
   }
 }
@@ -203,7 +225,7 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
     });
 
     final testLogs = await FirebaseConnectionTest.runAllTests();
-    
+
     setState(() {
       _logs = testLogs;
       _isRunning = false;
@@ -218,10 +240,10 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
 
     try {
       List<String> logs = [];
-      
+
       logs.add('🔍 Verificando estrutura do banco de dados...');
       logs.add('=' * 50);
-      
+
       // Verificar usuário atual
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
@@ -238,21 +260,39 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
 
       // Verificar coleção de usuários
       logs.add('\n📊 Verificando coleções...');
-      
-      final usuarios = await FirebaseFirestore.instance.collection('usuarios').limit(1).get();
-      logs.add('📁 Coleção "usuarios": ${usuarios.docs.isEmpty ? "Vazia" : "${usuarios.docs.length} documento(s)"}');
-      
+
+      final usuarios = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .limit(1)
+          .get();
+      logs.add(
+        '📁 Coleção "usuarios": ${usuarios.docs.isEmpty ? "Vazia" : "${usuarios.docs.length} documento(s)"}',
+      );
+
       // Verificar coleção de orçamentos
-      final orcamentos = await FirebaseFirestore.instance.collection('orcamentos').limit(1).get();
-      logs.add('📁 Coleção "orcamentos": ${orcamentos.docs.isEmpty ? "Vazia" : "${orcamentos.docs.length} documento(s)"}');
-      
+      final orcamentos = await FirebaseFirestore.instance
+          .collection('orcamentos')
+          .limit(1)
+          .get();
+      logs.add(
+        '📁 Coleção "orcamentos": ${orcamentos.docs.isEmpty ? "Vazia" : "${orcamentos.docs.length} documento(s)"}',
+      );
+
       if (orcamentos.docs.isNotEmpty) {
         final orcamentoId = orcamentos.docs.first.id;
         logs.add('\n🔍 Verificando subcoleções do orçamento: $orcamentoId');
-        
+
         // Verificar subcoleções
-        final subcollections = ['transacoes', 'categorias', 'contas', 'cartoes', 'metas', 'planejamentos', 'config_dashboard'];
-        
+        final subcollections = [
+          'transacoes',
+          'categorias',
+          'contas',
+          'cartoes',
+          'metas',
+          'planejamentos',
+          'config_dashboard',
+        ];
+
         for (final subcollection in subcollections) {
           try {
             final docs = await FirebaseFirestore.instance
@@ -261,7 +301,9 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
                 .collection(subcollection)
                 .limit(1)
                 .get();
-            logs.add('  📂 $subcollection: ${docs.docs.isEmpty ? "Vazia" : "${docs.docs.length} documento(s)"}');
+            logs.add(
+              '  📂 $subcollection: ${docs.docs.isEmpty ? "Vazia" : "${docs.docs.length} documento(s)"}',
+            );
           } catch (e) {
             logs.add('  ❌ Erro ao verificar $subcollection: $e');
           }
@@ -271,15 +313,21 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
       // Teste de criação de documento
       logs.add('\n🧪 Testando criação de documento...');
       try {
-        await FirebaseFirestore.instance.collection('test').doc('connection_test').set({
-          'timestamp': FieldValue.serverTimestamp(),
-          'status': 'connected',
-          'user': user.uid,
-        });
+        await FirebaseFirestore.instance
+            .collection('test')
+            .doc('connection_test')
+            .set({
+              'timestamp': FieldValue.serverTimestamp(),
+              'status': 'connected',
+              'user': user.uid,
+            });
         logs.add('✅ Documento de teste criado com sucesso');
-        
+
         // Remover documento de teste
-        await FirebaseFirestore.instance.collection('test').doc('connection_test').delete();
+        await FirebaseFirestore.instance
+            .collection('test')
+            .doc('connection_test')
+            .delete();
         logs.add('✅ Documento de teste removido');
       } catch (e) {
         logs.add('❌ Erro ao criar documento de teste: $e');
@@ -287,7 +335,7 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
 
       logs.add('\n${'=' * 50}');
       logs.add('✅ Verificação concluída!');
-      
+
       setState(() {
         _logs = logs;
         _isCheckingDatabase = false;
@@ -329,7 +377,9 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         ),
                         SizedBox(width: 8),
@@ -343,7 +393,9 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
             ),
             const SizedBox(height: 8),
             ElevatedButton(
-              onPressed: (_isRunning || _isCheckingDatabase) ? null : _checkDatabaseStructure,
+              onPressed: (_isRunning || _isCheckingDatabase)
+                  ? null
+                  : _checkDatabaseStructure,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
@@ -358,7 +410,9 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         ),
                         SizedBox(width: 8),
@@ -391,7 +445,7 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
                         itemBuilder: (context, index) {
                           final log = _logs[index];
                           Color textColor = Colors.white;
-                          
+
                           if (log.contains('✅')) {
                             textColor = Colors.green;
                           } else if (log.contains('❌')) {
@@ -401,7 +455,7 @@ class _FirebaseTestScreenState extends State<FirebaseTestScreen> {
                           } else if (log.contains('📊') || log.contains('🔍')) {
                             textColor = Colors.cyan;
                           }
-                          
+
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 2),
                             child: Text(

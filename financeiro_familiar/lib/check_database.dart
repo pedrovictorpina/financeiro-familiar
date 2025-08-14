@@ -25,21 +25,36 @@ class DatabaseChecker {
 
       // Verificar coleção de usuários
       print('\n📊 Verificando coleções...');
-      
+
       final usuarios = await _firestore.collection('usuarios').limit(1).get();
-      print('📁 Coleção "usuarios": ${usuarios.docs.isEmpty ? "Vazia" : "${usuarios.docs.length} documento(s)"}');
-      
+      print(
+        '📁 Coleção "usuarios": ${usuarios.docs.isEmpty ? "Vazia" : "${usuarios.docs.length} documento(s)"}',
+      );
+
       // Verificar coleção de orçamentos
-      final orcamentos = await _firestore.collection('orcamentos').limit(1).get();
-      print('📁 Coleção "orcamentos": ${orcamentos.docs.isEmpty ? "Vazia" : "${orcamentos.docs.length} documento(s)"}');
-      
+      final orcamentos = await _firestore
+          .collection('orcamentos')
+          .limit(1)
+          .get();
+      print(
+        '📁 Coleção "orcamentos": ${orcamentos.docs.isEmpty ? "Vazia" : "${orcamentos.docs.length} documento(s)"}',
+      );
+
       if (orcamentos.docs.isNotEmpty) {
         final orcamentoId = orcamentos.docs.first.id;
         print('\n🔍 Verificando subcoleções do orçamento: $orcamentoId');
-        
+
         // Verificar subcoleções
-        final subcollections = ['transacoes', 'categorias', 'contas', 'cartoes', 'metas', 'planejamentos', 'config_dashboard'];
-        
+        final subcollections = [
+          'transacoes',
+          'categorias',
+          'contas',
+          'cartoes',
+          'metas',
+          'planejamentos',
+          'config_dashboard',
+        ];
+
         for (final subcollection in subcollections) {
           try {
             final docs = await _firestore
@@ -48,7 +63,9 @@ class DatabaseChecker {
                 .collection(subcollection)
                 .limit(1)
                 .get();
-            print('  📂 $subcollection: ${docs.docs.isEmpty ? "Vazia" : "${docs.docs.length} documento(s)"}');
+            print(
+              '  📂 $subcollection: ${docs.docs.isEmpty ? "Vazia" : "${docs.docs.length} documento(s)"}',
+            );
           } catch (e) {
             print('  ❌ Erro ao verificar $subcollection: $e');
           }
@@ -64,14 +81,13 @@ class DatabaseChecker {
           'user': user?.uid,
         });
         print('✅ Documento de teste criado com sucesso');
-        
+
         // Remover documento de teste
         await _firestore.collection('test').doc('connection_test').delete();
         print('✅ Documento de teste removido');
       } catch (e) {
         print('❌ Erro ao criar documento de teste: $e');
       }
-
     } catch (e) {
       print('❌ Erro geral: $e');
     }

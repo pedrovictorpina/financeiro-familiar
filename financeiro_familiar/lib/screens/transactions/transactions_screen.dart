@@ -6,6 +6,9 @@ import '../../models/transacao.dart';
 import '../../models/categoria.dart';
 import '../../models/conta.dart';
 import '../../utils/theme_extensions.dart';
+import 'add_income_screen.dart';
+import 'add_expense_screen.dart';
+import 'add_transfer_screen.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
@@ -21,7 +24,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   DateTime? _dataInicio;
   DateTime? _dataFim;
   String _textoPesquisa = '';
-  
+
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -48,8 +51,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       ),
       body: Consumer<FinanceProvider>(
         builder: (context, financeProvider, child) {
-          final transacoesFiltradas = _filtrarTransacoes(financeProvider.transacoes);
-          
+          final transacoesFiltradas = _filtrarTransacoes(
+            financeProvider.transacoes,
+          );
+
           if (transacoesFiltradas.isEmpty) {
             return Center(
               child: Column(
@@ -62,7 +67,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    _temFiltrosAtivos() 
+                    _temFiltrosAtivos()
                         ? 'Nenhuma transação encontrada'
                         : 'Nenhuma transação registrada',
                     style: TextStyle(
@@ -102,7 +107,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     itemCount: transacoesFiltradas.length,
                     itemBuilder: (context, index) {
                       final transacao = transacoesFiltradas[index];
-                      return _buildTransactionCard(context, transacao, financeProvider);
+                      return _buildTransactionCard(
+                        context,
+                        transacao,
+                        financeProvider,
+                      );
                     },
                   ),
                 ),
@@ -156,7 +165,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     );
   }
 
-  Widget _buildTransactionCard(BuildContext context, Transacao transacao, FinanceProvider financeProvider) {
+  Widget _buildTransactionCard(
+    BuildContext context,
+    Transacao transacao,
+    FinanceProvider financeProvider,
+  ) {
     final categoria = financeProvider.categorias.firstWhere(
       (c) => c.id == transacao.categoriaId,
       orElse: () => Categoria(
@@ -167,7 +180,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         icone: Icons.help_outline,
       ),
     );
-    
+
     final conta = financeProvider.contas.firstWhere(
       (c) => c.id == transacao.contaId,
       orElse: () => Conta(
@@ -183,7 +196,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     Color cor;
     IconData icone;
     String sinal;
-    
+
     switch (transacao.tipo) {
       case TipoTransacao.receita:
         cor = TransactionColors.receita;
@@ -245,7 +258,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               ),
           ],
         ),
-        onTap: () => _showTransactionDetails(context, transacao, financeProvider),
+        onTap: () =>
+            _showTransactionDetails(context, transacao, financeProvider),
       ),
     );
   }
@@ -256,17 +270,18 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       if (_filtroTipo != null && transacao.tipo != _filtroTipo) {
         return false;
       }
-      
+
       // Filtro por categoria
-      if (_filtroCategoria != null && transacao.categoriaId != _filtroCategoria) {
+      if (_filtroCategoria != null &&
+          transacao.categoriaId != _filtroCategoria) {
         return false;
       }
-      
+
       // Filtro por conta
       if (_filtroConta != null && transacao.contaId != _filtroConta) {
         return false;
       }
-      
+
       // Filtro por data
       if (_dataInicio != null && transacao.data.isBefore(_dataInicio!)) {
         return false;
@@ -274,24 +289,24 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       if (_dataFim != null && transacao.data.isAfter(_dataFim!)) {
         return false;
       }
-      
+
       // Filtro por texto
       if (_textoPesquisa.isNotEmpty) {
         final texto = _textoPesquisa.toLowerCase();
         return transacao.descricao.toLowerCase().contains(texto);
       }
-      
+
       return true;
     }).toList();
   }
 
   bool _temFiltrosAtivos() {
     return _filtroTipo != null ||
-           _filtroCategoria != null ||
-           _filtroConta != null ||
-           _dataInicio != null ||
-           _dataFim != null ||
-           _textoPesquisa.isNotEmpty;
+        _filtroCategoria != null ||
+        _filtroConta != null ||
+        _dataInicio != null ||
+        _dataFim != null ||
+        _textoPesquisa.isNotEmpty;
   }
 
   void _limparFiltros() {
@@ -363,9 +378,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     ],
                     onChanged: (value) => setState(() => _filtroTipo = value),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Filtro por categoria
                   const Text('Categoria'),
                   const SizedBox(height: 8),
@@ -387,11 +402,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         );
                       }),
                     ],
-                    onChanged: (value) => setState(() => _filtroCategoria = value),
+                    onChanged: (value) =>
+                        setState(() => _filtroCategoria = value),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Filtro por conta
                   const Text('Conta'),
                   const SizedBox(height: 8),
@@ -415,9 +431,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     ],
                     onChanged: (value) => setState(() => _filtroConta = value),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Filtro por período
                   const Text('Período'),
                   const SizedBox(height: 8),
@@ -432,8 +448,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           ),
                           readOnly: true,
                           controller: TextEditingController(
-                            text: _dataInicio != null 
-                                ? Formatters.formatDate(_dataInicio!) 
+                            text: _dataInicio != null
+                                ? Formatters.formatDate(_dataInicio!)
                                 : '',
                           ),
                           onTap: () async {
@@ -459,8 +475,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           ),
                           readOnly: true,
                           controller: TextEditingController(
-                            text: _dataFim != null 
-                                ? Formatters.formatDate(_dataFim!) 
+                            text: _dataFim != null
+                                ? Formatters.formatDate(_dataFim!)
                                 : '',
                           ),
                           onTap: () async {
@@ -547,7 +563,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     );
   }
 
-  void _showTransactionDetails(BuildContext context, Transacao transacao, FinanceProvider financeProvider) {
+  void _showTransactionDetails(
+    BuildContext context,
+    Transacao transacao,
+    FinanceProvider financeProvider,
+  ) {
     final categoria = financeProvider.categorias.firstWhere(
       (c) => c.id == transacao.categoriaId,
       orElse: () => Categoria(
@@ -558,7 +578,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         icone: Icons.help_outline,
       ),
     );
-    
+
     final conta = financeProvider.contas.firstWhere(
       (c) => c.id == transacao.contaId,
       orElse: () => Conta(
@@ -574,7 +594,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     Color cor;
     IconData icone;
     String sinal;
-    
+
     switch (transacao.tipo) {
       case TipoTransacao.receita:
         cor = TransactionColors.receita;
@@ -625,7 +645,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // Cabeçalho principal com valor em destaque
                   Container(
                     padding: const EdgeInsets.all(24),
@@ -633,10 +653,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [
-                          cor.withOpacity(0.1),
-                          cor.withOpacity(0.05),
-                        ],
+                        colors: [cor.withOpacity(0.1), cor.withOpacity(0.05)],
                       ),
                     ),
                     child: Column(
@@ -649,11 +666,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                 color: cor.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Icon(
-                                icone,
-                                color: cor,
-                                size: 24,
-                              ),
+                              child: Icon(icone, color: cor, size: 24),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
@@ -672,10 +685,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                   const SizedBox(height: 4),
                                   Text(
                                     transacao.descricao,
-                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context).colorScheme.onSurface,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -683,28 +701,68 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             Column(
                               children: [
                                 IconButton(
-                                  onPressed: () {
-                                    // TODO: Implementar edição
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Edição em desenvolvimento')),
+                                  onPressed: () async {
+                                    final confirmed = await showDialog<bool>(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: const Text('Excluir Transação'),
+                                        content: const Text(
+                                          'Tem certeza que deseja excluir esta transação?',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(
+                                              context,
+                                            ).pop(false),
+                                            child: const Text('Cancelar'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(true),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                            ),
+                                            child: const Text('Excluir'),
+                                          ),
+                                        ],
+                                      ),
                                     );
+
+                                    if (confirmed == true) {
+                                      final success = await financeProvider
+                                          .deletarTransacao(transacao.id);
+                                      if (!mounted) return;
+                                      if (success) {
+                                        Navigator.of(context).pop();
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Transação excluída com sucesso',
+                                            ),
+                                          ),
+                                        );
+                                      } else {
+                                        final msg =
+                                            financeProvider.errorMessage ??
+                                            'Erro ao excluir a transação';
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(content: Text(msg)),
+                                        );
+                                      }
+                                    }
                                   },
-                                  icon: Icon(Icons.edit_outlined, color: Theme.of(context).colorScheme.primary),
-                                  style: IconButton.styleFrom(
-                                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                  icon: Icon(
+                                    Icons.delete_outline,
+                                    color: Colors.red.shade600,
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                IconButton(
-                                  onPressed: () {
-                                    // TODO: Implementar exclusão
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Exclusão em desenvolvimento')),
-                                    );
-                                  },
-                                  icon: Icon(Icons.delete_outline, color: Colors.red.shade600),
                                   style: IconButton.styleFrom(
-                                    backgroundColor: Colors.red.withOpacity(0.1),
+                                    backgroundColor: Colors.red.withOpacity(
+                                      0.1,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -712,10 +770,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           ],
                         ),
                         const SizedBox(height: 20),
-                        
+
                         // Valor em destaque
                         Container(
-                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 24,
+                          ),
                           decoration: BoxDecoration(
                             color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(16),
@@ -741,7 +802,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               if (transacao.recorrente) ...[
                                 const SizedBox(width: 12),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.blue.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(12),
@@ -773,7 +837,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       ],
                     ),
                   ),
-                  
+
                   // Lista de detalhes
                   Expanded(
                     child: ListView(
@@ -803,16 +867,18 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             _buildModernDetailRow(
                               Icons.arrow_forward,
                               'Conta Destino',
-                              financeProvider.contas.firstWhere(
-                                (c) => c.id == transacao.contaDestinoId,
-                                orElse: () => conta,
-                              ).nome,
+                              financeProvider.contas
+                                  .firstWhere(
+                                    (c) => c.id == transacao.contaDestinoId,
+                                    orElse: () => conta,
+                                  )
+                                  .nome,
                               Colors.orange,
                             ),
                         ]),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         _buildModernDetailSection('Informações do Sistema', [
                           _buildModernDetailRow(
                             Icons.access_time,
@@ -865,15 +931,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     );
   }
 
-  Widget _buildModernDetailRow(IconData icon, String label, String value, Color iconColor) {
+  Widget _buildModernDetailRow(
+    IconData icon,
+    String label,
+    String value,
+    Color iconColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.withOpacity(0.1),
-            width: 1,
-          ),
+          bottom: BorderSide(color: Colors.grey.withOpacity(0.1), width: 1),
         ),
       ),
       child: Row(
@@ -884,11 +952,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               color: iconColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: iconColor,
-            ),
+            child: Icon(icon, size: 20, color: iconColor),
           ),
           const SizedBox(width: 16),
           Expanded(

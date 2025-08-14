@@ -20,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  
+
   final List<Widget> _screens = [
     const DashboardScreen(),
     const TransactionsScreen(),
@@ -36,14 +36,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _initializeData() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
-    
+    final financeProvider = Provider.of<FinanceProvider>(
+      context,
+      listen: false,
+    );
+
     print('DEBUG: Inicializando dados da aplicação');
     print('DEBUG: Usuário logado: ${authProvider.user?.email}');
     print('DEBUG: UID do usuário: ${authProvider.user?.uid}');
-    
+
     if (authProvider.user != null) {
-      print('DEBUG: Carregando orçamentos para o usuário ${authProvider.user!.uid}');
+      print(
+        'DEBUG: Carregando orçamentos para o usuário ${authProvider.user!.uid}',
+      );
       financeProvider.carregarOrcamentos(authProvider.user!.uid);
     } else {
       print('DEBUG: Erro - Usuário não está logado');
@@ -62,17 +67,12 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           });
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
         return Scaffold(
-          body: IndexedStack(
-            index: _currentIndex,
-            children: _screens,
-          ),
+          body: IndexedStack(index: _currentIndex, children: _screens),
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: _currentIndex,
@@ -104,7 +104,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          floatingActionButton: _currentIndex == 1 // Mostrar FAB apenas na tela de transações
+          floatingActionButton:
+              _currentIndex ==
+                  1 // Mostrar FAB apenas na tela de transações
               ? FloatingActionButton(
                   heroTag: 'fab-transactions',
                   onPressed: () {
@@ -140,11 +142,13 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurfaceVariant.withOpacity(0.4),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            
+
             // Header
             Padding(
               padding: const EdgeInsets.all(16),
@@ -166,9 +170,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            
+
             const Divider(height: 1),
-            
+
             // Botões de tipo de transação
             Expanded(
               child: Padding(
@@ -176,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   children: [
                     const SizedBox(height: 16),
-                    
+
                     // Receita
                     _buildTransactionTypeCard(
                       context,
@@ -193,9 +197,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Despesa
                     _buildTransactionTypeCard(
                       context,
@@ -212,9 +216,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Transferência
                     _buildTransactionTypeCard(
                       context,
@@ -263,11 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 24,
-                ),
+                child: Icon(icon, color: color, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(

@@ -109,102 +109,102 @@ class AppConstants {
   // Configurações padrão
   static const String defaultCurrency = 'BRL';
   static const String defaultLocale = 'pt_BR';
-  
+
   // Limites da aplicação
   static const int maxCategorias = 50;
   static const int maxContas = 20;
   static const int maxCartoes = 10;
   static const int maxMetas = 20;
   static const int maxUsuariosPorOrcamento = 5;
-  
+
   // Configurações de cache
   static const Duration cacheTimeout = Duration(minutes: 30);
-  
+
   // Configurações de sincronização
   static const Duration syncInterval = Duration(minutes: 5);
-  
+
   // Mensagens padrão
   static const String noDataMessage = 'Nenhum dado encontrado';
   static const String loadingMessage = 'Carregando...';
   static const String errorMessage = 'Ocorreu um erro. Tente novamente.';
   static const String successMessage = 'Operação realizada com sucesso!';
-  
+
   // Validações
   static const int minPasswordLength = 6;
   static const int maxNameLength = 50;
   static const int maxDescriptionLength = 200;
-  
+
   // Formatação
   static const int currencyDecimalPlaces = 2;
   static const int percentageDecimalPlaces = 1;
-  
+
   // URLs e links
   static const String privacyPolicyUrl = 'https://example.com/privacy';
   static const String termsOfServiceUrl = 'https://example.com/terms';
   static const String supportEmail = 'suporte@financeirofamiliar.com';
-  
+
   // Configurações do Firebase
   static const String firestoreTimeout = '30s';
-  
+
   // Configurações de notificação
   static const String notificationChannelId = 'financeiro_familiar';
   static const String notificationChannelName = 'Financeiro Familiar';
-  
+
   // Chaves para SharedPreferences
   static const String keyThemeMode = 'theme_mode';
   static const String keyFirstRun = 'first_run';
   static const String keyLastSync = 'last_sync';
   static const String keySelectedBudget = 'selected_budget';
-  
+
   // Configurações de gráficos
   static const double chartAnimationDuration = 1.5;
   static const int maxChartDataPoints = 12;
-  
+
   // Configurações de dashboard
   static const int maxDashboardCards = 8;
-  
+
   // Métodos utilitários
   static Color getColorByIndex(int index) {
     return availableColors[index % availableColors.length];
   }
-  
+
   static IconData getReceitaIcon(String key) {
     return receitaIcons[key] ?? Icons.attach_money;
   }
-  
+
   static IconData getDespesaIcon(String key) {
     return despesaIcons[key] ?? Icons.more_horiz;
   }
-  
+
   static IconData getContaIcon(String key) {
     return contaIcons[key] ?? Icons.account_balance_wallet;
   }
-  
+
   static IconData getMetaIcon(String key) {
     return metaIcons[key] ?? Icons.flag;
   }
-  
+
   static String getBandeiraCartao(String key) {
     return cartaoBandeiras[key] ?? 'Outro';
   }
-  
+
   static String getTipoRecorrencia(String key) {
     return tiposRecorrencia[key] ?? 'Mensal';
   }
-  
+
   // Validadores
   static bool isValidEmail(String email) {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
-  
+
   static bool isValidPassword(String password) {
     return password.length >= minPasswordLength;
   }
-  
+
   static bool isValidCurrency(double value) {
     return value >= 0 && value <= 999999999.99;
   }
-  
+
   static bool isValidPercentage(double value) {
     return value >= 0 && value <= 100;
   }
@@ -222,24 +222,8 @@ enum DashboardCardType {
   planejamentoMensal,
 }
 
-enum ChartType {
-  pizza,
-  barra,
-  linha,
-  area,
-}
+enum ChartType { pizza, barra, linha, area }
 
-enum PeriodType {
-  semana,
-  mes,
-  trimestre,
-  semestre,
-  ano,
-}
+enum PeriodType { semana, mes, trimestre, semestre, ano }
 
-enum TransactionFilter {
-  todos,
-  receitas,
-  despesas,
-  transferencias,
-}
+enum TransactionFilter { todos, receitas, despesas, transferencias }

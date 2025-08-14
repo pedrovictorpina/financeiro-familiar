@@ -7,10 +7,7 @@ import '../../utils/formatters.dart';
 class AddGoalValueScreen extends StatefulWidget {
   final Meta meta;
 
-  const AddGoalValueScreen({
-    super.key,
-    required this.meta,
-  });
+  const AddGoalValueScreen({super.key, required this.meta});
 
   @override
   State<AddGoalValueScreen> createState() => _AddGoalValueScreenState();
@@ -33,7 +30,7 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
   Widget build(BuildContext context) {
     final valorRestante = widget.meta.valorRestante;
     final percentualAtual = widget.meta.percentualConcluido;
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
       appBar: AppBar(
@@ -77,14 +74,26 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: (widget.meta.cor != null 
-                  ? Color(int.parse(widget.meta.cor!.replaceFirst('#', '0xFF')))
-                  : Colors.blue).withOpacity(0.1),
+                color:
+                    (widget.meta.cor != null
+                            ? Color(
+                                int.parse(
+                                  widget.meta.cor!.replaceFirst('#', '0xFF'),
+                                ),
+                              )
+                            : Colors.blue)
+                        .withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: (widget.meta.cor != null 
-                    ? Color(int.parse(widget.meta.cor!.replaceFirst('#', '0xFF')))
-                    : Colors.blue).withOpacity(0.3),
+                  color:
+                      (widget.meta.cor != null
+                              ? Color(
+                                  int.parse(
+                                    widget.meta.cor!.replaceFirst('#', '0xFF'),
+                                  ),
+                                )
+                              : Colors.blue)
+                          .withOpacity(0.3),
                 ),
               ),
               child: Column(
@@ -95,18 +104,34 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: (widget.meta.cor != null 
-                            ? Color(int.parse(widget.meta.cor!.replaceFirst('#', '0xFF')))
-                            : Colors.blue).withOpacity(0.2),
+                          color:
+                              (widget.meta.cor != null
+                                      ? Color(
+                                          int.parse(
+                                            widget.meta.cor!.replaceFirst(
+                                              '#',
+                                              '0xFF',
+                                            ),
+                                          ),
+                                        )
+                                      : Colors.blue)
+                                  .withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
-                          widget.meta.icone != null 
-                            ? IconData(int.parse(widget.meta.icone!), fontFamily: 'MaterialIcons')
-                            : Icons.track_changes,
-                          color: widget.meta.cor != null 
-                            ? Color(int.parse(widget.meta.cor!.replaceFirst('#', '0xFF')))
-                            : Colors.blue,
+                          widget.meta.icone != null
+                              ? IconData(
+                                  int.parse(widget.meta.icone!),
+                                  fontFamily: 'MaterialIcons',
+                                )
+                              : Icons.track_changes,
+                          color: widget.meta.cor != null
+                              ? Color(
+                                  int.parse(
+                                    widget.meta.cor!.replaceFirst('#', '0xFF'),
+                                  ),
+                                )
+                              : Colors.blue,
                           size: 24,
                         ),
                       ),
@@ -137,7 +162,7 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Progresso atual
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -175,11 +200,18 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
                           Text(
                             Formatters.formatCurrency(valorRestante),
                             style: TextStyle(
-                              color: valorRestante > 0 
-                              ? (widget.meta.cor != null 
-                                ? Color(int.parse(widget.meta.cor!.replaceFirst('#', '0xFF')))
-                                : Colors.blue)
-                              : Colors.green,
+                              color: valorRestante > 0
+                                  ? (widget.meta.cor != null
+                                        ? Color(
+                                            int.parse(
+                                              widget.meta.cor!.replaceFirst(
+                                                '#',
+                                                '0xFF',
+                                              ),
+                                            ),
+                                          )
+                                        : Colors.blue)
+                                  : Colors.green,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -188,9 +220,9 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Barra de progresso
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,9 +240,16 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
                           Text(
                             '${percentualAtual.toStringAsFixed(1)}%',
                             style: TextStyle(
-                              color: widget.meta.cor != null 
-                                ? Color(int.parse(widget.meta.cor!.replaceFirst('#', '0xFF')))
-                                : Colors.blue,
+                              color: widget.meta.cor != null
+                                  ? Color(
+                                      int.parse(
+                                        widget.meta.cor!.replaceFirst(
+                                          '#',
+                                          '0xFF',
+                                        ),
+                                      ),
+                                    )
+                                  : Colors.blue,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -224,9 +263,16 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
                           value: percentualAtual / 100,
                           backgroundColor: Colors.grey[800],
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            widget.meta.cor != null 
-                              ? Color(int.parse(widget.meta.cor!.replaceFirst('#', '0xFF')))
-                              : Colors.blue
+                            widget.meta.cor != null
+                                ? Color(
+                                    int.parse(
+                                      widget.meta.cor!.replaceFirst(
+                                        '#',
+                                        '0xFF',
+                                      ),
+                                    ),
+                                  )
+                                : Colors.blue,
                           ),
                           minHeight: 8,
                         ),
@@ -254,9 +300,7 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
               decoration: BoxDecoration(
                 color: Colors.green.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.green.withOpacity(0.3),
-                ),
+                border: Border.all(color: Colors.green.withOpacity(0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,7 +333,9 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _valorController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -297,10 +343,7 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
                     ),
                     decoration: const InputDecoration(
                       hintText: '0,00',
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 24,
-                      ),
+                      hintStyle: TextStyle(color: Colors.grey, fontSize: 24),
                       border: InputBorder.none,
                       prefixText: 'R\$ ',
                       prefixStyle: TextStyle(
@@ -429,7 +472,7 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
 
   Widget _buildValorRapido(double valor) {
     if (valor <= 0) return const SizedBox.shrink();
-    
+
     return GestureDetector(
       onTap: () {
         _valorController.text = valor.toStringAsFixed(2).replaceAll('.', ',');
@@ -439,9 +482,7 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
         decoration: BoxDecoration(
           color: const Color(0xFF2A2A2A),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: Colors.grey.withOpacity(0.3),
-          ),
+          border: Border.all(color: Colors.grey.withOpacity(0.3)),
         ),
         child: Text(
           valor == widget.meta.valorRestante
@@ -467,12 +508,13 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
     try {
       final valor = double.parse(_valorController.text.replaceAll(',', '.'));
       final novoValorAtual = widget.meta.valorAtual + valor;
-      
-      final metaAtualizada = widget.meta.copyWith(
-        valorAtual: novoValorAtual,
-      );
 
-      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+      final metaAtualizada = widget.meta.copyWith(valorAtual: novoValorAtual);
+
+      final financeProvider = Provider.of<FinanceProvider>(
+        context,
+        listen: false,
+      );
       final success = await financeProvider.atualizarProgressoMeta(
         widget.meta.id,
         valor,
@@ -482,13 +524,13 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
       if (success) {
         if (mounted) {
           Navigator.of(context).pop();
-          
+
           // Mostrar mensagem especial se a meta foi completada
           final isCompleta = novoValorAtual >= widget.meta.valorMeta;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                isCompleta 
+                isCompleta
                     ? '🎉 Parabéns! Meta "${widget.meta.nome}" concluída!'
                     : 'Valor adicionado com sucesso!',
               ),
@@ -501,7 +543,9 @@ class _AddGoalValueScreenState extends State<AddGoalValueScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(financeProvider.errorMessage ?? 'Erro ao adicionar valor'),
+              content: Text(
+                financeProvider.errorMessage ?? 'Erro ao adicionar valor',
+              ),
               backgroundColor: Colors.red,
             ),
           );

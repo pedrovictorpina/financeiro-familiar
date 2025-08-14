@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../providers/finance_provider.dart';
 import '../../models/transacao.dart';
@@ -6,9 +7,11 @@ import '../../models/conta.dart';
 import '../../utils/formatters.dart';
 import '../../utils/theme_extensions.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/currency_input_formatter.dart';
 
 class AddTransferScreen extends StatefulWidget {
-  const AddTransferScreen({super.key});
+  final Transacao? transacao;
+  const AddTransferScreen({super.key, this.transacao});
 
   @override
   State<AddTransferScreen> createState() => _AddTransferScreenState();
@@ -18,11 +21,24 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descricaoController = TextEditingController();
   final _valorController = TextEditingController();
-  
+
   String? _contaOrigemId;
   String? _contaDestinoId;
   DateTime _dataSelecionada = DateTime.now();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final t = widget.transacao;
+    if (t != null) {
+      _descricaoController.text = t.descricao;
+      _valorController.text = CurrencyInputFormatter.formatValue(t.valor);
+      _dataSelecionada = t.data;
+      _contaOrigemId = t.contaId;
+      _contaDestinoId = t.contaDestinoId;
+    }
+  }
 
   @override
   void dispose() {
@@ -34,13 +50,15 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.appBarTheme.backgroundColor,
         title: Text(
-          'Nova Transferência',
+          widget.transacao != null
+              ? 'Editar Transferência'
+              : 'Nova Transferência',
           style: TextStyle(color: theme.appBarTheme.foregroundColor),
         ),
         leading: IconButton(
@@ -83,7 +101,7 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                     color: TransactionColors.getTransferenciaBackground(context),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Colors.blue.withOpacity(0.3),
+                      color: TransactionColors.transferencia.withOpacity(0.3),
                     ),
                   ),
                   child: Column(
@@ -94,12 +112,12 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.blue.withOpacity(0.2),
+                              color: TransactionColors.transferencia.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(
                               Icons.swap_horiz,
-                              color: Colors.blue,
+                              color: TransactionColors.transferencia,
                               size: 20,
                             ),
                           ),
@@ -118,21 +136,25 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                       TextFormField(
                         controller: _valorController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          CurrencyInputFormatter(),
+                        ],
                         style: TextStyle(
                           color: context.primaryText,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'R\$ 0,00',
                           hintStyle: TextStyle(
-                            color: Colors.grey,
+                            color: context.secondaryText,
                             fontSize: 24,
                           ),
                           border: InputBorder.none,
                           prefixText: 'R\$ ',
-                          prefixStyle: TextStyle(
-                            color: Colors.blue,
+                          prefixStyle: const TextStyle(
+                            color: TransactionColors.transferencia,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -141,7 +163,7 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira o valor';
                           }
-                          final valor = double.tryParse(value.replaceAll(',', '.'));
+                          final valor = CurrencyInputFormatter.parseValue(value);
                           if (valor == null || valor <= 0) {
                             return 'Por favor, insira um valor válido';
                           }
@@ -168,15 +190,22 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                   value: _contaOrigemId,
                   dropdownColor: context.dropdownColor,
                   style: TextStyle(color: context.primaryText),
-                  decoration: const InputDecoration(
+                  iconEnabledColor: TransactionColors.transferencia,
+                  focusColor: TransactionColors.transferencia.withOpacity(0.1),
+                  decoration: InputDecoration(
                     hintText: 'Selecione a conta de origem',
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: OutlineInputBorder(),
+                    hintStyle: TextStyle(color: context.secondaryText),
+                    border: const OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
+                      borderSide: BorderSide(
+                        color: TransactionColors.transferencia.withOpacity(0.4),
+                      ),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: TransactionColors.transferencia,
+                        width: 2,
+                      ),
                     ),
                   ),
                   items: financeProvider.contas.map((conta) {
@@ -255,52 +284,60 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                   value: _contaDestinoId,
                   dropdownColor: context.dropdownColor,
                   style: TextStyle(color: context.primaryText),
-                  decoration: const InputDecoration(
+                  iconEnabledColor: TransactionColors.transferencia,
+                  focusColor: TransactionColors.transferencia.withOpacity(0.1),
+                  decoration: InputDecoration(
                     hintText: 'Selecione a conta de destino',
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: OutlineInputBorder(),
+                    hintStyle: TextStyle(color: context.secondaryText),
+                    border: const OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
+                      borderSide: BorderSide(
+                        color: TransactionColors.transferencia.withOpacity(0.4),
+                      ),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: TransactionColors.transferencia,
+                        width: 2,
+                      ),
                     ),
                   ),
                   items: financeProvider.contas
                       .where((conta) => conta.id != _contaOrigemId)
                       .map((conta) {
-                    return DropdownMenuItem<String>(
-                      value: conta.id,
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: conta.cor,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(conta.nome),
-                                Text(
-                                  'Saldo: ${Formatters.formatCurrency(conta.saldoAtual)}',
-                                  style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
-                                  ),
+                        return DropdownMenuItem<String>(
+                          value: conta.id,
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: conta.cor,
+                                  shape: BoxShape.circle,
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(conta.nome),
+                                    Text(
+                                      'Saldo: ${Formatters.formatCurrency(conta.saldoAtual)}',
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      })
+                      .toList(),
                   onChanged: (value) => setState(() => _contaDestinoId = value),
                   validator: (value) {
                     if (value == null) {
@@ -384,7 +421,8 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                 const SizedBox(height: 32),
 
                 // Aviso sobre saldo
-                if (_contaOrigemId != null) ..._buildSaldoWarning(financeProvider),
+                if (_contaOrigemId != null)
+                  ..._buildSaldoWarning(financeProvider),
               ],
             ),
           );
@@ -406,7 +444,8 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
       ),
     );
 
-    final valor = double.tryParse(_valorController.text.replaceAll(',', '.')) ?? 0;
+    final valor =
+        double.tryParse(_valorController.text.replaceAll(',', '.')) ?? 0;
     final saldoInsuficiente = valor > contaOrigem.saldoAtual;
 
     if (saldoInsuficiente && valor > 0) {
@@ -416,17 +455,11 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
           decoration: BoxDecoration(
             color: context.warningColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: context.warningColor.withOpacity(0.3),
-            ),
+            border: Border.all(color: context.warningColor.withOpacity(0.3)),
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.warning,
-                color: context.warningColor,
-                size: 20,
-              ),
+              Icon(Icons.warning, color: context.warningColor, size: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -441,10 +474,7 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
                     ),
                     Text(
                       'Saldo disponível: ${Formatters.formatCurrency(contaOrigem.saldoAtual)}',
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
                     ),
                   ],
                 ),
@@ -477,7 +507,7 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
         );
       },
     );
-    
+
     if (data != null) {
       setState(() => _dataSelecionada = data);
     }
@@ -489,13 +519,16 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
     }
 
     // Validações adicionais antes de salvar
-    final valor = double.tryParse(_valorController.text.replaceAll(',', '.')) ?? 0;
-    
+    final valor =
+        CurrencyInputFormatter.parseValue(_valorController.text) ?? 0.0;
+
     // Verificar se as contas são diferentes
     if (_contaOrigemId == _contaDestinoId) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('A conta de origem deve ser diferente da conta de destino'),
+          content: Text(
+            'A conta de origem deve ser diferente da conta de destino',
+          ),
           backgroundColor: context.errorColor,
         ),
       );
@@ -503,7 +536,10 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
     }
 
     // Verificar saldo suficiente na conta de origem
-    final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+    final financeProvider = Provider.of<FinanceProvider>(
+      context,
+      listen: false,
+    );
     final contaOrigem = financeProvider.contas.firstWhere(
       (c) => c.id == _contaOrigemId,
       orElse: () => Conta(
@@ -520,7 +556,7 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Saldo insuficiente na conta de origem. Saldo disponível: ${Formatters.formatCurrency(contaOrigem.saldoAtual)}'
+            'Saldo insuficiente na conta de origem. Saldo disponível: ${Formatters.formatCurrency(contaOrigem.saldoAtual)}',
           ),
           backgroundColor: context.errorColor,
           duration: Duration(seconds: 4),
@@ -537,29 +573,44 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
           : _descricaoController.text.trim();
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final userId = authProvider.user?.uid ?? 'unknown';
-      
-      final transacao = Transacao(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        tipo: TipoTransacao.transferencia,
-        valor: valor,
-        data: _dataSelecionada,
-        descricao: descricao,
-        categoriaId: '', // Transferências não precisam de categoria
-        contaId: _contaOrigemId!,
-        contaDestinoId: _contaDestinoId!,
-        recorrente: false,
-        criadoPor: userId,
-        timestamp: DateTime.now(),
-      );
 
-      final success = await financeProvider.adicionarTransacao(transacao);
+      bool success = false;
+      if (widget.transacao != null) {
+        final transacaoAtualizada = widget.transacao!.copyWith(
+          valor: valor,
+          data: _dataSelecionada,
+          descricao: descricao,
+          contaId: _contaOrigemId!,
+          contaDestinoId: _contaDestinoId!,
+        );
+        success = await financeProvider.atualizarTransacao(transacaoAtualizada);
+      } else {
+        final transacao = Transacao(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          tipo: TipoTransacao.transferencia,
+          valor: valor,
+          data: _dataSelecionada,
+          descricao: descricao,
+          categoriaId: '', // Transferências não precisam de categoria
+          contaId: _contaOrigemId!,
+          contaDestinoId: _contaDestinoId!,
+          recorrente: false,
+          criadoPor: userId,
+          timestamp: DateTime.now(),
+        );
+        success = await financeProvider.adicionarTransacao(transacao);
+      }
 
       if (success) {
         if (mounted) {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Transferência realizada com sucesso!'),
+              content: Text(
+                widget.transacao != null
+                    ? 'Transferência atualizada com sucesso!'
+                    : 'Transferência realizada com sucesso!',
+              ),
               backgroundColor: TransactionColors.transferencia,
             ),
           );
@@ -568,7 +619,9 @@ class _AddTransferScreenState extends State<AddTransferScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(financeProvider.errorMessage ?? 'Erro ao realizar transferência'),
+              content: Text(
+                financeProvider.errorMessage ?? 'Erro ao salvar transferência',
+              ),
               backgroundColor: context.errorColor,
             ),
           );

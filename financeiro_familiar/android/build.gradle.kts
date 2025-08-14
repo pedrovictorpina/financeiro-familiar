@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.compile.JavaCompile
 allprojects {
     repositories {
         google()
@@ -18,4 +19,11 @@ subprojects {
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
+}
+
+subprojects {
+    // Suprimir avisos/notes do compilador Java em subprojetos
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.addAll(listOf("-Xlint:-options", "-Xlint:-deprecation", "-Xlint:-unchecked"))
+    }
 }

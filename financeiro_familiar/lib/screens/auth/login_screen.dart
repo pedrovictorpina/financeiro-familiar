@@ -16,8 +16,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'pedrovictorpina@gmail.com');
-  final _passwordController = TextEditingController(text: 'Juliane@020');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
 
@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     final success = await authProvider.signIn(
       _emailController.text.trim(),
       _passwordController.text,
@@ -64,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 60),
-                
+
                 // Logo e título
                 Icon(
                   Icons.account_balance_wallet,
@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(height: 16),
-                
+
                 Text(
                   'Financeiro Familiar',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -81,9 +81,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 Text(
                   'Controle suas finanças em família',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -91,9 +91,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 48),
-                
+
                 // Campo de email
                 TextFormField(
                   controller: _emailController,
@@ -108,15 +108,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Por favor, digite seu email';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(value)) {
                       return 'Digite um email válido';
                     }
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Campo de senha
                 TextFormField(
                   controller: _passwordController,
@@ -129,7 +131,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     prefixIcon: const Icon(Icons.lock_outlined),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                        _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -148,9 +152,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Lembrar-me e esqueci a senha
                 Row(
                   children: [
@@ -176,9 +180,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Botão de login
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, child) {
@@ -200,9 +204,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   },
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Divisor
                 Row(
                   children: [
@@ -219,9 +223,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Expanded(child: Divider()),
                   ],
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Botão de registro
                 OutlinedButton(
                   onPressed: () {
@@ -239,9 +243,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Toggle de tema
                 Consumer<ThemeProvider>(
                   builder: (context, themeProvider, child) {

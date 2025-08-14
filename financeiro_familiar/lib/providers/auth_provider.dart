@@ -5,7 +5,7 @@ import '../services/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
-  
+
   User? _user;
   Usuario? _userData;
   bool _isLoading = false;
@@ -25,13 +25,13 @@ class AuthProvider extends ChangeNotifier {
   void _initAuthListener() {
     _authService.authStateChanges.listen((User? user) async {
       _user = user;
-      
+
       if (user != null) {
         await _loadUserData(user.uid);
       } else {
         _userData = null;
       }
-      
+
       notifyListeners();
     });
   }
@@ -47,7 +47,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> signIn(String email, String password) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       await _authService.signInWithEmailAndPassword(
         email: email,
@@ -65,7 +65,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> signUp(String email, String password, String nome) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       await _authService.createUserWithEmailAndPassword(
         email: email,
@@ -83,7 +83,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> signOut() async {
     _setLoading(true);
-    
+
     try {
       await _authService.signOut();
     } catch (e) {
@@ -96,7 +96,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> sendPasswordReset(String email) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       await _authService.sendPasswordResetEmail(email);
       return true;
@@ -111,7 +111,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> updateUserData(Usuario usuario) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       await _authService.updateUserData(usuario);
       _userData = usuario;
@@ -128,7 +128,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> deleteAccount() async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       await _authService.deleteAccount();
       return true;
@@ -154,17 +154,14 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> atualizarPerfil(String nome, String email) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       if (_userData != null) {
-        final usuarioAtualizado = _userData?.copyWith(
-            nome: nome,
-            email: email,
-          );
-          
-          if (usuarioAtualizado != null) {
-            await _authService.updateUserData(usuarioAtualizado);
-          }
+        final usuarioAtualizado = _userData?.copyWith(nome: nome, email: email);
+
+        if (usuarioAtualizado != null) {
+          await _authService.updateUserData(usuarioAtualizado);
+        }
         _userData = usuarioAtualizado;
         notifyListeners();
         return true;
@@ -182,7 +179,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> alterarSenha(String senhaAtual, String novaSenha) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       if (_user != null) {
         // Reautenticar o usuário com a senha atual
@@ -190,9 +187,9 @@ class AuthProvider extends ChangeNotifier {
           email: _user!.email!,
           password: senhaAtual,
         );
-        
+
         await _user?.reauthenticateWithCredential(credential);
-        
+
         // Atualizar a senha
         await _user?.updatePassword(novaSenha);
         return true;

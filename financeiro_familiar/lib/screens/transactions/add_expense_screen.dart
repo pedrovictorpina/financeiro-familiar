@@ -23,7 +23,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descricaoController = TextEditingController();
   final _valorController = TextEditingController();
-  
+
   String? _categoriaId;
   String? _contaId;
   DateTime _dataSelecionada = DateTime.now();
@@ -55,7 +55,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEditMode = widget.transacao != null;
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -107,9 +107,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   decoration: BoxDecoration(
                     color: Colors.red.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.red.withOpacity(0.3),
-                    ),
+                    border: Border.all(color: Colors.red.withOpacity(0.3)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,7 +140,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _valorController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                           CurrencyInputFormatter(),
@@ -170,7 +170,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira o valor';
                           }
-                          final valor = CurrencyInputFormatter.parseValue(value);
+                          final valor = CurrencyInputFormatter.parseValue(
+                            value,
+                          );
                           if (valor == null || valor <= 0) {
                             return 'Por favor, insira um valor válido';
                           }
@@ -247,11 +249,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       value: categoria.id,
                       child: Row(
                         children: [
-                          Icon(
-                            categoria.icone,
-                            color: categoria.cor,
-                            size: 20,
-                          ),
+                          Icon(categoria.icone, color: categoria.cor, size: 20),
                           const SizedBox(width: 12),
                           Text(categoria.nome),
                         ],
@@ -373,11 +371,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.repeat,
-                        color: context.iconColor,
-                        size: 20,
-                      ),
+                      Icon(Icons.repeat, color: context.iconColor, size: 20),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -403,7 +397,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       ),
                       Switch(
                         value: _recorrente,
-                        onChanged: (value) => setState(() => _recorrente = value),
+                        onChanged: (value) =>
+                            setState(() => _recorrente = value),
                         activeColor: Colors.red,
                       ),
                     ],
@@ -437,7 +432,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         );
       },
     );
-    
+
     if (data != null) {
       setState(() => _dataSelecionada = data);
     }
@@ -451,12 +446,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final parsed = CurrencyInputFormatter.parseValue(_valorController.text) ?? 0.0;
+      final parsed =
+          CurrencyInputFormatter.parseValue(_valorController.text) ?? 0.0;
       final valor = parsed;
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final userId = authProvider.user?.uid ?? 'unknown';
       final isEditMode = widget.transacao != null;
-      
+
       final transacao = isEditMode
           ? widget.transacao!.copyWith(
               valor: valor,
@@ -479,7 +475,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               timestamp: DateTime.now(),
             );
 
-      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+      final financeProvider = Provider.of<FinanceProvider>(
+        context,
+        listen: false,
+      );
       final success = isEditMode
           ? await financeProvider.atualizarTransacao(transacao)
           : await financeProvider.adicionarTransacao(transacao);
@@ -489,19 +488,24 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           Navigator.of(context).pop(true);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(isEditMode ? 'Despesa atualizada com sucesso!' : 'Despesa adicionada com sucesso!'),
+              content: Text(
+                isEditMode
+                    ? 'Despesa atualizada com sucesso!'
+                    : 'Despesa adicionada com sucesso!',
+              ),
               backgroundColor: TransactionColors.despesa,
             ),
           );
         }
       } else {
         if (mounted) {
-          final msg = financeProvider.errorMessage ?? (isEditMode ? 'Erro ao atualizar despesa' : 'Erro ao adicionar despesa');
+          final msg =
+              financeProvider.errorMessage ??
+              (isEditMode
+                  ? 'Erro ao atualizar despesa'
+                  : 'Erro ao adicionar despesa');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(msg),
-              backgroundColor: context.errorColor,
-            ),
+            SnackBar(content: Text(msg), backgroundColor: context.errorColor),
           );
         }
       }

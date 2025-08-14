@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:android_intent_plus/android_intent.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/finance_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -45,49 +46,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Configurações'),
-      ),
+      appBar: AppBar(title: const Text('Configurações')),
       body: Consumer3<AuthProvider, FinanceProvider, ThemeProvider>(
-        builder: (context, authProvider, financeProvider, themeProvider, child) {
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              // Seção do perfil
-              _buildProfileSection(context, authProvider),
-              
-              const SizedBox(height: 24),
-              
-              // Seção do orçamento
-              _buildBudgetSection(context, financeProvider),
-              
-              const SizedBox(height: 24),
-              
-              // Seção de aparência
-              _buildAppearanceSection(context, themeProvider),
-              
-              const SizedBox(height: 24),
-              
-              // Seção de notificações
-              _buildNotificationsSection(context, authProvider, financeProvider),
-              
-              const SizedBox(height: 24),
-              
-              // Seção de dados
-              _buildDataSection(context, financeProvider),
-              
-              const SizedBox(height: 24),
-              
-              // Seção de conta
-              _buildAccountSection(context, authProvider),
-              
-              const SizedBox(height: 24),
-              
-              // Seção sobre
-              _buildAboutSection(context),
-            ],
-          );
-        },
+        builder:
+            (context, authProvider, financeProvider, themeProvider, child) {
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Seção do perfil
+                  _buildProfileSection(context, authProvider),
+
+                  const SizedBox(height: 24),
+
+                  // Seção do orçamento
+                  _buildBudgetSection(context, financeProvider),
+
+                  const SizedBox(height: 24),
+
+                  // Seção de aparência
+                  _buildAppearanceSection(context, themeProvider),
+
+                  const SizedBox(height: 24),
+
+                  // Seção de notificações
+                  _buildNotificationsSection(
+                    context,
+                    authProvider,
+                    financeProvider,
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Seção de dados
+                  _buildDataSection(context, financeProvider),
+
+                  const SizedBox(height: 24),
+
+                  // Seção de conta
+                  _buildAccountSection(context, authProvider),
+
+                  const SizedBox(height: 24),
+
+                  // Seção sobre
+                  _buildAboutSection(context),
+                ],
+              );
+            },
       ),
     );
   }
@@ -101,9 +105,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               'Perfil',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Row(
@@ -112,7 +116,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   radius: 30,
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   child: Text(
-                    authProvider.userData?.nome.substring(0, 1).toUpperCase() ?? 'U',
+                    authProvider.userData?.nome.substring(0, 1).toUpperCase() ??
+                        'U',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -153,7 +158,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildBudgetSection(BuildContext context, FinanceProvider financeProvider) {
+  Widget _buildBudgetSection(
+    BuildContext context,
+    FinanceProvider financeProvider,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -162,9 +170,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               'Orçamento',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             if (financeProvider.orcamentoAtual != null) ...[
@@ -173,7 +181,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 leading: const Icon(Icons.account_balance_wallet),
                 title: Text(financeProvider.orcamentoAtual!.nome),
                 subtitle: Text(
-                  'Criado em ${Formatters.formatDate(financeProvider.orcamentoAtual!.dataCriacao)}',
+                  'Criado em: ${Formatters.formatDate(financeProvider.orcamentoAtual!.dataCriacao)}',
                 ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _gerenciarOrcamento(financeProvider),
@@ -210,7 +218,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildAppearanceSection(BuildContext context, ThemeProvider themeProvider) {
+  Widget _buildAppearanceSection(
+    BuildContext context,
+    ThemeProvider themeProvider,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -219,9 +230,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               'Aparência',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             ListTile(
@@ -230,8 +241,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 themeProvider.themeMode == ThemeMode.dark
                     ? Icons.dark_mode
                     : themeProvider.themeMode == ThemeMode.light
-                        ? Icons.light_mode
-                        : Icons.brightness_auto,
+                    ? Icons.light_mode
+                    : Icons.brightness_auto,
               ),
               title: const Text('Tema'),
               subtitle: Text(_getThemeName(themeProvider.themeMode)),
@@ -252,7 +263,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildDataSection(BuildContext context, FinanceProvider financeProvider) {
+  Widget _buildDataSection(
+    BuildContext context,
+    FinanceProvider financeProvider,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -261,9 +275,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               'Dados',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             ListTile(
@@ -321,9 +335,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               'Conta',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             ListTile(
@@ -353,7 +367,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.delete_forever, color: Colors.red),
-              title: const Text('Excluir Conta', style: TextStyle(color: Colors.red)),
+              title: const Text(
+                'Excluir Conta',
+                style: TextStyle(color: Colors.red),
+              ),
               subtitle: const Text('Excluir permanentemente sua conta'),
               trailing: const Icon(Icons.chevron_right, color: Colors.red),
               onTap: () => _excluirConta(authProvider),
@@ -373,9 +390,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               'Sobre',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             ListTile(
@@ -391,7 +408,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               leading: const Icon(Icons.system_update),
               title: const Text('Verificar Atualizações'),
               subtitle: const Text('Verificar se há novas versões disponíveis'),
-              trailing: _checkingForUpdates 
+              trailing: _checkingForUpdates
                   ? const SizedBox(
                       width: 20,
                       height: 20,
@@ -453,27 +470,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _gerenciarCategorias() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const CategoriesScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const CategoriesScreen()));
   }
 
   void _gerenciarContas() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const AccountsScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const AccountsScreen()));
   }
 
   void _gerenciarCartoes() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const CardsScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const CardsScreen()));
   }
 
   void _selecionarTema(ThemeProvider themeProvider) {
@@ -523,7 +534,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildNotificationsSection(BuildContext context, AuthProvider authProvider, FinanceProvider financeProvider) {
+  Widget _buildNotificationsSection(
+    BuildContext context,
+    AuthProvider authProvider,
+    FinanceProvider financeProvider,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -532,28 +547,108 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               'Notificações',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
+            
+            // Configurações de notificação
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.notifications),
               title: const Text('Lembrete de fatura'),
               subtitle: Text(
-                'Notificar ${authProvider.userData?.reminderDays ?? 3} ${(authProvider.userData?.reminderDays ?? 3) == 1 ? 'dia' : 'dias'} antes do vencimento'
+                'Notificar ${authProvider.userData?.reminderDays ?? 3} ${(authProvider.userData?.reminderDays ?? 3) == 1 ? 'dia' : 'dias'} antes do vencimento',
               ),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => _selecionarDiasLembrete(authProvider, financeProvider),
+              onTap: () =>
+                  _selecionarDiasLembrete(authProvider, financeProvider),
             ),
+            
+            const Divider(height: 24),
+            
+            // Seção de Permissões
+            Text(
+              'Permissões',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            
+            // Status de Alarmes Exatos
+            FutureBuilder<bool>(
+              future: _checkExactAlarmPermission(),
+              builder: (context, snapshot) {
+                final isAllowed = snapshot.data ?? false;
+                final isLoading = snapshot.connectionState == ConnectionState.waiting;
+                
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(
+                    isAllowed ? Icons.alarm_on : Icons.alarm_off,
+                    color: isAllowed ? Colors.green : Colors.orange,
+                  ),
+                  title: const Text('Alarmes exatos'),
+                  subtitle: Text(
+                    kIsWeb 
+                      ? 'Disponível apenas no Android'
+                      : isLoading 
+                        ? 'Verificando...' 
+                        : isAllowed 
+                          ? 'Permitidos - notificações precisas habilitadas'
+                          : 'Negados - notificações podem ter atraso',
+                  ),
+                  trailing: kIsWeb ? null : IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () => setState(() {}),
+                    tooltip: 'Verificar novamente',
+                  ),
+                );
+              },
+            ),
+            
+            if (!kIsWeb) ...[
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.settings),
+                title: const Text('Permitir alarmes exatos'),
+                subtitle: const Text('Abrir configurações do app (Android 12+)'),
+                trailing: const Icon(Icons.open_in_new),
+                onTap: () => _openExactAlarmSettings(),
+              ),
+            ],
+            
+            const Divider(height: 24),
+            
+            // Seção de Testes
+            Text(
+              'Testes de notificação',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.notification_important),
-              title: const Text('Testar notificação'),
-              subtitle: const Text('Enviar uma notificação de teste'),
+              title: const Text('Testar notificação imediata'),
+              subtitle: const Text('Enviar uma notificação de teste agora'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => _testarNotificacao(),
+            ),
+            
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.alarm_add),
+              title: const Text('Testar agendamento (10s)'),
+              subtitle: const Text('Agenda uma notificação para 10 segundos'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _testarAgendamento(),
             ),
           ],
         ),
@@ -570,9 +665,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _fazerBackup() async {
     try {
-      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+      final financeProvider = Provider.of<FinanceProvider>(
+        context,
+        listen: false,
+      );
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      
+
       // Criar dados de backup
       final backupData = {
         'versao': '1.0.0',
@@ -587,11 +685,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'cartoes': financeProvider.cartoes.map((c) => c.toMap()).toList(),
         'transacoes': financeProvider.transacoes.map((t) => t.toMap()).toList(),
         'metas': financeProvider.metas.map((m) => m.toMap()).toList(),
-        'planejamentos': financeProvider.planejamentos.map((p) => p.toMap()).toList(),
+        'planejamentos': financeProvider.planejamentos
+            .map((p) => p.toMap())
+            .toList(),
       };
-      
+
       final jsonString = jsonEncode(backupData);
-      
+
       // Salvar backup como string JSON
       // Em uma implementação completa, isso seria salvo em um arquivo
       if (mounted) {
@@ -602,7 +702,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         );
       }
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Backup criado com sucesso!')),
@@ -610,9 +710,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao criar backup: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao criar backup: $e')));
       }
     }
   }
@@ -623,24 +723,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
-      
+
       if (result != null && result.files.single.bytes != null) {
         final bytes = result.files.single.bytes!;
         final jsonString = utf8.decode(bytes);
         final backupData = jsonDecode(jsonString);
-        
+
         // Validar estrutura do backup
         if (backupData['versao'] == null || backupData['dataBackup'] == null) {
           throw Exception('Arquivo de backup inválido');
         }
-        
+
         // Confirmar restauração
         final confirm = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Confirmar Restauração'),
             content: Text(
-              'Isso irá substituir todos os seus dados atuais pelos dados do backup de ${DateTime.parse(backupData['dataBackup']).toString().split(' ')[0]}. Deseja continuar?'
+              'Isso irá substituir todos os seus dados atuais pelos dados do backup de ${DateTime.parse(backupData['dataBackup']).toString().split(' ')[0]}. Deseja continuar?',
             ),
             actions: [
               TextButton(
@@ -654,14 +754,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         );
-        
+
         if (confirm == true) {
-          final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+          final financeProvider = Provider.of<FinanceProvider>(
+            context,
+            listen: false,
+          );
           // Simular restauração do backup
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Backup restaurado com sucesso!')),
           );
-          
+
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Backup restaurado com sucesso!')),
@@ -671,50 +774,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao restaurar backup: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao restaurar backup: $e')));
       }
     }
   }
 
   void _exportarDados() async {
     try {
-      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
-      
+      final financeProvider = Provider.of<FinanceProvider>(
+        context,
+        listen: false,
+      );
+
       // Criar CSV das transações
       final csvData = StringBuffer();
       csvData.writeln('Data,Descrição,Categoria,Conta,Tipo,Valor');
-      
+
       for (final transacao in financeProvider.transacoes) {
-        final categoria = financeProvider.categorias
-            .where((c) => c.id == transacao.categoriaId)
-            .firstOrNull?.nome ?? 'Sem categoria';
-        final conta = financeProvider.contas
-            .where((c) => c.id == transacao.contaId)
-            .firstOrNull?.nome ?? 'Sem conta';
-        
+        final categoria =
+            financeProvider.categorias
+                .where((c) => c.id == transacao.categoriaId)
+                .firstOrNull
+                ?.nome ??
+            'Sem categoria';
+        final conta =
+            financeProvider.contas
+                .where((c) => c.id == transacao.contaId)
+                .firstOrNull
+                ?.nome ??
+            'Sem conta';
+
         csvData.writeln(
           '${transacao.data.toString().split(' ')[0]},'
           '"${transacao.descricao}",'
           '"$categoria",'
           '"$conta",'
           '${transacao.tipo.name},'
-          '${transacao.valor}'
+          '${transacao.valor}',
         );
       }
-      
+
       // Gerar CSV das transações
-       // Em uma implementação completa, isso seria salvo em um arquivo
-       if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-             content: Text('CSV gerado com ${csvData.length} linhas'),
-             duration: const Duration(seconds: 3),
-           ),
-         );
-       }
-      
+      // Em uma implementação completa, isso seria salvo em um arquivo
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('CSV gerado com ${csvData.length} linhas'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Dados exportados com sucesso!')),
@@ -722,9 +834,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao exportar dados: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao exportar dados: $e')));
       }
     }
   }
@@ -739,25 +851,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao sincronizar: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erro ao sincronizar: $e')));
       }
     }
   }
 
   void _alterarSenha() {
-    showDialog(
-      context: context,
-      builder: (context) => _ChangePasswordDialog(),
-    );
+    showDialog(context: context, builder: (context) => _ChangePasswordDialog());
   }
 
   void _compartilharOrcamento() {
-    showDialog(
-      context: context,
-      builder: (context) => _ShareBudgetDialog(),
-    );
+    showDialog(context: context, builder: (context) => _ShareBudgetDialog());
   }
 
   void _logout(AuthProvider authProvider) {
@@ -809,7 +915,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 await authProvider.deleteAccount();
                 if (mounted) {
                   Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
                     (route) => false,
                   );
                 }
@@ -829,7 +937,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _selecionarDiasLembrete(AuthProvider authProvider, FinanceProvider financeProvider) {
+  void _selecionarDiasLembrete(
+    AuthProvider authProvider,
+    FinanceProvider financeProvider,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -838,7 +949,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Quantos dias antes do vencimento deseja ser notificado?'),
+            const Text(
+              'Quantos dias antes do vencimento deseja ser notificado?',
+            ),
             const SizedBox(height: 16),
             ...List.generate(5, (index) {
               final dias = index + 1;
@@ -853,28 +966,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       final usuarioAtualizado = authProvider.userData!.copyWith(
                         reminderDays: value,
                       );
-                      
+
                       await authProvider.updateUserData(usuarioAtualizado);
-                      
-                      // Reagendar notificações com novos dias
+
+                      // Garantir init e permissões antes de agendar
                       final notificationService = NotificationService();
+                      await notificationService.initialize();
+                      await notificationService.requestPermissions();
+
+                      // Reagendar notificações com novos dias
                       await notificationService.scheduleCardReminders(
                         cartoes: financeProvider.cartoes,
                         reminderDays: value,
                       );
-                      
+
                       if (mounted) {
                         Navigator.of(context).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Lembrete configurado para $value ${value == 1 ? 'dia' : 'dias'} antes'),
+                            content: Text(
+                              'Lembrete configurado para $value ${value == 1 ? 'dia' : 'dias'} antes',
+                            ),
                           ),
                         );
                       }
                     } catch (e) {
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Erro ao salvar configuração: $e')),
+                          SnackBar(
+                            content: Text('Erro ao salvar configuração: $e'),
+                          ),
                         );
                       }
                     }
@@ -897,8 +1018,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _testarNotificacao() async {
     try {
       final notificationService = NotificationService();
+      await notificationService.initialize();
+      final granted = await notificationService.requestPermissions();
+
+      if (!granted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Permissão de notificação negada. Ative nas configurações.'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+        return;
+      }
+
       await notificationService.showTestNotification();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -911,6 +1047,116 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao enviar notificação: $e')),
+        );
+      }
+    }
+  }
+
+  void _testarAgendamento() async {
+    if (kIsWeb) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Recurso disponível apenas no Android.')),
+        );
+      }
+      return;
+    }
+    
+    try {
+      final notificationService = NotificationService();
+      await notificationService.initialize();
+      final granted = await notificationService.requestPermissions();
+      
+      if (!granted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Permissão de notificação negada. Ative nas configurações.'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+        return;
+      }
+
+      await notificationService.scheduleDebugNotificationIn(const Duration(seconds: 10));
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Notificação agendada para 10s.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao agendar: $e')),
+        );
+      }
+    }
+  }
+
+  Future<bool> _checkExactAlarmPermission() async {
+    if (kIsWeb) return false;
+    
+    try {
+      final notificationService = NotificationService();
+      await notificationService.initialize();
+      return await notificationService.canScheduleExactAlarms();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void _openExactAlarmSettings() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      const actionManageApp = 'android.settings.APPLICATION_DETAILS_SETTINGS';
+      final uri = Uri.parse('package:${packageInfo.packageName}');
+
+      final intent = AndroidIntent(
+        action: actionManageApp,
+        data: uri.toString(),
+      );
+      await intent.launch();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Abra "Alarmes e lembretes" e permita alarmes exatos.'),
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      try {
+        final packageInfo = await PackageInfo.fromPlatform();
+        final intentUrl = Uri(
+          scheme: 'android',
+          host: 'settings',
+          path: 'APPLICATION_DETAILS_SETTINGS',
+          queryParameters: {'package': packageInfo.packageName},
+        );
+        
+        if (await canLaunchUrl(intentUrl)) {
+          await launchUrl(intentUrl);
+        } else {
+          await launchUrl(Uri.parse('app-settings:'));
+        }
+      } catch (_) {}
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Não foi possível abrir diretamente. '
+              'Abra as permissões do app e permita alarmes exatos. '
+              'Detalhes: $e',
+            ),
+            duration: const Duration(seconds: 5),
+          ),
         );
       }
     }
@@ -951,7 +1197,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 '- Dados de categorias e contas\n'
                 '- Informações de orçamento e metas\n\n'
                 'Os dados são armazenados de forma segura no Firebase e não são compartilhados com terceiros.\n\n'
-                'Você pode solicitar a exclusão dos seus dados a qualquer momento através das configurações da conta.'
+                'Você pode solicitar a exclusão dos seus dados a qualquer momento através das configurações da conta.',
               ),
             ),
             actions: [
@@ -991,7 +1237,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 '4. Limitação de Responsabilidade\n'
                 'A aplicação é fornecida "como está" sem garantias.\n\n'
                 '5. Modificações\n'
-                'Estes termos podem ser atualizados periodicamente.'
+                'Estes termos podem ser atualizados periodicamente.',
               ),
             ),
             actions: [
@@ -1071,11 +1317,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _abrirTesteFirebase() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const FirebaseTestScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const FirebaseTestScreen()));
   }
 
   void _editarOrcamento(dynamic orcamento) {
@@ -1086,10 +1330,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _criarNovoOrcamento() {
-    showDialog(
-      context: context,
-      builder: (context) => _CreateBudgetDialog(),
-    );
+    showDialog(context: context, builder: (context) => _CreateBudgetDialog());
   }
 
   void _salvarConfiguracoesDashboard() {
@@ -1102,7 +1343,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Convite enviado para $email com permissão para $permissao'
+          'Convite enviado para $email com permissão para $permissao',
         ),
       ),
     );
@@ -1112,9 +1353,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 // Diálogo para editar orçamento
 class _EditBudgetDialog extends StatefulWidget {
   final dynamic orcamento;
-  
+
   const _EditBudgetDialog({required this.orcamento});
-  
+
   @override
   State<_EditBudgetDialog> createState() => _EditBudgetDialogState();
 }
@@ -1122,25 +1363,27 @@ class _EditBudgetDialog extends StatefulWidget {
 class _EditBudgetDialogState extends State<_EditBudgetDialog> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _valorController;
-  
+
   @override
   void initState() {
     super.initState();
     _valorController = TextEditingController(
-      text: widget.orcamento.valorLimite.toString()
+      text: widget.orcamento.valorLimite.toString(),
     );
   }
-  
+
   @override
   void dispose() {
     _valorController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Editar Orçamento ${widget.orcamento.mes}/${widget.orcamento.ano}'),
+      title: Text(
+        'Editar Orçamento ${widget.orcamento.mes}/${widget.orcamento.ano}',
+      ),
       content: Form(
         key: _formKey,
         child: Column(
@@ -1177,17 +1420,22 @@ class _EditBudgetDialogState extends State<_EditBudgetDialog> {
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
               try {
-                final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+                final financeProvider = Provider.of<FinanceProvider>(
+                  context,
+                  listen: false,
+                );
                 final novoValor = double.parse(_valorController.text);
-                
+
                 // Atualizar o orçamento
-                  widget.orcamento.valorLimite = novoValor;
-                  await financeProvider.atualizarOrcamento(widget.orcamento);
-                
+                widget.orcamento.valorLimite = novoValor;
+                await financeProvider.atualizarOrcamento(widget.orcamento);
+
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Orçamento atualizado com sucesso!')),
+                    const SnackBar(
+                      content: Text('Orçamento atualizado com sucesso!'),
+                    ),
                   );
                 }
               } catch (e) {
@@ -1217,13 +1465,13 @@ class _CreateBudgetDialogState extends State<_CreateBudgetDialog> {
   final _valorController = TextEditingController();
   int _mesSelecionado = DateTime.now().month;
   int _anoSelecionado = DateTime.now().year;
-  
+
   @override
   void dispose() {
     _valorController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -1242,10 +1490,13 @@ class _CreateBudgetDialogState extends State<_CreateBudgetDialog> {
                       labelText: 'Mês',
                       border: OutlineInputBorder(),
                     ),
-                    items: List.generate(12, (index) => DropdownMenuItem(
-                      value: index + 1,
-                      child: Text(_getNomeMes(index + 1)),
-                    )),
+                    items: List.generate(
+                      12,
+                      (index) => DropdownMenuItem(
+                        value: index + 1,
+                        child: Text(_getNomeMes(index + 1)),
+                      ),
+                    ),
                     onChanged: (value) {
                       setState(() {
                         _mesSelecionado = value!;
@@ -1261,10 +1512,13 @@ class _CreateBudgetDialogState extends State<_CreateBudgetDialog> {
                       labelText: 'Ano',
                       border: OutlineInputBorder(),
                     ),
-                    items: List.generate(5, (index) => DropdownMenuItem(
-                      value: DateTime.now().year + index,
-                      child: Text((DateTime.now().year + index).toString()),
-                    )),
+                    items: List.generate(
+                      5,
+                      (index) => DropdownMenuItem(
+                        value: DateTime.now().year + index,
+                        child: Text((DateTime.now().year + index).toString()),
+                      ),
+                    ),
                     onChanged: (value) {
                       setState(() {
                         _anoSelecionado = value!;
@@ -1306,14 +1560,19 @@ class _CreateBudgetDialogState extends State<_CreateBudgetDialog> {
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
               try {
-                final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+                final financeProvider = Provider.of<FinanceProvider>(
+                  context,
+                  listen: false,
+                );
                 final valor = double.parse(_valorController.text);
-                
+
                 // Simular criação de novo orçamento
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Orçamento criado com sucesso!')),
+                    const SnackBar(
+                      content: Text('Orçamento criado com sucesso!'),
+                    ),
                   );
                 }
               } catch (e) {
@@ -1330,11 +1589,21 @@ class _CreateBudgetDialogState extends State<_CreateBudgetDialog> {
       ],
     );
   }
-  
+
   String _getNomeMes(int mes) {
     const meses = [
-      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro',
     ];
     return meses[mes - 1];
   }
@@ -1343,9 +1612,9 @@ class _CreateBudgetDialogState extends State<_CreateBudgetDialog> {
 // Diálogo para editar perfil
 class _EditProfileDialog extends StatefulWidget {
   final AuthProvider authProvider;
-  
+
   const _EditProfileDialog({required this.authProvider});
-  
+
   @override
   State<_EditProfileDialog> createState() => _EditProfileDialogState();
 }
@@ -1354,21 +1623,25 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nomeController;
   late TextEditingController _emailController;
-  
+
   @override
   void initState() {
     super.initState();
-    _nomeController = TextEditingController(text: widget.authProvider.userData?.nome ?? '');
-    _emailController = TextEditingController(text: widget.authProvider.userData?.email ?? '');
+    _nomeController = TextEditingController(
+      text: widget.authProvider.userData?.nome ?? '',
+    );
+    _emailController = TextEditingController(
+      text: widget.authProvider.userData?.email ?? '',
+    );
   }
-  
+
   @override
   void dispose() {
     _nomeController.dispose();
     _emailController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -1422,12 +1695,16 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
               try {
                 // Simular atualização do perfil
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Perfil atualizado com sucesso!')),
+                  const SnackBar(
+                    content: Text('Perfil atualizado com sucesso!'),
+                  ),
                 );
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Perfil atualizado com sucesso!')),
+                    const SnackBar(
+                      content: Text('Perfil atualizado com sucesso!'),
+                    ),
                   );
                 }
               } catch (e) {
@@ -1462,20 +1739,25 @@ class _BudgetManagementDialog extends StatelessWidget {
                 if (financeProvider.orcamentos.isEmpty)
                   const Text('Nenhum orçamento encontrado')
                 else
-                  ...financeProvider.orcamentos.map((orcamento) => ListTile(
-                    title: Text('Orçamento ${orcamento.mesAtual}'),
-                    subtitle: Text('Criado em: ${DateFormat('dd/MM/yyyy').format(orcamento.dataCriacao)}'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () {
-                Navigator.of(context).pop();
-                showDialog(
-                  context: context,
-                  builder: (context) => _EditBudgetDialog(orcamento: orcamento),
-                );
-              },
+                  ...financeProvider.orcamentos.map(
+                    (orcamento) => ListTile(
+                      title: Text('Orçamento ${orcamento.mesAtual}'),
+                      subtitle: Text(
+                        'Criado em: ${DateFormat('dd/MM/yyyy').format(orcamento.dataCriacao)}',
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          showDialog(
+                            context: context,
+                            builder: (context) =>
+                                _EditBudgetDialog(orcamento: orcamento),
+                          );
+                        },
+                      ),
                     ),
-                  )),
+                  ),
               ],
             ),
           ),
@@ -1517,7 +1799,7 @@ class _DashboardConfigDialogState extends State<_DashboardConfigDialog> {
     'Metas Financeiras': false,
     'Cartões de Crédito': false,
   };
-  
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -1529,15 +1811,17 @@ class _DashboardConfigDialogState extends State<_DashboardConfigDialog> {
           children: [
             const Text('Selecione os widgets que deseja exibir:'),
             const SizedBox(height: 16),
-            ..._widgets.entries.map((entry) => CheckboxListTile(
-              title: Text(entry.key),
-              value: entry.value,
-              onChanged: (value) {
-                setState(() {
-                  _widgets[entry.key] = value ?? false;
-                });
-              },
-            )),
+            ..._widgets.entries.map(
+              (entry) => CheckboxListTile(
+                title: Text(entry.key),
+                value: entry.value,
+                onChanged: (value) {
+                  setState(() {
+                    _widgets[entry.key] = value ?? false;
+                  });
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -1550,7 +1834,9 @@ class _DashboardConfigDialogState extends State<_DashboardConfigDialog> {
           onPressed: () {
             // Salvar configurações do dashboard
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Configurações salvas com sucesso!')),
+              const SnackBar(
+                content: Text('Configurações salvas com sucesso!'),
+              ),
             );
             Navigator.of(context).pop();
             ScaffoldMessenger.of(context).showSnackBar(
@@ -1578,7 +1864,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
   bool _obscureAtual = true;
   bool _obscureNova = true;
   bool _obscureConfirmar = true;
-  
+
   @override
   void dispose() {
     _senhaAtualController.dispose();
@@ -1586,7 +1872,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
     _confirmarSenhaController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -1603,8 +1889,11 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                 labelText: 'Senha Atual',
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
-                  icon: Icon(_obscureAtual ? Icons.visibility : Icons.visibility_off),
-                  onPressed: () => setState(() => _obscureAtual = !_obscureAtual),
+                  icon: Icon(
+                    _obscureAtual ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  onPressed: () =>
+                      setState(() => _obscureAtual = !_obscureAtual),
                 ),
               ),
               validator: (value) {
@@ -1622,7 +1911,9 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                 labelText: 'Nova Senha',
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
-                  icon: Icon(_obscureNova ? Icons.visibility : Icons.visibility_off),
+                  icon: Icon(
+                    _obscureNova ? Icons.visibility : Icons.visibility_off,
+                  ),
                   onPressed: () => setState(() => _obscureNova = !_obscureNova),
                 ),
               ),
@@ -1644,8 +1935,11 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                 labelText: 'Confirmar Nova Senha',
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
-                  icon: Icon(_obscureConfirmar ? Icons.visibility : Icons.visibility_off),
-                  onPressed: () => setState(() => _obscureConfirmar = !_obscureConfirmar),
+                  icon: Icon(
+                    _obscureConfirmar ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  onPressed: () =>
+                      setState(() => _obscureConfirmar = !_obscureConfirmar),
                 ),
               ),
               validator: (value) {
@@ -1675,7 +1969,9 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                 if (context.mounted) {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Senha alterada com sucesso!')),
+                    const SnackBar(
+                      content: Text('Senha alterada com sucesso!'),
+                    ),
                   );
                 }
               } catch (e) {
@@ -1703,13 +1999,13 @@ class _ShareBudgetDialog extends StatefulWidget {
 class _ShareBudgetDialogState extends State<_ShareBudgetDialog> {
   final _emailController = TextEditingController();
   String _permissao = 'visualizar';
-  
+
   @override
   void dispose() {
     _emailController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -1734,8 +2030,14 @@ class _ShareBudgetDialogState extends State<_ShareBudgetDialog> {
               border: OutlineInputBorder(),
             ),
             items: const [
-              DropdownMenuItem(value: 'visualizar', child: Text('Apenas Visualizar')),
-              DropdownMenuItem(value: 'editar', child: Text('Visualizar e Editar')),
+              DropdownMenuItem(
+                value: 'visualizar',
+                child: Text('Apenas Visualizar'),
+              ),
+              DropdownMenuItem(
+                value: 'editar',
+                child: Text('Visualizar e Editar'),
+              ),
             ],
             onChanged: (value) {
               setState(() {
@@ -1752,15 +2054,22 @@ class _ShareBudgetDialogState extends State<_ShareBudgetDialog> {
         ),
         ElevatedButton(
           onPressed: () {
-            if (_emailController.text.isNotEmpty && _emailController.text.contains('@')) {
+            if (_emailController.text.isNotEmpty &&
+                _emailController.text.contains('@')) {
               // Simular compartilhamento
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Orçamento compartilhado com ${_emailController.text}')),
+                SnackBar(
+                  content: Text(
+                    'Orçamento compartilhado com ${_emailController.text}',
+                  ),
+                ),
               );
               Navigator.of(context).pop();
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Por favor, insira um email válido')),
+                const SnackBar(
+                  content: Text('Por favor, insira um email válido'),
+                ),
               );
             }
           },

@@ -10,16 +10,22 @@ class Formatters {
 
   // Formatador de data brasileira
   static final DateFormat _dateFormatter = DateFormat('dd/MM/yyyy', 'pt_BR');
-  
+
   // Formatador de data e hora
-  static final DateFormat _dateTimeFormatter = DateFormat('dd/MM/yyyy HH:mm', 'pt_BR');
-  
+  static final DateFormat _dateTimeFormatter = DateFormat(
+    'dd/MM/yyyy HH:mm',
+    'pt_BR',
+  );
+
   // Formatador de mês/ano
   static final DateFormat _monthYearFormatter = DateFormat('MM/yyyy', 'pt_BR');
-  
+
   // Formatador de mês por extenso
-  static final DateFormat _monthNameFormatter = DateFormat('MMMM yyyy', 'pt_BR');
-  
+  static final DateFormat _monthNameFormatter = DateFormat(
+    'MMMM yyyy',
+    'pt_BR',
+  );
+
   // Formatador de dia da semana
   static final DateFormat _weekdayFormatter = DateFormat('EEEE', 'pt_BR');
 
@@ -73,7 +79,7 @@ class Formatters {
           .replaceAll(' ', '')
           .replaceAll('.', '')
           .replaceAll(',', '.');
-      
+
       return double.parse(cleanString);
     } catch (e) {
       return null;
@@ -126,17 +132,17 @@ class Formatters {
   /// Verifica se a data é hoje
   static bool isToday(DateTime date) {
     final now = DateTime.now();
-    return date.year == now.year && 
-           date.month == now.month && 
-           date.day == now.day;
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
 
   /// Verifica se a data é ontem
   static bool isYesterday(DateTime date) {
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
-    return date.year == yesterday.year && 
-           date.month == yesterday.month && 
-           date.day == yesterday.day;
+    return date.year == yesterday.year &&
+        date.month == yesterday.month &&
+        date.day == yesterday.day;
   }
 
   /// Retorna uma descrição relativa da data (hoje, ontem, etc.)
@@ -175,18 +181,21 @@ class Formatters {
   /// Capitaliza a primeira letra de cada palavra
   static String capitalize(String text) {
     if (text.isEmpty) return text;
-    
-    return text.split(' ').map((word) {
-      if (word.isEmpty) return word;
-      return word[0].toUpperCase() + word.substring(1).toLowerCase();
-    }).join(' ');
+
+    return text
+        .split(' ')
+        .map((word) {
+          if (word.isEmpty) return word;
+          return word[0].toUpperCase() + word.substring(1).toLowerCase();
+        })
+        .join(' ');
   }
 
   /// Remove acentos de uma string
   static String removeAccents(String text) {
     const withAccents = 'àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿ';
     const withoutAccents = 'aaaaaaeceeeeiiiinoooooouuuuyy';
-    
+
     String result = text.toLowerCase();
     for (int i = 0; i < withAccents.length; i++) {
       result = result.replaceAll(withAccents[i], withoutAccents[i]);

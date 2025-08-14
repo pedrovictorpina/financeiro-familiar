@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../providers/auth_provider.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -24,7 +25,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     final success = await authProvider.sendPasswordReset(
       _emailController.text.trim(),
     );
@@ -33,7 +34,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       setState(() {
         _emailSent = true;
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Email de recuperação enviado com sucesso!'),
@@ -59,10 +60,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Recuperar Senha'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Recuperar Senha'), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -70,16 +68,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 32),
-              
+
               // Ícone
               Icon(
                 _emailSent ? Icons.mark_email_read : Icons.lock_reset,
                 size: 80,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Título
               Text(
                 _emailSent ? 'Email Enviado!' : 'Esqueceu sua senha?',
@@ -88,9 +86,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Descrição
               Text(
                 _emailSent
@@ -101,9 +99,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               if (!_emailSent) ...[
                 // Formulário
                 Form(
@@ -126,20 +124,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, digite seu email';
                           }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                          if (!RegExp(
+                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          ).hasMatch(value)) {
                             return 'Digite um email válido';
                           }
                           return null;
                         },
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Botão de enviar
                       Consumer<AuthProvider>(
                         builder: (context, authProvider, child) {
                           return ElevatedButton(
-                            onPressed: authProvider.isLoading ? null : _handleSendResetEmail,
+                            onPressed: authProvider.isLoading
+                                ? null
+                                : _handleSendResetEmail,
                             style: ElevatedButton.styleFrom(
                               minimumSize: const Size.fromHeight(50),
                             ),
@@ -147,7 +149,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 ? const SizedBox(
                                     height: 20,
                                     width: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Text(
                                     'Enviar link de recuperação',
@@ -179,9 +183,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Botão para voltar ao login
                     ElevatedButton(
                       onPressed: () {
@@ -198,14 +202,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ],
                 ),
               ],
-              
+
               const SizedBox(height: 32),
-              
+
               // Informações adicionais
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surfaceVariant.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -221,9 +227,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         const SizedBox(width: 8),
                         Text(
                           'Dicas importantes:',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -239,18 +244,28 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Link para suporte
               TextButton(
-                onPressed: () {
-                  // TODO: Implementar link para suporte
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Entre em contato: suporte@financeirofamiliar.com'),
-                    ),
+                onPressed: () async {
+                  final uri = Uri(
+                    scheme: 'mailto',
+                    path: 'suporte@financeirofamiliar.com',
+                    query: 'subject=Ajuda com recuperação de senha',
                   );
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Não foi possível abrir o aplicativo de email. Envie para suporte@financeirofamiliar.com',
+                        ),
+                      ),
+                    );
+                  }
                 },
                 child: const Text('Precisa de ajuda? Entre em contato'),
               ),

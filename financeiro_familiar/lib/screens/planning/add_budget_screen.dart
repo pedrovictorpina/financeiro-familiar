@@ -22,7 +22,7 @@ class AddBudgetScreen extends StatefulWidget {
 class _AddBudgetScreenState extends State<AddBudgetScreen> {
   final _formKey = GlobalKey<FormState>();
   final _limiteController = TextEditingController();
-  
+
   String? _categoriaId;
   bool _isLoading = false;
   bool get _isEditing => widget.planejamento != null;
@@ -32,7 +32,9 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
     super.initState();
     if (_isEditing) {
       _categoriaId = widget.planejamento!.categoriaId;
-      _limiteController.text = widget.planejamento!.limite.toStringAsFixed(2).replaceAll('.', ',');
+      _limiteController.text = widget.planejamento!.limite
+          .toStringAsFixed(2)
+          .replaceAll('.', ',');
     }
   }
 
@@ -148,11 +150,7 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
                       value: categoria.id,
                       child: Row(
                         children: [
-                          Icon(
-                            categoria.icone,
-                            color: categoria.cor,
-                            size: 20,
-                          ),
+                          Icon(categoria.icone, color: categoria.cor, size: 20),
                           const SizedBox(width: 12),
                           Text(categoria.nome),
                         ],
@@ -185,9 +183,7 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
                   decoration: BoxDecoration(
                     color: Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.blue.withOpacity(0.3),
-                    ),
+                    border: Border.all(color: Colors.blue.withOpacity(0.3)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +216,9 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _limiteController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24,
@@ -244,7 +242,9 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira o valor limite';
                           }
-                          final valor = double.tryParse(value.replaceAll(',', '.'));
+                          final valor = double.tryParse(
+                            value.replaceAll(',', '.'),
+                          );
                           if (valor == null || valor <= 0) {
                             return 'Por favor, insira um valor válido';
                           }
@@ -316,12 +316,17 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
 
     try {
       final limite = double.parse(_limiteController.text.replaceAll(',', '.'));
-      final mesFormatado = '${widget.mesSelecionado.year}-${widget.mesSelecionado.month.toString().padLeft(2, '0')}';
-      
-      print('DEBUG: Salvando planejamento - Mês: $mesFormatado, Categoria: $_categoriaId, Limite: $limite');
-      
+      final mesFormatado =
+          '${widget.mesSelecionado.year}-${widget.mesSelecionado.month.toString().padLeft(2, '0')}';
+
+      print(
+        'DEBUG: Salvando planejamento - Mês: $mesFormatado, Categoria: $_categoriaId, Limite: $limite',
+      );
+
       final planejamento = Planejamento(
-        id: _isEditing ? widget.planejamento!.id : DateTime.now().millisecondsSinceEpoch.toString(),
+        id: _isEditing
+            ? widget.planejamento!.id
+            : DateTime.now().millisecondsSinceEpoch.toString(),
         categoriaId: _categoriaId!,
         mes: mesFormatado,
         limite: limite,
@@ -330,10 +335,13 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
 
       print('DEBUG: Planejamento criado: ${planejamento.toMap()}');
 
-      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+      final financeProvider = Provider.of<FinanceProvider>(
+        context,
+        listen: false,
+      );
       print('DEBUG: Orçamento atual ID: ${financeProvider.orcamentoAtual?.id}');
-      
-      final success = _isEditing 
+
+      final success = _isEditing
           ? await financeProvider.atualizarPlanejamento(planejamento)
           : await financeProvider.adicionarPlanejamento(planejamento);
 
@@ -347,7 +355,11 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_isEditing ? 'Orçamento atualizado com sucesso!' : 'Orçamento criado com sucesso!'),
+              content: Text(
+                _isEditing
+                    ? 'Orçamento atualizado com sucesso!'
+                    : 'Orçamento criado com sucesso!',
+              ),
               backgroundColor: Colors.blue,
             ),
           );
@@ -356,7 +368,9 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(financeProvider.errorMessage ?? 'Erro ao salvar orçamento'),
+              content: Text(
+                financeProvider.errorMessage ?? 'Erro ao salvar orçamento',
+              ),
               backgroundColor: Colors.red,
             ),
           );

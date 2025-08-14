@@ -43,7 +43,7 @@ class AuthService {
       if (credential.user != null) {
         // Criar documento do usuário no Firestore
         await _createUserDocument(credential.user!, nome);
-        
+
         // Atualizar displayName
         await credential.user!.updateDisplayName(nome);
       }
@@ -64,10 +64,7 @@ class AuthService {
       dataCriacao: DateTime.now(),
     );
 
-    await _firestore
-        .collection('usuarios')
-        .doc(user.uid)
-        .set(usuario.toMap());
+    await _firestore.collection('usuarios').doc(user.uid).set(usuario.toMap());
   }
 
   // Buscar dados do usuário
@@ -116,7 +113,7 @@ class AuthService {
       if (user != null) {
         // Deletar documento do usuário
         await _firestore.collection('usuarios').doc(user.uid).delete();
-        
+
         // Deletar conta
         await user.delete();
       }

@@ -1,0 +1,2 @@
+fc93e059b2ffaba14005b03d27755816a7b9fa5eb8c07a02348bcc02c93ebe1e  financeiro-familiar-1.1.3.apk
+e43389a89938c0de21ee0e39458f2c4bc30b5ee257c04d0dc0db2a341d3f88a6  financeiro-familiar-1.1.3.aab

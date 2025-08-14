@@ -66,8 +66,4 @@ class Planejamento {
   }
 }
 
-enum StatusPlanejamento {
-  normal,
-  atencao,
-  excedido,
-}
+enum StatusPlanejamento { normal, atencao, excedido }

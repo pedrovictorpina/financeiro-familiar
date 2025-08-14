@@ -13,7 +13,7 @@ import '../services/auth_service.dart';
 class FinanceProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
   final AuthService _authService = AuthService();
-  
+
   // Estado atual
   Orcamento? _orcamentoAtual;
   List<Orcamento> _orcamentos = [];
@@ -24,7 +24,7 @@ class FinanceProvider extends ChangeNotifier {
   List<Meta> _metas = [];
   List<Planejamento> _planejamentos = [];
   List<ConfigDashboard> _configDashboard = [];
-  
+
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -49,18 +49,24 @@ class FinanceProvider extends ChangeNotifier {
   double get receitasMes {
     final agora = DateTime.now();
     return _transacoes
-        .where((t) => t.tipo == TipoTransacao.receita && 
-                     t.data.month == agora.month && 
-                     t.data.year == agora.year)
+        .where(
+          (t) =>
+              t.tipo == TipoTransacao.receita &&
+              t.data.month == agora.month &&
+              t.data.year == agora.year,
+        )
         .fold(0.0, (sum, t) => sum + t.valor);
   }
 
   double get despesasMes {
     final agora = DateTime.now();
     return _transacoes
-        .where((t) => t.tipo == TipoTransacao.despesa && 
-                     t.data.month == agora.month && 
-                     t.data.year == agora.year)
+        .where(
+          (t) =>
+              t.tipo == TipoTransacao.despesa &&
+              t.data.month == agora.month &&
+              t.data.year == agora.year,
+        )
         .fold(0.0, (sum, t) => sum + t.valor);
   }
 
@@ -69,17 +75,23 @@ class FinanceProvider extends ChangeNotifier {
   // Novos métodos para filtragem por mês
   double getReceitasMes(DateTime mes) {
     return _transacoes
-        .where((t) => t.tipo == TipoTransacao.receita && 
-                     t.data.month == mes.month && 
-                     t.data.year == mes.year)
+        .where(
+          (t) =>
+              t.tipo == TipoTransacao.receita &&
+              t.data.month == mes.month &&
+              t.data.year == mes.year,
+        )
         .fold(0.0, (sum, t) => sum + t.valor);
   }
 
   double getDespesasMes(DateTime mes) {
     return _transacoes
-        .where((t) => t.tipo == TipoTransacao.despesa && 
-                     t.data.month == mes.month && 
-                     t.data.year == mes.year)
+        .where(
+          (t) =>
+              t.tipo == TipoTransacao.despesa &&
+              t.data.month == mes.month &&
+              t.data.year == mes.year,
+        )
         .fold(0.0, (sum, t) => sum + t.valor);
   }
 
@@ -91,7 +103,7 @@ class FinanceProvider extends ChangeNotifier {
   Map<String, double> getGastosPorCategoria([DateTime? mes]) {
     final mesReferencia = mes ?? DateTime.now();
     final gastos = <String, double>{};
-    
+
     for (final transacao in _transacoes) {
       if (transacao.tipo == TipoTransacao.despesa &&
           transacao.data.month == mesReferencia.month &&
@@ -106,50 +118,58 @@ class FinanceProvider extends ChangeNotifier {
             icone: Icons.help_outline,
           ),
         );
-        
-        gastos[categoria.nome] = (gastos[categoria.nome] ?? 0) + transacao.valor;
+
+        gastos[categoria.nome] =
+            (gastos[categoria.nome] ?? 0) + transacao.valor;
       }
     }
-    
+
     return gastos;
   }
 
   // ORÇAMENTOS
   void carregarOrcamentos(String uid) {
     print('DEBUG: Iniciando carregamento de orçamentos para UID: $uid');
-    _firestoreService.getOrcamentosDoUsuario(uid).listen(
-      (orcamentos) async {
-        print('DEBUG: Orçamentos carregados: ${orcamentos.length}');
-        _orcamentos = orcamentos;
-        
-        // Se não há orçamentos, criar um padrão
-        if (orcamentos.isEmpty) {
-          print('DEBUG: Nenhum orçamento encontrado, criando orçamento padrão');
-          await _criarOrcamentoPadrao(uid);
-          return; // O listener será chamado novamente após a criação
-        }
-        
-        if (_orcamentoAtual == null && orcamentos.isNotEmpty) {
-          print('DEBUG: Selecionando primeiro orçamento: ${orcamentos.first.id}');
-          selecionarOrcamento(orcamentos.first.id!);
-        }
-        
-        print('DEBUG: Orçamento atual: ${_orcamentoAtual?.id}');
-        notifyListeners();
-      },
-      onError: (error) {
-        print('DEBUG: Erro ao carregar orçamentos: $error');
-        _errorMessage = 'Erro ao carregar orçamentos: $error';
-        notifyListeners();
-      },
-    );
+    _firestoreService
+        .getOrcamentosDoUsuario(uid)
+        .listen(
+          (orcamentos) async {
+            print('DEBUG: Orçamentos carregados: ${orcamentos.length}');
+            _orcamentos = orcamentos;
+
+            // Se não há orçamentos, criar um padrão
+            if (orcamentos.isEmpty) {
+              print(
+                'DEBUG: Nenhum orçamento encontrado, criando orçamento padrão',
+              );
+              await _criarOrcamentoPadrao(uid);
+              return; // O listener será chamado novamente após a criação
+            }
+
+            if (_orcamentoAtual == null && orcamentos.isNotEmpty) {
+              print(
+                'DEBUG: Selecionando primeiro orçamento: ${orcamentos.first.id}',
+              );
+              selecionarOrcamento(orcamentos.first.id!);
+            }
+
+            print('DEBUG: Orçamento atual: ${_orcamentoAtual?.id}');
+            notifyListeners();
+          },
+          onError: (error) {
+            print('DEBUG: Erro ao carregar orçamentos: $error');
+            _errorMessage = 'Erro ao carregar orçamentos: $error';
+            notifyListeners();
+          },
+        );
   }
-  
+
   Future<void> _criarOrcamentoPadrao(String uid) async {
     try {
       final agora = DateTime.now();
-      final mesAtual = '${agora.year}-${agora.month.toString().padLeft(2, '0')}';
-      
+      final mesAtual =
+          '${agora.year}-${agora.month.toString().padLeft(2, '0')}';
+
       final orcamentoPadrao = Orcamento(
         id: '',
         nome: 'Meu Orçamento',
@@ -158,7 +178,7 @@ class FinanceProvider extends ChangeNotifier {
         mesAtual: mesAtual,
         dataCriacao: agora,
       );
-      
+
       await _firestoreService.criarOrcamento(orcamentoPadrao);
     } catch (e) {
       _errorMessage = 'Erro ao criar orçamento padrão: $e';
@@ -193,70 +213,61 @@ class FinanceProvider extends ChangeNotifier {
 
   void _carregarDadosOrcamento(String orcamentoId) {
     // Carregar transações
-    _firestoreService.getTransacoes(orcamentoId).listen(
-      (transacoes) {
-        _transacoes = transacoes;
-        notifyListeners();
-      },
-    );
+    _firestoreService.getTransacoes(orcamentoId).listen((transacoes) {
+      _transacoes = transacoes;
+      notifyListeners();
+    });
 
     // Carregar categorias
-    _firestoreService.getCategorias(orcamentoId).listen(
-      (categorias) {
-        _categorias = categorias;
-        notifyListeners();
-      },
-    );
+    _firestoreService.getCategorias(orcamentoId).listen((categorias) {
+      _categorias = categorias;
+      notifyListeners();
+    });
 
     // Carregar contas
-    _firestoreService.getContas(orcamentoId).listen(
-      (contas) {
-        _contas = contas;
-        notifyListeners();
-      },
-    );
+    _firestoreService.getContas(orcamentoId).listen((contas) {
+      _contas = contas;
+      notifyListeners();
+    });
 
     // Carregar cartões
-    _firestoreService.getCartoes(orcamentoId).listen(
-      (cartoes) {
-        _cartoes = cartoes;
-        notifyListeners();
-      },
-    );
+    _firestoreService.getCartoes(orcamentoId).listen((cartoes) {
+      _cartoes = cartoes;
+      notifyListeners();
+    });
 
     // Carregar metas
-    _firestoreService.getMetas(orcamentoId).listen(
-      (metas) {
-        _metas = metas;
-        notifyListeners();
-      },
-    );
+    _firestoreService.getMetas(orcamentoId).listen((metas) {
+      _metas = metas;
+      notifyListeners();
+    });
 
     // Carregar planejamentos do mês atual
     final mesAtual = DateTime.now().toString().substring(0, 7); // YYYY-MM
-    _firestoreService.getPlanejamentos(orcamentoId, mesAtual).listen(
-      (planejamentos) {
-        _planejamentos = planejamentos;
-        notifyListeners();
-      },
-    );
+    _firestoreService.getPlanejamentos(orcamentoId, mesAtual).listen((
+      planejamentos,
+    ) {
+      _planejamentos = planejamentos;
+      notifyListeners();
+    });
 
     // Carregar configuração do dashboard
-    _firestoreService.getConfigDashboard(orcamentoId).listen(
-      (configs) {
-        _configDashboard = configs;
-        notifyListeners();
-      },
-    );
+    _firestoreService.getConfigDashboard(orcamentoId).listen((configs) {
+      _configDashboard = configs;
+      notifyListeners();
+    });
   }
 
   // TRANSAÇÕES
   Future<bool> adicionarTransacao(Transacao transacao) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
-      await _firestoreService.adicionarTransacao(_orcamentoAtual!.id, transacao);
+      await _firestoreService.adicionarTransacao(
+        _orcamentoAtual!.id,
+        transacao,
+      );
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -268,10 +279,13 @@ class FinanceProvider extends ChangeNotifier {
 
   Future<bool> atualizarTransacao(Transacao transacao) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
-      await _firestoreService.atualizarTransacao(_orcamentoAtual!.id, transacao);
+      await _firestoreService.atualizarTransacao(
+        _orcamentoAtual!.id,
+        transacao,
+      );
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -283,10 +297,13 @@ class FinanceProvider extends ChangeNotifier {
 
   Future<bool> deletarTransacao(String transacaoId) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
-      await _firestoreService.deletarTransacao(_orcamentoAtual!.id, transacaoId);
+      await _firestoreService.deletarTransacao(
+        _orcamentoAtual!.id,
+        transacaoId,
+      );
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -299,10 +316,13 @@ class FinanceProvider extends ChangeNotifier {
   // CATEGORIAS
   Future<bool> adicionarCategoria(Categoria categoria) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
-      await _firestoreService.adicionarCategoria(_orcamentoAtual!.id, categoria);
+      await _firestoreService.adicionarCategoria(
+        _orcamentoAtual!.id,
+        categoria,
+      );
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -315,7 +335,7 @@ class FinanceProvider extends ChangeNotifier {
   // CONTAS
   Future<bool> adicionarConta(Conta conta) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
       await _firestoreService.adicionarConta(_orcamentoAtual!.id, conta);
@@ -330,7 +350,7 @@ class FinanceProvider extends ChangeNotifier {
 
   Future<bool> atualizarConta(Conta conta) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
       await _firestoreService.atualizarConta(_orcamentoAtual!.id, conta);
@@ -345,7 +365,7 @@ class FinanceProvider extends ChangeNotifier {
 
   Future<bool> deletarConta(String contaId) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
       await _firestoreService.deletarConta(_orcamentoAtual!.id, contaId);
@@ -365,10 +385,10 @@ class FinanceProvider extends ChangeNotifier {
       print('DEBUG: Tentativa de adicionar cartão sem orçamento selecionado');
       return false;
     }
-    
+
     print('DEBUG: Adicionando cartão ao orçamento: ${_orcamentoAtual!.id}');
     print('DEBUG: Usuário autenticado: ${_authService.currentUser?.uid}');
-    
+
     _setLoading(true);
     try {
       await _firestoreService.adicionarCartao(_orcamentoAtual!.id, cartao);
@@ -385,7 +405,7 @@ class FinanceProvider extends ChangeNotifier {
 
   Future<bool> atualizarCartao(Cartao cartao) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
       await _firestoreService.atualizarCartao(_orcamentoAtual!.id, cartao);
@@ -400,7 +420,7 @@ class FinanceProvider extends ChangeNotifier {
 
   Future<bool> deletarCartao(String cartaoId) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
       await _firestoreService.deletarCartao(_orcamentoAtual!.id, cartaoId);
@@ -416,7 +436,7 @@ class FinanceProvider extends ChangeNotifier {
   // METAS
   Future<bool> adicionarMeta(Meta meta) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
       await _firestoreService.adicionarMeta(_orcamentoAtual!.id, meta);
@@ -431,7 +451,7 @@ class FinanceProvider extends ChangeNotifier {
 
   Future<bool> atualizarMeta(Meta meta) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
       await _firestoreService.atualizarMeta(_orcamentoAtual!.id, meta);
@@ -444,12 +464,20 @@ class FinanceProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> atualizarProgressoMeta(String metaId, double valorAdicionado, String? descricao) async {
+  Future<bool> atualizarProgressoMeta(
+    String metaId,
+    double valorAdicionado,
+    String? descricao,
+  ) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
-      await _firestoreService.atualizarProgressoMeta(_orcamentoAtual!.id, metaId, valorAdicionado);
+      await _firestoreService.atualizarProgressoMeta(
+        _orcamentoAtual!.id,
+        metaId,
+        valorAdicionado,
+      );
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -461,7 +489,7 @@ class FinanceProvider extends ChangeNotifier {
 
   Future<bool> excluirMeta(String metaId) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
       await _firestoreService.excluirMeta(_orcamentoAtual!.id, metaId);
@@ -477,18 +505,20 @@ class FinanceProvider extends ChangeNotifier {
   // PLANEJAMENTOS
   void carregarPlanejamentosMes(DateTime mes) {
     if (_orcamentoAtual == null) return;
-    
+
     final mesFormatado = '${mes.year}-${mes.month.toString().padLeft(2, '0')}';
-    _firestoreService.getPlanejamentos(_orcamentoAtual!.id, mesFormatado).listen(
-      (planejamentos) {
-        _planejamentos = planejamentos;
-        notifyListeners();
-      },
-      onError: (error) {
-        _errorMessage = 'Erro ao carregar planejamentos: $error';
-        notifyListeners();
-      },
-    );
+    _firestoreService
+        .getPlanejamentos(_orcamentoAtual!.id, mesFormatado)
+        .listen(
+          (planejamentos) {
+            _planejamentos = planejamentos;
+            notifyListeners();
+          },
+          onError: (error) {
+            _errorMessage = 'Erro ao carregar planejamentos: $error';
+            notifyListeners();
+          },
+        );
   }
 
   Future<bool> adicionarPlanejamento(Planejamento planejamento) async {
@@ -496,13 +526,18 @@ class FinanceProvider extends ChangeNotifier {
       print('DEBUG: Erro - Orçamento atual é null');
       return false;
     }
-    
-    print('DEBUG: Adicionando planejamento ao orçamento ${_orcamentoAtual!.id}');
+
+    print(
+      'DEBUG: Adicionando planejamento ao orçamento ${_orcamentoAtual!.id}',
+    );
     print('DEBUG: Dados do planejamento: ${planejamento.toMap()}');
-    
+
     _setLoading(true);
     try {
-      final id = await _firestoreService.adicionarPlanejamento(_orcamentoAtual!.id, planejamento);
+      final id = await _firestoreService.adicionarPlanejamento(
+        _orcamentoAtual!.id,
+        planejamento,
+      );
       print('DEBUG: Planejamento adicionado com ID: $id');
       return true;
     } catch (e) {
@@ -516,10 +551,13 @@ class FinanceProvider extends ChangeNotifier {
 
   Future<bool> atualizarPlanejamento(Planejamento planejamento) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
-      await _firestoreService.atualizarPlanejamento(_orcamentoAtual!.id, planejamento);
+      await _firestoreService.atualizarPlanejamento(
+        _orcamentoAtual!.id,
+        planejamento,
+      );
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -531,10 +569,13 @@ class FinanceProvider extends ChangeNotifier {
 
   Future<bool> excluirPlanejamento(String planejamentoId) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
-      await _firestoreService.excluirPlanejamento(_orcamentoAtual!.id, planejamentoId);
+      await _firestoreService.excluirPlanejamento(
+        _orcamentoAtual!.id,
+        planejamentoId,
+      );
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -547,10 +588,13 @@ class FinanceProvider extends ChangeNotifier {
   // CONFIGURAÇÃO DASHBOARD
   Future<bool> salvarConfigDashboard(List<ConfigDashboard> configs) async {
     if (_orcamentoAtual == null) return false;
-    
+
     _setLoading(true);
     try {
-      await _firestoreService.salvarConfigDashboard(_orcamentoAtual!.id, configs);
+      await _firestoreService.salvarConfigDashboard(
+        _orcamentoAtual!.id,
+        configs,
+      );
       return true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -573,10 +617,13 @@ class FinanceProvider extends ChangeNotifier {
 
   // Filtros e consultas
   List<Transacao> getTransacoesPorPeriodo(DateTime inicio, DateTime fim) {
-    return _transacoes.where((t) => 
-        t.data.isAfter(inicio.subtract(const Duration(days: 1))) &&
-        t.data.isBefore(fim.add(const Duration(days: 1)))
-    ).toList();
+    return _transacoes
+        .where(
+          (t) =>
+              t.data.isAfter(inicio.subtract(const Duration(days: 1))) &&
+              t.data.isBefore(fim.add(const Duration(days: 1))),
+        )
+        .toList();
   }
 
   List<Transacao> getTransacoesPorCategoria(String categoriaId) {
@@ -585,7 +632,6 @@ class FinanceProvider extends ChangeNotifier {
 
   // Método getGastosPorCategoria sem filtro de mês foi removido para evitar duplicidade.
   // Utilize getGastosPorCategoria([DateTime? mes]) definido anteriormente, passando o mês desejado ou null para usar o mês atual.
-
 
   // Método para atualizar orçamento
   Future<bool> atualizarOrcamento(dynamic orcamento) async {
@@ -611,7 +657,7 @@ class FinanceProvider extends ChangeNotifier {
       // Simular restauração do backup
       // Em uma implementação real, isso restauraria todos os dados do backup
       await Future.delayed(const Duration(milliseconds: 1000));
-      
+
       // Recarregar dados após restauração
       await carregarDados();
       return true;

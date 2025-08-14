@@ -33,11 +33,18 @@ class _IncomeScreenState extends State<IncomeScreen> {
   List<Transacao> _getFilteredIncomes(List<Transacao> allTransactions) {
     return allTransactions.where((transacao) {
       if (transacao.tipo != TipoTransacao.receita) return false;
-      if (transacao.data.year != _selectedMonth.year || transacao.data.month != _selectedMonth.month) return false;
-      if (_selectedCategoryId != null && transacao.categoriaId != _selectedCategoryId) return false;
-      if (_selectedAccountId != null && transacao.contaId != _selectedAccountId) return false;
+      if (transacao.data.year != _selectedMonth.year ||
+          transacao.data.month != _selectedMonth.month)
+        return false;
+      if (_selectedCategoryId != null &&
+          transacao.categoriaId != _selectedCategoryId)
+        return false;
+      if (_selectedAccountId != null && transacao.contaId != _selectedAccountId)
+        return false;
       if (_searchText.isNotEmpty) {
-        return transacao.descricao.toLowerCase().contains(_searchText.toLowerCase());
+        return transacao.descricao.toLowerCase().contains(
+          _searchText.toLowerCase(),
+        );
       }
       return true;
     }).toList();
@@ -75,10 +82,15 @@ class _IncomeScreenState extends State<IncomeScreen> {
       ),
       body: Consumer<FinanceProvider>(
         builder: (context, financeProvider, child) {
-          final filteredIncomes = _getFilteredIncomes(financeProvider.transacoes);
+          final filteredIncomes = _getFilteredIncomes(
+            financeProvider.transacoes,
+          );
           final paginated = _getPaginatedIncomes(filteredIncomes);
           final totalPages = (filteredIncomes.length / _itemsPerPage).ceil();
-          final totalValue = filteredIncomes.fold(0.0, (sum, t) => sum + t.valor);
+          final totalValue = filteredIncomes.fold(
+            0.0,
+            (sum, t) => sum + t.valor,
+          );
 
           return Column(
             children: [
@@ -91,7 +103,11 @@ class _IncomeScreenState extends State<IncomeScreen> {
                         itemCount: paginated.length,
                         itemBuilder: (context, index) {
                           final transacao = paginated[index];
-                          return _buildIncomeCard(context, transacao, financeProvider);
+                          return _buildIncomeCard(
+                            context,
+                            transacao,
+                            financeProvider,
+                          );
                         },
                       ),
               ),
@@ -129,15 +145,15 @@ class _IncomeScreenState extends State<IncomeScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Icon(
-                      Icons.keyboard_arrow_down,
-                      color: context.primaryText,
-                    ),
+                    Icon(Icons.keyboard_arrow_down, color: context.primaryText),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: TransactionColors.getReceitaBackground(context),
                   borderRadius: BorderRadius.circular(20),
@@ -196,7 +212,11 @@ class _IncomeScreenState extends State<IncomeScreen> {
     );
   }
 
-  Widget _buildIncomeCard(BuildContext context, Transacao transacao, FinanceProvider financeProvider) {
+  Widget _buildIncomeCard(
+    BuildContext context,
+    Transacao transacao,
+    FinanceProvider financeProvider,
+  ) {
     final categoria = financeProvider.categorias.firstWhere(
       (c) => c.id == transacao.categoriaId,
       orElse: () => Categoria(
@@ -235,11 +255,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
               color: categoria.cor.withOpacity(0.2),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              categoria.icone,
-              color: categoria.cor,
-              size: 20,
-            ),
+            child: Icon(categoria.icone, color: categoria.cor, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -257,18 +273,12 @@ class _IncomeScreenState extends State<IncomeScreen> {
                 const SizedBox(height: 4),
                 Text(
                   categoria.nome,
-                  style: TextStyle(
-                    color: context.secondaryText,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: context.secondaryText, fontSize: 14),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '${conta.nome} • ${Formatters.formatDate(transacao.data)}',
-                  style: TextStyle(
-                    color: context.mutedText,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: context.mutedText, fontSize: 12),
                 ),
               ],
             ),
@@ -287,7 +297,10 @@ class _IncomeScreenState extends State<IncomeScreen> {
               if (transacao.recorrente)
                 Container(
                   margin: const EdgeInsets.only(top: 4),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: context.infoColor.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
@@ -316,12 +329,21 @@ class _IncomeScreenState extends State<IncomeScreen> {
               } else if (value == 'excluir') {
                 final confirm = await _confirmarExclusao(transacao);
                 if (confirm == true) {
-                  final success = await financeProvider.deletarTransacao(transacao.id);
+                  final success = await financeProvider.deletarTransacao(
+                    transacao.id,
+                  );
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(success ? 'Receita excluída com sucesso!' : (financeProvider.errorMessage ?? 'Erro ao excluir receita')),
-                        backgroundColor: success ? Colors.green : context.errorColor,
+                        content: Text(
+                          success
+                              ? 'Receita excluída com sucesso!'
+                              : (financeProvider.errorMessage ??
+                                    'Erro ao excluir receita'),
+                        ),
+                        backgroundColor: success
+                            ? Colors.green
+                            : context.errorColor,
                       ),
                     );
                   }
@@ -361,7 +383,10 @@ class _IncomeScreenState extends State<IncomeScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).cardColor,
-        title: Text('Excluir receita', style: TextStyle(color: context.primaryText)),
+        title: Text(
+          'Excluir receita',
+          style: TextStyle(color: context.primaryText),
+        ),
         content: Text(
           'Deseja realmente excluir a receita "${transacao.descricao}" no valor de +${Formatters.formatCurrency(transacao.valor)}?',
           style: TextStyle(color: context.secondaryText),
@@ -369,7 +394,10 @@ class _IncomeScreenState extends State<IncomeScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancelar', style: TextStyle(color: context.primaryText)),
+            child: Text(
+              'Cancelar',
+              style: TextStyle(color: context.primaryText),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -385,11 +413,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.trending_up,
-            size: 64,
-            color: context.iconColorMuted,
-          ),
+          Icon(Icons.trending_up, size: 64, color: context.iconColorMuted),
           const SizedBox(height: 16),
           Text(
             'Nenhuma receita encontrada',
@@ -402,10 +426,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
           const SizedBox(height: 8),
           Text(
             'Tente ajustar os filtros ou selecionar outro mês',
-            style: TextStyle(
-              color: context.mutedText,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: context.mutedText, fontSize: 14),
             textAlign: TextAlign.center,
           ),
         ],
@@ -552,19 +573,17 @@ class _IncomeScreenState extends State<IncomeScreen> {
                       ...financeProvider.categorias
                           .where((c) => c.tipo == TipoCategoria.receita)
                           .map((categoria) {
-                        return DropdownMenuItem<String?>(
-                          value: categoria.id,
-                          child: Text(categoria.nome),
-                        );
-                      }),
+                            return DropdownMenuItem<String?>(
+                              value: categoria.id,
+                              child: Text(categoria.nome),
+                            );
+                          }),
                     ],
-                    onChanged: (value) => setState(() => _selectedCategoryId = value),
+                    onChanged: (value) =>
+                        setState(() => _selectedCategoryId = value),
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'Conta',
-                    style: TextStyle(color: context.primaryText),
-                  ),
+                  Text('Conta', style: TextStyle(color: context.primaryText)),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String?>(
                     value: _selectedAccountId,
@@ -587,7 +606,8 @@ class _IncomeScreenState extends State<IncomeScreen> {
                         );
                       }),
                     ],
-                    onChanged: (value) => setState(() => _selectedAccountId = value),
+                    onChanged: (value) =>
+                        setState(() => _selectedAccountId = value),
                   ),
                 ],
               ),

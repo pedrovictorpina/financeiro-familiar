@@ -70,8 +70,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     try {
       // Marcar o cadastro como completo adicionando uma transação simbólica
-      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
-      
+      final financeProvider = Provider.of<FinanceProvider>(
+        context,
+        listen: false,
+      );
+
       // Criar uma transação simbólica para marcar o cadastro como completo
       final transacaoCompleta = Transacao(
         id: '',
@@ -79,15 +82,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         valor: 0.0,
         data: DateTime.now(),
         tipo: TipoTransacao.receita,
-        categoriaId: financeProvider.categorias.isNotEmpty ? financeProvider.categorias.first.id! : '',
-        contaId: financeProvider.contas.isNotEmpty ? financeProvider.contas.first.id! : '',
+        categoriaId: financeProvider.categorias.isNotEmpty
+            ? financeProvider.categorias.first.id!
+            : '',
+        contaId: financeProvider.contas.isNotEmpty
+            ? financeProvider.contas.first.id!
+            : '',
         recorrente: false,
         criadoPor: 'sistema',
         timestamp: DateTime.now(),
       );
-      
+
       await financeProvider.adicionarTransacao(transacaoCompleta);
-      
+
       // Simular um pequeno delay para mostrar o loading
       await Future.delayed(const Duration(milliseconds: 1500));
 
@@ -95,7 +102,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('🎉 Parabéns! Seu cadastro está completo e o app está pronto para uso!'),
+            content: Text(
+              '🎉 Parabéns! Seu cadastro está completo e o app está pronto para uso!',
+            ),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 3),
           ),
@@ -106,7 +115,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('🎉 Parabéns! Seu app está configurado e pronto para uso!'),
+            content: Text(
+              '🎉 Parabéns! Seu app está configurado e pronto para uso!',
+            ),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 3),
           ),
@@ -118,7 +129,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -130,7 +141,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ),
         title: Text(
           'Configuração Inicial',
-          style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         centerTitle: true,
       ),
@@ -145,9 +159,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: List.generate(5, (index) {
                     return Expanded(
                       child: Container(
-                        margin: EdgeInsets.only(
-                          right: index < 4 ? 8 : 0,
-                        ),
+                        margin: EdgeInsets.only(right: index < 4 ? 8 : 0),
                         height: 4,
                         decoration: BoxDecoration(
                           color: index <= _currentStep
@@ -163,14 +175,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Text(
                   'Passo ${_currentStep + 1} de 5',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.7),
                     fontSize: 14,
                   ),
                 ),
               ],
             ),
           ),
-          
+
           // Content
           Expanded(
             child: PageView(
@@ -189,7 +203,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ],
             ),
           ),
-          
+
           // Navigation buttons
           Container(
             padding: const EdgeInsets.all(20),
@@ -201,7 +215,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       onPressed: _previousStep,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: theme.colorScheme.onSurface,
-                        side: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.3)),
+                        side: BorderSide(
+                          color: theme.colorScheme.onSurface.withOpacity(0.3),
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       child: const Text('Voltar'),
@@ -211,7 +227,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Expanded(
                   flex: _currentStep == 0 ? 1 : 1,
                   child: ElevatedButton(
-                    onPressed: _currentStep == 4 ? _completeOnboarding : _nextStep,
+                    onPressed: _currentStep == 4
+                        ? _completeOnboarding
+                        : _nextStep,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.primary,
                       foregroundColor: theme.colorScheme.onPrimary,
@@ -223,7 +241,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : Text(_currentStep == 4 ? 'Finalizar' : 'Próximo'),
@@ -272,7 +292,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Text(
                 'Vamos configurar seu app financeiro em alguns passos simples. Isso levará apenas alguns minutos!',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 16,
                   height: 1.5,
                 ),
@@ -289,12 +311,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary, size: 20),
+                        Icon(
+                          Icons.check_circle,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 20,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             'Cadastrar conta bancária',
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.7),
+                            ),
                           ),
                         ),
                       ],
@@ -302,12 +332,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary, size: 20),
+                        Icon(
+                          Icons.check_circle,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 20,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             'Adicionar cartão de crédito',
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.7),
+                            ),
                           ),
                         ),
                       ],
@@ -315,12 +353,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary, size: 20),
+                        Icon(
+                          Icons.check_circle,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 20,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             'Configurar categorias',
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.7),
+                            ),
                           ),
                         ),
                       ],
@@ -339,7 +385,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
         final hasAccounts = financeProvider.contas.isNotEmpty;
-        
+
         return Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -378,20 +424,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              
+
               if (hasAccounts) ...[
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: const Color(0xFF10B981).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF10B981).withOpacity(0.3)),
+                    border: Border.all(
+                      color: const Color(0xFF10B981).withOpacity(0.3),
+                    ),
                   ),
                   child: Column(
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.check_circle, color: Color(0xFF10B981), size: 24),
+                          Icon(
+                            Icons.check_circle,
+                            color: Color(0xFF10B981),
+                            size: 24,
+                          ),
                           SizedBox(width: 12),
                           Text(
                             'Conta cadastrada com sucesso!',
@@ -403,35 +455,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      ...financeProvider.contas.take(2).map((conta) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF10B981),
-                                shape: BoxShape.circle,
+                      ...financeProvider.contas
+                          .take(2)
+                          .map(
+                            (conta) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF10B981),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      conta.nome,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    'R\$ ${conta.saldoAtual.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                conta.nome,
-                                style: const TextStyle(color: Colors.white70),
-                              ),
-                            ),
-                            Text(
-                              'R\$ ${conta.saldoAtual.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
+                          ),
                     ],
                   ),
                 ),
@@ -447,7 +505,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF10B981),
                     side: const BorderSide(color: Color(0xFF10B981)),
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 24,
+                    ),
                   ),
                   child: const Text('Gerenciar Contas'),
                 ),
@@ -477,10 +538,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       SizedBox(height: 8),
                       Text(
                         'Adicione sua primeira conta para continuar',
-                        style: TextStyle(
-                          color: Colors.white54,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.white54, fontSize: 14),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -510,9 +568,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
               ],
-              
+
               const Spacer(),
-              
+
               if (hasAccounts)
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -522,7 +580,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   child: const Row(
                     children: [
-                      Icon(Icons.lightbulb_outline, color: Color(0xFF8B5CF6), size: 20),
+                      Icon(
+                        Icons.lightbulb_outline,
+                        color: Color(0xFF8B5CF6),
+                        size: 20,
+                      ),
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -547,7 +609,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
         final hasCards = financeProvider.cartoes.isNotEmpty;
-        
+
         return Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -586,20 +648,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              
+
               if (hasCards) ...[
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: const Color(0xFF3B82F6).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF3B82F6).withOpacity(0.3)),
+                    border: Border.all(
+                      color: const Color(0xFF3B82F6).withOpacity(0.3),
+                    ),
                   ),
                   child: Column(
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.check_circle, color: Color(0xFF3B82F6), size: 24),
+                          Icon(
+                            Icons.check_circle,
+                            color: Color(0xFF3B82F6),
+                            size: 24,
+                          ),
                           SizedBox(width: 12),
                           Text(
                             'Cartão cadastrado com sucesso!',
@@ -611,35 +679,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      ...financeProvider.cartoes.take(2).map((cartao) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF3B82F6),
-                                shape: BoxShape.circle,
+                      ...financeProvider.cartoes
+                          .take(2)
+                          .map(
+                            (cartao) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF3B82F6),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      cartao.nome,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    'R\$ ${cartao.limite.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                cartao.nome,
-                                style: const TextStyle(color: Colors.white70),
-                              ),
-                            ),
-                            Text(
-                              'R\$ ${cartao.limite.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
+                          ),
                     ],
                   ),
                 ),
@@ -655,7 +729,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF3B82F6),
                     side: const BorderSide(color: Color(0xFF3B82F6)),
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 24,
+                    ),
                   ),
                   child: const Text('Gerenciar Cartões'),
                 ),
@@ -685,10 +762,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       SizedBox(height: 8),
                       Text(
                         'Adicione seus cartões para melhor controle',
-                        style: TextStyle(
-                          color: Colors.white54,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.white54, fontSize: 14),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -718,9 +792,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
               ],
-              
+
               const Spacer(),
-              
+
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -729,7 +803,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.info_outline, color: Color(0xFFF59E0B), size: 20),
+                    Icon(
+                      Icons.info_outline,
+                      color: Color(0xFFF59E0B),
+                      size: 20,
+                    ),
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -754,7 +832,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Consumer<FinanceProvider>(
       builder: (context, financeProvider, child) {
         final hasCategories = financeProvider.categorias.isNotEmpty;
-        
+
         return Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -793,20 +871,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              
+
               if (hasCategories) ...[
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEF4444).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.3)),
+                    border: Border.all(
+                      color: const Color(0xFFEF4444).withOpacity(0.3),
+                    ),
                   ),
                   child: Column(
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.check_circle, color: Color(0xFFEF4444), size: 24),
+                          Icon(
+                            Icons.check_circle,
+                            color: Color(0xFFEF4444),
+                            size: 24,
+                          ),
                           SizedBox(width: 12),
                           Text(
                             'Categorias configuradas!',
@@ -818,47 +902,62 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      ...financeProvider.categorias.take(3).map((categoria) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: categoria.cor,
-                                shape: BoxShape.circle,
+                      ...financeProvider.categorias
+                          .take(3)
+                          .map(
+                            (categoria) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: categoria.cor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      categoria.nome,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          categoria.tipo ==
+                                              TipoCategoria.receita
+                                          ? Colors.green.withOpacity(0.2)
+                                          : Colors.red.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      categoria.tipo == TipoCategoria.receita
+                                          ? 'Receita'
+                                          : 'Despesa',
+                                      style: TextStyle(
+                                        color:
+                                            categoria.tipo ==
+                                                TipoCategoria.receita
+                                            ? Colors.green
+                                            : Colors.red,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                categoria.nome,
-                                style: const TextStyle(color: Colors.white70),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: categoria.tipo == TipoCategoria.receita
-                                    ? Colors.green.withOpacity(0.2)
-                                    : Colors.red.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                categoria.tipo == TipoCategoria.receita ? 'Receita' : 'Despesa',
-                                style: TextStyle(
-                                  color: categoria.tipo == TipoCategoria.receita
-                                      ? Colors.green
-                                      : Colors.red,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
+                          ),
                     ],
                   ),
                 ),
@@ -874,7 +973,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFEF4444),
                     side: const BorderSide(color: Color(0xFFEF4444)),
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 24,
+                    ),
                   ),
                   child: const Text('Gerenciar Categorias'),
                 ),
@@ -904,10 +1006,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       SizedBox(height: 8),
                       Text(
                         'Configure categorias para organizar suas transações',
-                        style: TextStyle(
-                          color: Colors.white54,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.white54, fontSize: 14),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -937,9 +1036,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
               ],
-              
+
               const Spacer(),
-              
+
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -948,7 +1047,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.info_outline, color: Color(0xFFF59E0B), size: 20),
+                    Icon(
+                      Icons.info_outline,
+                      color: Color(0xFFF59E0B),
+                      size: 20,
+                    ),
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -975,16 +1078,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         final hasAccounts = financeProvider.contas.isNotEmpty;
         final hasCards = financeProvider.cartoes.isNotEmpty;
         final hasCategories = financeProvider.categorias.isNotEmpty;
-        
-        final completedSteps = [
-          hasAccounts,
-          hasCards,
-          hasCategories,
-        ];
-        
+
+        final completedSteps = [hasAccounts, hasCards, hasCategories];
+
         final completedCount = completedSteps.where((step) => step).length;
         final completionPercentage = ((completedCount / 3) * 100).round();
-        
+
         return Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -1024,7 +1123,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              
+
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -1042,32 +1141,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    
+
                     _buildSummaryItem(
                       'Contas Bancárias',
-                      hasAccounts ? '${financeProvider.contas.length} conta(s)' : 'Nenhuma',
+                      hasAccounts
+                          ? '${financeProvider.contas.length} conta(s)'
+                          : 'Nenhuma',
                       hasAccounts,
                     ),
                     const SizedBox(height: 12),
-                    
+
                     _buildSummaryItem(
                       'Cartões de Crédito',
-                      hasCards ? '${financeProvider.cartoes.length} cartão(ões)' : 'Nenhum',
+                      hasCards
+                          ? '${financeProvider.cartoes.length} cartão(ões)'
+                          : 'Nenhum',
                       hasCards,
                     ),
                     const SizedBox(height: 12),
-                    
+
                     _buildSummaryItem(
                       'Categorias',
-                      hasCategories ? '${financeProvider.categorias.length} categoria(s)' : 'Padrão',
+                      hasCategories
+                          ? '${financeProvider.categorias.length} categoria(s)'
+                          : 'Padrão',
                       hasCategories,
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -1078,7 +1183,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.lightbulb_outline, color: Color(0xFF8B5CF6), size: 24),
+                        Icon(
+                          Icons.lightbulb_outline,
+                          color: Color(0xFF8B5CF6),
+                          size: 24,
+                        ),
                         SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -1122,10 +1231,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Expanded(
           child: Text(
             title,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
         ),
         Text(

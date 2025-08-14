@@ -29,12 +29,15 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: 'latest'
+        flutter-version: '3.32.0'
         channel: 'stable'
         cache: true
 
     - name: Flutter Doctor
-      run: flutter doctor -v
+      run: |
+        flutter --version
+        dart --version
+        flutter doctor -v
       
     - name: Prepare signing keys (if provided)
       if: ${{ secrets.KEYSTORE_BASE64 != '' }}
@@ -49,8 +52,11 @@ jobs:
       env:
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         
-    - name: Ensure Gradle wrapper is executable
-      run: chmod +x android/gradlew
+    - name: Generate Gradle wrapper
+      run: |
+        cd android
+        gradle wrapper --gradle-version 8.12
+        chmod +x gradlew
         
     - name: Get dependencies
       run: flutter pub get
@@ -59,10 +65,25 @@ jobs:
       run: flutter test --reporter expanded
       
     - name: Build APK
-      run: flutter build apk --release --verbose
+      run: |
+        # Prefer gradle wrapper if present for consistency
+        if [ -f android/gradlew ]; then
+          pushd android
+          ./gradlew assembleRelease --stacktrace --warning-mode all
+          popd
+        else
+          flutter build apk --release --verbose
+        fi
       
     - name: Build App Bundle
-      run: flutter build appbundle --release --verbose
+      run: |
+        if [ -f android/gradlew ]; then
+          pushd android
+          ./gradlew bundleRelease --stacktrace --warning-mode all
+          popd
+        else
+          flutter build appbundle --release --verbose
+        fi
       
     - name: Get version from pubspec.yaml
       id: version
@@ -96,6 +117,7 @@ jobs:
         prerelease: false
         files: |
           build/app/outputs/flutter-apk/app-release.apk
+          build/app/outputs/apk/release/app-release.apk
           build/app/outputs/bundle/release/app-release.aab
     - name: Upload build reports on failure
       if: failure()

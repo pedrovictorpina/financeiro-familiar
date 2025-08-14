@@ -16,7 +16,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -28,14 +28,17 @@ class _AccountsScreenState extends State<AccountsScreen> {
         ),
         title: Text(
           'Contas Bancárias',
-          style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         centerTitle: true,
       ),
       body: Consumer<FinanceProvider>(
         builder: (context, financeProvider, child) {
           final contas = financeProvider.contas;
-          
+
           return Column(
             children: [
               if (contas.isEmpty) ...[
@@ -87,10 +90,10 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     itemCount: contas.length,
                     itemBuilder: (context, index) {
                       final conta = contas[index];
-                      final bankInfo = conta.banco != null 
-                          ? BankUtils.getBankInfo(conta.banco!) 
+                      final bankInfo = conta.banco != null
+                          ? BankUtils.getBankInfo(conta.banco!)
                           : BankUtils.getBankInfo('outro');
-                      
+
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(16),
@@ -98,10 +101,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                           color: theme.cardColor,
                           borderRadius: BorderRadius.circular(12),
                           border: Border(
-                            left: BorderSide(
-                              width: 4,
-                              color: bankInfo.color,
-                            ),
+                            left: BorderSide(width: 4, color: bankInfo.color),
                           ),
                         ),
                         child: Row(
@@ -146,14 +146,16 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                       Text(
                                         ' • ',
                                         style: TextStyle(
-                                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                          color: theme.colorScheme.onSurface
+                                              .withOpacity(0.7),
                                           fontSize: 12,
                                         ),
                                       ),
                                       Text(
                                         conta.tipoNome,
                                         style: TextStyle(
-                                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                          color: theme.colorScheme.onSurface
+                                              .withOpacity(0.7),
                                           fontSize: 12,
                                         ),
                                       ),
@@ -168,7 +170,9 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                 Text(
                                   'R\$ ${conta.saldoAtual.toStringAsFixed(2)}',
                                   style: TextStyle(
-                                    color: conta.saldoAtual >= 0 ? theme.colorScheme.primary : Colors.red,
+                                    color: conta.saldoAtual >= 0
+                                        ? theme.colorScheme.primary
+                                        : Colors.red,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -177,7 +181,8 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                 Text(
                                   'Saldo atual',
                                   style: TextStyle(
-                                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(0.7),
                                     fontSize: 12,
                                   ),
                                 ),
@@ -187,7 +192,9 @@ class _AccountsScreenState extends State<AccountsScreen> {
                             PopupMenuButton<String>(
                               icon: Icon(
                                 Icons.more_vert,
-                                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.7,
+                                ),
                               ),
                               color: theme.cardColor,
                               onSelected: (value) {
@@ -202,9 +209,19 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                   value: 'edit',
                                   child: Row(
                                     children: [
-                                      Icon(Icons.edit, color: theme.colorScheme.onSurface.withOpacity(0.7), size: 20),
+                                      Icon(
+                                        Icons.edit,
+                                        color: theme.colorScheme.onSurface
+                                            .withOpacity(0.7),
+                                        size: 20,
+                                      ),
                                       const SizedBox(width: 8),
-                                      Text('Editar', style: TextStyle(color: theme.colorScheme.onSurface)),
+                                      Text(
+                                        'Editar',
+                                        style: TextStyle(
+                                          color: theme.colorScheme.onSurface,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -212,9 +229,16 @@ class _AccountsScreenState extends State<AccountsScreen> {
                                   value: 'delete',
                                   child: Row(
                                     children: [
-                                      Icon(Icons.delete, color: Colors.red, size: 20),
+                                      Icon(
+                                        Icons.delete,
+                                        color: Colors.red,
+                                        size: 20,
+                                      ),
                                       SizedBox(width: 8),
-                                      Text('Excluir', style: TextStyle(color: Colors.red)),
+                                      Text(
+                                        'Excluir',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -227,7 +251,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                   ),
                 ),
               ],
-              
+
               // Botão adicionar
               Container(
                 padding: const EdgeInsets.all(16),
@@ -260,7 +284,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
     final saldoController = TextEditingController();
     TipoConta tipoSelecionado = TipoConta.banco;
     String bancoSelecionado = 'outro';
-    
+
     showDialog(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
@@ -330,11 +354,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                       value: banco,
                       child: Row(
                         children: [
-                          Icon(
-                            bankInfo.icon,
-                            color: bankInfo.color,
-                            size: 20,
-                          ),
+                          Icon(bankInfo.icon, color: bankInfo.color, size: 20),
                           const SizedBox(width: 8),
                           Text(
                             bankInfo.name,
@@ -362,29 +382,29 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white30),
                     ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF10B981)),
-                  ),
-                ),
-                items: TipoConta.values.map((tipo) {
-                  return DropdownMenuItem(
-                    value: tipo,
-                    child: Text(
-                      _getTipoContaName(tipo),
-                      style: const TextStyle(color: Colors.white),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF10B981)),
                     ),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    tipoSelecionado = value!;
-                  });
-                },
-              ),
-            ],
+                  ),
+                  items: TipoConta.values.map((tipo) {
+                    return DropdownMenuItem(
+                      value: tipo,
+                      child: Text(
+                        _getTipoContaName(tipo),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      tipoSelecionado = value!;
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-        actions: [
+          actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: const Text(
@@ -423,7 +443,12 @@ class _AccountsScreenState extends State<AccountsScreen> {
     }
   }
 
-  void _addAccount(String nome, String saldoText, TipoConta tipo, String banco) {
+  void _addAccount(
+    String nome,
+    String saldoText,
+    TipoConta tipo,
+    String banco,
+  ) {
     if (nome.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -450,7 +475,10 @@ class _AccountsScreenState extends State<AccountsScreen> {
       banco: banco,
     );
 
-    final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+    final financeProvider = Provider.of<FinanceProvider>(
+      context,
+      listen: false,
+    );
     financeProvider.adicionarConta(conta).then((success) {
       if (success) {
         Navigator.of(context).pop();
@@ -463,7 +491,9 @@ class _AccountsScreenState extends State<AccountsScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(financeProvider.errorMessage ?? 'Erro ao adicionar conta'),
+            content: Text(
+              financeProvider.errorMessage ?? 'Erro ao adicionar conta',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -473,10 +503,12 @@ class _AccountsScreenState extends State<AccountsScreen> {
 
   void _showEditAccountDialog(Conta conta) {
     final nomeController = TextEditingController(text: conta.nome);
-    final saldoController = TextEditingController(text: conta.saldoAtual.toString());
+    final saldoController = TextEditingController(
+      text: conta.saldoAtual.toString(),
+    );
     TipoConta tipoSelecionado = conta.tipo;
     String bancoSelecionado = conta.banco ?? 'outro';
-    
+
     showDialog(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
@@ -546,11 +578,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                       value: banco,
                       child: Row(
                         children: [
-                          Icon(
-                            bankInfo.icon,
-                            color: bankInfo.color,
-                            size: 20,
-                          ),
+                          Icon(bankInfo.icon, color: bankInfo.color, size: 20),
                           const SizedBox(width: 8),
                           Text(
                             bankInfo.name,
@@ -602,7 +630,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
           ),
           actions: [
             TextButton(
-               onPressed: () => Navigator.of(dialogContext).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               child: const Text(
                 'Cancelar',
                 style: TextStyle(color: Colors.white70),
@@ -610,13 +638,13 @@ class _AccountsScreenState extends State<AccountsScreen> {
             ),
             ElevatedButton(
               onPressed: () => _updateAccount(
-                 dialogContext,
-                 conta,
-                 nomeController.text,
-                 saldoController.text,
-                 tipoSelecionado,
-                 bancoSelecionado,
-               ),
+                dialogContext,
+                conta,
+                nomeController.text,
+                saldoController.text,
+                tipoSelecionado,
+                bancoSelecionado,
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF10B981),
               ),
@@ -628,7 +656,14 @@ class _AccountsScreenState extends State<AccountsScreen> {
     );
   }
 
-  void _updateAccount(BuildContext context, Conta conta, String nome, String saldoText, TipoConta tipo, String banco) {
+  void _updateAccount(
+    BuildContext context,
+    Conta conta,
+    String nome,
+    String saldoText,
+    TipoConta tipo,
+    String banco,
+  ) {
     if (nome.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -654,7 +689,10 @@ class _AccountsScreenState extends State<AccountsScreen> {
       banco: banco,
     );
 
-    final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+    final financeProvider = Provider.of<FinanceProvider>(
+      context,
+      listen: false,
+    );
     financeProvider.atualizarConta(contaAtualizada).then((success) {
       if (success) {
         Navigator.of(context).pop();
@@ -667,7 +705,9 @@ class _AccountsScreenState extends State<AccountsScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(financeProvider.errorMessage ?? 'Erro ao atualizar conta'),
+            content: Text(
+              financeProvider.errorMessage ?? 'Erro ao atualizar conta',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -698,9 +738,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
           ),
           ElevatedButton(
             onPressed: () => _deleteAccount(dialogContext, conta),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Excluir'),
           ),
         ],
@@ -709,7 +747,10 @@ class _AccountsScreenState extends State<AccountsScreen> {
   }
 
   void _deleteAccount(BuildContext context, Conta conta) {
-    final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+    final financeProvider = Provider.of<FinanceProvider>(
+      context,
+      listen: false,
+    );
     financeProvider.deletarConta(conta.id).then((success) {
       if (success) {
         Navigator.of(context).pop();
@@ -722,7 +763,9 @@ class _AccountsScreenState extends State<AccountsScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(financeProvider.errorMessage ?? 'Erro ao excluir conta'),
+            content: Text(
+              financeProvider.errorMessage ?? 'Erro ao excluir conta',
+            ),
             backgroundColor: Colors.red,
           ),
         );

@@ -11,19 +11,32 @@ import 'providers/notifications_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'services/update_service.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Inicializar Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   // Inicializar localização para pt_BR
   await initializeDateFormatting('pt_BR', null);
-  
+
+  // Inicializar serviço de notificações
+  await _initializeNotifications();
+
   runApp(const MyApp());
+}
+
+Future<void> _initializeNotifications() async {
+  try {
+    final notificationService = NotificationService();
+    await notificationService.initialize();
+    await notificationService.requestPermissions();
+    print('✅ Notificações inicializadas com sucesso');
+  } catch (e) {
+    print('❌ Erro ao inicializar notificações: $e');
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -58,9 +71,7 @@ class MyApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            supportedLocales: const [
-              Locale('pt', 'BR'),
-            ],
+            supportedLocales: const [Locale('pt', 'BR')],
             home: const AuthWrapper(),
           );
         },
@@ -86,12 +97,10 @@ class _AuthWrapperState extends State<AuthWrapper> {
         // Mostrar loading enquanto verifica autenticação
         if (authProvider.isLoading) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
-        
+
         // Se usuário está logado, mostrar tela principal
         if (authProvider.user != null) {
           // Verificar atualizações apenas uma vez após o login
@@ -103,7 +112,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
           }
           return const HomeScreen();
         }
-        
+
         // Se não está logado, mostrar tela de login
         return const LoginScreen();
       },

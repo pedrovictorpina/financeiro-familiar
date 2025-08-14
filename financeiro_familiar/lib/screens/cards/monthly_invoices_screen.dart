@@ -8,7 +8,7 @@ import '../../utils/formatters.dart';
 
 class MonthlyInvoicesScreen extends StatefulWidget {
   final Cartao cartao;
-  
+
   const MonthlyInvoicesScreen({super.key, required this.cartao});
 
   @override
@@ -20,14 +20,16 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
   DateTime _selectedDate = DateTime.now();
   String _descricao = '';
   final _descricaoController = TextEditingController();
-  
+
   List<Map<String, dynamic>> _faturasMensais = [];
   bool _houveMudancas = false;
 
   @override
   void initState() {
     super.initState();
-    _faturasMensais = List<Map<String, dynamic>>.from(widget.cartao.faturasMensais);
+    _faturasMensais = List<Map<String, dynamic>>.from(
+      widget.cartao.faturasMensais,
+    );
     print('DEBUG: Faturas carregadas no initState: ${_faturasMensais.length}');
     print('DEBUG: Faturas do cartão: ${widget.cartao.faturasMensais}');
   }
@@ -56,9 +58,7 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
         body: Column(
           children: [
             _buildAddInvoiceForm(),
-            Expanded(
-              child: _buildInvoicesList(),
-            ),
+            Expanded(child: _buildInvoicesList()),
           ],
         ),
       ),
@@ -93,7 +93,7 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Campo de valor
             TextFormField(
               controller: _valorController,
@@ -104,14 +104,16 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
                 labelStyle: TextStyle(color: Colors.grey),
               ),
               style: const TextStyle(color: Colors.white),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]')),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Campo de descrição
             TextFormField(
               controller: _descricaoController,
@@ -123,9 +125,9 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
               style: const TextStyle(color: Colors.white),
               onChanged: (value) => _descricao = value,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Seletor de data
             GestureDetector(
               onTap: _selectDate,
@@ -145,18 +147,15 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
                     const SizedBox(width: 12),
                     Text(
                       'Mês/Ano: ${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ],
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Botão adicionar
             SizedBox(
               width: double.infinity,
@@ -183,20 +182,20 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
   }
 
   Widget _buildInvoicesList() {
-    print('DEBUG: _buildInvoicesList - Tamanho da lista: ${_faturasMensais.length}');
-    print('DEBUG: _buildInvoicesList - Lista vazia? ${_faturasMensais.isEmpty}');
+    print(
+      'DEBUG: _buildInvoicesList - Tamanho da lista: ${_faturasMensais.length}',
+    );
+    print(
+      'DEBUG: _buildInvoicesList - Lista vazia? ${_faturasMensais.isEmpty}',
+    );
     print('DEBUG: _buildInvoicesList - Conteúdo: $_faturasMensais');
-    
+
     if (_faturasMensais.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.receipt_long,
-              size: 80,
-              color: Colors.grey[600],
-            ),
+            Icon(Icons.receipt_long, size: 80, color: Colors.grey[600]),
             const SizedBox(height: 16),
             Text(
               'Nenhuma fatura adicionada',
@@ -209,10 +208,7 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
             const SizedBox(height: 8),
             Text(
               'Adicione faturas mensais para melhor controle',
-              style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.grey[500], fontSize: 14),
             ),
           ],
         ),
@@ -252,18 +248,12 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
               children: [
                 Text(
                   '${fatura['mes'].toString().padLeft(2, '0')}/${fatura['ano']}',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: Colors.grey[400], fontSize: 12),
                 ),
                 if (fatura['descricao'].isNotEmpty)
                   Text(
                     fatura['descricao'],
-                    style: TextStyle(
-                      color: Colors.grey[300],
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.grey[300], fontSize: 12),
                   ),
               ],
             ),
@@ -279,11 +269,7 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
                   onPressed: () => _editInvoice(index),
                 ),
                 IconButton(
-                  icon: const Icon(
-                    Icons.delete,
-                    color: Colors.red,
-                    size: 20,
-                  ),
+                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                   onPressed: () => _removeInvoice(index),
                 ),
               ],
@@ -314,7 +300,7 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
         );
       },
     );
-    
+
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
@@ -323,10 +309,8 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
   }
 
   void _addInvoice() async {
-    final valor = double.tryParse(
-      _valorController.text.replaceAll(',', '.'),
-    );
-    
+    final valor = double.tryParse(_valorController.text.replaceAll(',', '.'));
+
     if (valor == null || valor <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -336,12 +320,14 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
       );
       return;
     }
-    
+
     // Verificar se já existe fatura para este mês/ano
     final existeFatura = _faturasMensais.any(
-      (fatura) => fatura['mes'] == _selectedDate.month && fatura['ano'] == _selectedDate.year,
+      (fatura) =>
+          fatura['mes'] == _selectedDate.month &&
+          fatura['ano'] == _selectedDate.year,
     );
-    
+
     if (existeFatura) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -351,7 +337,7 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
       );
       return;
     }
-    
+
     setState(() {
       _faturasMensais.add({
         'valor': valor,
@@ -360,7 +346,7 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
         'descricao': _descricao,
         'data': Timestamp.now(),
       });
-      
+
       // Ordenar por ano e mês (mais recente primeiro)
       _faturasMensais.sort((a, b) {
         final dateA = DateTime(a['ano'], a['mes']);
@@ -368,15 +354,15 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
         return dateB.compareTo(dateA);
       });
     });
-    
+
     // Limpar campos
     _valorController.clear();
     _descricaoController.clear();
     _descricao = '';
-    
+
     // Salvar no cartão
     await _salvarFaturasMensais();
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Fatura adicionada com sucesso'),
@@ -401,10 +387,7 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(color: Colors.grey),
-            ),
+            child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -412,10 +395,10 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
               setState(() {
                 _faturasMensais.removeAt(index);
               });
-              
+
               // Salvar no cartão
               await _salvarFaturasMensais();
-              
+
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Fatura removida com sucesso'),
@@ -423,13 +406,8 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text(
-              'Remover',
-              style: TextStyle(color: Colors.white),
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Remover', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -437,21 +415,26 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
   }
 
   Future<void> _salvarFaturasMensais() async {
-    final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
-    
+    final financeProvider = Provider.of<FinanceProvider>(
+      context,
+      listen: false,
+    );
+
     print('DEBUG: Salvando faturas mensais: ${_faturasMensais.length}');
     print('DEBUG: Dados das faturas: $_faturasMensais');
-    
+
     // Criar uma cópia do cartão com as faturas atualizadas
     final cartaoAtualizado = widget.cartao.copyWith(
       faturasMensais: _faturasMensais,
     );
-    
-    print('DEBUG: Cartão atualizado - faturas: ${cartaoAtualizado.faturasMensais}');
-    
+
+    print(
+      'DEBUG: Cartão atualizado - faturas: ${cartaoAtualizado.faturasMensais}',
+    );
+
     final resultado = await financeProvider.atualizarCartao(cartaoAtualizado);
     print('DEBUG: Resultado da atualização: $resultado');
-    
+
     if (resultado) {
       _houveMudancas = true;
     }
@@ -465,7 +448,7 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
     final descricaoController = TextEditingController(
       text: fatura['descricao'],
     );
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -495,7 +478,9 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
                 labelStyle: TextStyle(color: Colors.grey),
               ),
               style: const TextStyle(color: Colors.white),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               autofocus: true,
             ),
             const SizedBox(height: 16),
@@ -513,17 +498,14 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(color: Colors.grey),
-            ),
+            child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () async {
               final novoValor = double.tryParse(
                 controller.text.replaceAll(',', '.'),
               );
-              
+
               if (novoValor == null || novoValor <= 0) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -533,9 +515,9 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
                 );
                 return;
               }
-              
+
               Navigator.of(context).pop();
-              
+
               setState(() {
                 _faturasMensais[index] = {
                   'valor': novoValor,
@@ -545,10 +527,10 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
                   'data': fatura['data'],
                 };
               });
-              
+
               // Salvar no cartão
               await _salvarFaturasMensais();
-              
+
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Fatura editada com sucesso'),
@@ -559,10 +541,7 @@ class _MonthlyInvoicesScreenState extends State<MonthlyInvoicesScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF8B5CF6),
             ),
-            child: const Text(
-              'Salvar',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text('Salvar', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

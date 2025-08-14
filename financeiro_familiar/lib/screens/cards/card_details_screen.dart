@@ -9,16 +9,16 @@ import 'monthly_invoices_screen.dart';
 
 class CardDetailsScreen extends StatefulWidget {
   final Cartao cartao;
-  
+
   const CardDetailsScreen({super.key, required this.cartao});
-  
+
   @override
   State<CardDetailsScreen> createState() => _CardDetailsScreenState();
 }
 
 class _CardDetailsScreenState extends State<CardDetailsScreen> {
   late Cartao cartao;
-  
+
   @override
   void initState() {
     super.initState();
@@ -60,17 +60,14 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
 
   Widget _buildCardVisual() {
     final percentualUtilizado = cartao.percentualUtilizado;
-    
+
     return Container(
       height: 220,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            cartao.cor,
-            cartao.cor.withOpacity(0.8),
-          ],
+          colors: [cartao.cor, cartao.cor.withOpacity(0.8)],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
@@ -89,13 +86,10 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(
-                  Icons.credit_card,
-                  color: Colors.white,
-                  size: 32,
-                ),
+                const Icon(Icons.credit_card, color: Colors.white, size: 32),
                 Text(
-                  AppConstants.cartaoBandeiras[cartao.bandeira ?? ''] ?? (cartao.bandeira ?? '').toUpperCase(),
+                  AppConstants.cartaoBandeiras[cartao.bandeira ?? ''] ??
+                      (cartao.bandeira ?? '').toUpperCase(),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -122,10 +116,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                   children: [
                     const Text(
                       'Limite Total',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                     Text(
                       Formatters.formatCurrency(cartao.limite),
@@ -142,10 +133,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                   children: [
                     const Text(
                       'Disponível',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                     Text(
                       Formatters.formatCurrency(cartao.limiteDisponivel),
@@ -168,10 +156,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                   children: [
                     const Text(
                       'Fatura Atual',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                     Text(
                       '${percentualUtilizado.toStringAsFixed(1)}%',
@@ -210,7 +195,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
     final percentualUtilizado = cartao.percentualUtilizado;
     Color statusColor;
     String statusText;
-    
+
     if (percentualUtilizado >= 90) {
       statusColor = Colors.red;
       statusText = 'Limite quase esgotado';
@@ -248,7 +233,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             Row(
               children: [
                 Expanded(
@@ -267,9 +252,9 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             Row(
               children: [
                 Expanded(
@@ -288,9 +273,9 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -301,10 +286,10 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
               child: Row(
                 children: [
                   Icon(
-                    percentualUtilizado >= 90 
-                      ? Icons.warning 
-                      : percentualUtilizado >= 70 
-                        ? Icons.info 
+                    percentualUtilizado >= 90
+                        ? Icons.warning
+                        : percentualUtilizado >= 70
+                        ? Icons.info
                         : Icons.check_circle,
                     color: statusColor,
                     size: 20,
@@ -330,13 +315,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 12,
-          ),
-        ),
+        Text(label, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
         const SizedBox(height: 4),
         Text(
           value,
@@ -353,8 +332,12 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
   Widget _buildDatesInfo() {
     final proximoFechamento = cartao.proximoFechamento;
     final proximoVencimento = cartao.proximoVencimento;
-    final diasParaFechamento = proximoFechamento.difference(DateTime.now()).inDays;
-    final diasParaVencimento = proximoVencimento.difference(DateTime.now()).inDays;
+    final diasParaFechamento = proximoFechamento
+        .difference(DateTime.now())
+        .inDays;
+    final diasParaVencimento = proximoVencimento
+        .difference(DateTime.now())
+        .inDays;
 
     return Card(
       color: const Color(0xFF2A2A2A),
@@ -382,7 +365,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             Row(
               children: [
                 Expanded(
@@ -413,13 +396,15 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          diasParaFechamento > 0 
-                            ? 'Em $diasParaFechamento dias'
-                            : diasParaFechamento == 0
+                          diasParaFechamento > 0
+                              ? 'Em $diasParaFechamento dias'
+                              : diasParaFechamento == 0
                               ? 'Hoje'
                               : 'Próximo mês',
                           style: TextStyle(
-                            color: diasParaFechamento <= 3 ? Colors.orange : Colors.grey[400],
+                            color: diasParaFechamento <= 3
+                                ? Colors.orange
+                                : Colors.grey[400],
                             fontSize: 12,
                           ),
                         ),
@@ -456,19 +441,21 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          diasParaVencimento > 0 
-                            ? 'Em $diasParaVencimento dias'
-                            : diasParaVencimento == 0
+                          diasParaVencimento > 0
+                              ? 'Em $diasParaVencimento dias'
+                              : diasParaVencimento == 0
                               ? 'Hoje'
                               : 'Vencido',
                           style: TextStyle(
-                            color: diasParaVencimento <= 5 
-                              ? Colors.red 
-                              : diasParaVencimento <= 10
+                            color: diasParaVencimento <= 5
+                                ? Colors.red
+                                : diasParaVencimento <= 10
                                 ? Colors.orange
                                 : Colors.grey[400],
                             fontSize: 12,
-                            fontWeight: diasParaVencimento <= 5 ? FontWeight.bold : FontWeight.normal,
+                            fontWeight: diasParaVencimento <= 5
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                       ],
@@ -493,11 +480,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
           children: [
             Row(
               children: [
-                const Icon(
-                  Icons.settings,
-                  color: Color(0xFF8B5CF6),
-                  size: 24,
-                ),
+                const Icon(Icons.settings, color: Color(0xFF8B5CF6), size: 24),
                 const SizedBox(width: 12),
                 const Text(
                   'Ações',
@@ -510,25 +493,25 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             _buildActionButton(
               icon: Icons.edit,
               title: 'Editar Cartão',
               subtitle: 'Alterar informações do cartão',
               onTap: () => _editarCartao(context),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             _buildActionButton(
               icon: Icons.receipt_long,
               title: 'Faturas por Mês',
               subtitle: 'Adicionar e gerenciar faturas mensais',
               onTap: () => _gerenciarFaturasMensais(context),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             _buildActionButton(
               icon: Icons.delete,
               title: 'Excluir Cartão',
@@ -550,7 +533,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
     Color? color,
   }) {
     final buttonColor = color ?? const Color(0xFF8B5CF6);
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -567,11 +550,7 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                 color: buttonColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
-                icon,
-                color: buttonColor,
-                size: 20,
-              ),
+              child: Icon(icon, color: buttonColor, size: 20),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -588,19 +567,12 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
                   ),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: Colors.grey[400], fontSize: 12),
                   ),
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: Colors.grey[400],
-              size: 20,
-            ),
+            Icon(Icons.chevron_right, color: Colors.grey[400], size: 20),
           ],
         ),
       ),
@@ -631,43 +603,35 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(color: Colors.grey),
-            ),
+            child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () async {
               Navigator.of(context).pop();
               Navigator.of(context).pop(); // Voltar para a tela anterior
-              
+
               final financeProvider = Provider.of<FinanceProvider>(
-                context, 
+                context,
                 listen: false,
               );
-              
+
               final sucesso = await financeProvider.deletarCartao(cartao.id!);
-              
+
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      sucesso 
-                        ? 'Cartão excluído com sucesso'
-                        : 'Erro ao excluir cartão',
+                      sucesso
+                          ? 'Cartão excluído com sucesso'
+                          : 'Erro ao excluir cartão',
                     ),
                     backgroundColor: sucesso ? Colors.green : Colors.red,
                   ),
                 );
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text(
-              'Excluir',
-              style: TextStyle(color: Colors.white),
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Excluir', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -680,18 +644,21 @@ class _CardDetailsScreenState extends State<CardDetailsScreen> {
         builder: (context) => MonthlyInvoicesScreen(cartao: cartao),
       ),
     );
-    
+
     // Se houve alteração nas faturas, recarregar os dados
     if (resultado == true) {
-      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+      final financeProvider = Provider.of<FinanceProvider>(
+        context,
+        listen: false,
+      );
       await financeProvider.carregarDados();
-      
+
       // Atualizar o cartão local com os dados mais recentes
       final cartaoAtualizado = financeProvider.cartoes.firstWhere(
         (c) => c.id == cartao.id,
         orElse: () => cartao,
       );
-      
+
       setState(() {
         cartao = cartaoAtualizado;
       });

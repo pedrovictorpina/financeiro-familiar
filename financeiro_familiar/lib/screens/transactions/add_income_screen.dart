@@ -23,7 +23,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descricaoController = TextEditingController();
   final _valorController = TextEditingController();
-  
+
   String? _categoriaId;
   String? _contaId;
   DateTime _dataSelecionada = DateTime.now();
@@ -33,12 +33,14 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Se é modo de edição, preenche os campos
     if (widget.transacao != null) {
       final transacao = widget.transacao!;
       _descricaoController.text = transacao.descricao;
-      _valorController.text = CurrencyInputFormatter.formatValue(transacao.valor);
+      _valorController.text = CurrencyInputFormatter.formatValue(
+        transacao.valor,
+      );
       _categoriaId = transacao.categoriaId;
       _contaId = transacao.contaId;
       _dataSelecionada = transacao.data;
@@ -57,7 +59,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEditMode = widget.transacao != null;
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -79,7 +81,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(TransactionColors.receita),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        TransactionColors.receita,
+                      ),
                     ),
                   )
                 : Text(
@@ -144,7 +148,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _valorController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                           CurrencyInputFormatter(),
@@ -172,7 +178,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira o valor';
                           }
-                          final valor = CurrencyInputFormatter.parseValue(value);
+                          final valor = CurrencyInputFormatter.parseValue(
+                            value,
+                          );
                           if (valor == null || valor <= 0) {
                             return 'Por favor, insira um valor válido';
                           }
@@ -249,11 +257,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                       value: categoria.id,
                       child: Row(
                         children: [
-                          Icon(
-                            categoria.icone,
-                            color: categoria.cor,
-                            size: 20,
-                          ),
+                          Icon(categoria.icone, color: categoria.cor, size: 20),
                           const SizedBox(width: 12),
                           Text(categoria.nome),
                         ],
@@ -375,11 +379,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.repeat,
-                        color: context.iconColor,
-                        size: 20,
-                      ),
+                      Icon(Icons.repeat, color: context.iconColor, size: 20),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -405,7 +405,8 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                       ),
                       Switch(
                         value: _recorrente,
-                        onChanged: (value) => setState(() => _recorrente = value),
+                        onChanged: (value) =>
+                            setState(() => _recorrente = value),
                         activeColor: TransactionColors.receita,
                       ),
                     ],
@@ -439,7 +440,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
         );
       },
     );
-    
+
     if (data != null) {
       setState(() => _dataSelecionada = data);
     }
@@ -453,12 +454,13 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final parsed = CurrencyInputFormatter.parseValue(_valorController.text) ?? 0.0;
+      final parsed =
+          CurrencyInputFormatter.parseValue(_valorController.text) ?? 0.0;
       final valor = parsed;
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final userId = authProvider.user?.uid ?? 'unknown';
       final isEditMode = widget.transacao != null;
-      
+
       final transacao = isEditMode
           ? widget.transacao!.copyWith(
               valor: valor,
@@ -481,7 +483,10 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
               timestamp: DateTime.now(),
             );
 
-      final financeProvider = Provider.of<FinanceProvider>(context, listen: false);
+      final financeProvider = Provider.of<FinanceProvider>(
+        context,
+        listen: false,
+      );
       final success = isEditMode
           ? await financeProvider.atualizarTransacao(transacao)
           : await financeProvider.adicionarTransacao(transacao);
@@ -491,19 +496,24 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
           Navigator.of(context).pop(true);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(isEditMode ? 'Receita atualizada com sucesso!' : 'Receita adicionada com sucesso!'),
+              content: Text(
+                isEditMode
+                    ? 'Receita atualizada com sucesso!'
+                    : 'Receita adicionada com sucesso!',
+              ),
               backgroundColor: TransactionColors.receita,
             ),
           );
         }
       } else {
         if (mounted) {
-          final msg = financeProvider.errorMessage ?? (isEditMode ? 'Erro ao atualizar receita' : 'Erro ao adicionar receita');
+          final msg =
+              financeProvider.errorMessage ??
+              (isEditMode
+                  ? 'Erro ao atualizar receita'
+                  : 'Erro ao adicionar receita');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(msg),
-              backgroundColor: context.errorColor,
-            ),
+            SnackBar(content: Text(msg), backgroundColor: context.errorColor),
           );
         }
       }

@@ -31,18 +31,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     if (!_acceptTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Você deve aceitar os termos de uso'),
-        ),
+        const SnackBar(content: Text('Você deve aceitar os termos de uso')),
       );
       return;
     }
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     final success = await authProvider.signUp(
       _emailController.text.trim(),
       _passwordController.text,
@@ -66,10 +64,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Criar Conta'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Criar Conta'), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -79,7 +74,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 32),
-                
+
                 // Título e subtítulo
                 Text(
                   'Junte-se a nós e organize suas finanças',
@@ -88,9 +83,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 Text(
                   'Crie sua conta e comece a controlar suas finanças em família',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -98,9 +93,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Campo de nome
                 TextFormField(
                   controller: _nameController,
@@ -124,9 +119,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Campo de email
                 TextFormField(
                   controller: _emailController,
@@ -141,15 +136,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Por favor, digite seu email';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(value)) {
                       return 'Digite um email válido';
                     }
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Campo de senha
                 TextFormField(
                   controller: _passwordController,
@@ -161,7 +158,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     prefixIcon: const Icon(Icons.lock_outlined),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                        _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -183,9 +182,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Campo de confirmação de senha
                 TextFormField(
                   controller: _confirmPasswordController,
@@ -198,7 +197,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     prefixIcon: const Icon(Icons.lock_outlined),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                        _obscureConfirmPassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -217,9 +218,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Força da senha
                 if (_passwordController.text.isNotEmpty) ...[
                   Text(
@@ -229,7 +230,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 4),
                   LinearProgressIndicator(
                     value: _getPasswordStrength(_passwordController.text),
-                    backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.surfaceVariant,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       _getPasswordStrengthColor(_passwordController.text),
                     ),
@@ -238,12 +241,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Text(
                     _getPasswordStrengthText(_passwordController.text),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: _getPasswordStrengthColor(_passwordController.text),
+                      color: _getPasswordStrengthColor(
+                        _passwordController.text,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
                 ],
-                
+
                 // Aceitar termos
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,7 +278,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 TextSpan(
                                   text: 'termos de uso',
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                     decoration: TextDecoration.underline,
                                   ),
                                 ),
@@ -281,7 +288,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 TextSpan(
                                   text: 'política de privacidade',
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                     decoration: TextDecoration.underline,
                                   ),
                                 ),
@@ -293,14 +302,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Botão de registro
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, child) {
                     return ElevatedButton(
-                      onPressed: authProvider.isLoading ? null : _handleRegister,
+                      onPressed: authProvider.isLoading
+                          ? null
+                          : _handleRegister,
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size.fromHeight(50),
                       ),
@@ -317,9 +328,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     );
                   },
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Link para login
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -346,28 +357,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   double _getPasswordStrength(String password) {
     if (password.isEmpty) return 0.0;
-    
+
     double strength = 0.0;
-    
+
     // Comprimento
     if (password.length >= 6) strength += 0.2;
     if (password.length >= 8) strength += 0.2;
-    
+
     // Letras minúsculas
     if (password.contains(RegExp(r'[a-z]'))) strength += 0.2;
-    
+
     // Letras maiúsculas
     if (password.contains(RegExp(r'[A-Z]'))) strength += 0.2;
-    
+
     // Números
     if (password.contains(RegExp(r'\d'))) strength += 0.2;
-    
+
     return strength;
   }
 
   Color _getPasswordStrengthColor(String password) {
     final strength = _getPasswordStrength(password);
-    
+
     if (strength <= 0.3) return Colors.red;
     if (strength <= 0.6) return Colors.orange;
     if (strength <= 0.8) return Colors.yellow;
@@ -376,7 +387,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String _getPasswordStrengthText(String password) {
     final strength = _getPasswordStrength(password);
-    
+
     if (strength <= 0.3) return 'Fraca';
     if (strength <= 0.6) return 'Média';
     if (strength <= 0.8) return 'Boa';
